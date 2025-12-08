@@ -18,7 +18,9 @@ Welcome to the comprehensive documentation for the Ragas Homelab Kubernetes clus
 - **GitOps**: Flux v2.7.5
 - **CNI**: Cilium (eBPF, DSR mode)
 - **Ingress**: Envoy Gateway (Gateway API)
+- **Storage**: Ceph CSI (connected to Proxmox Ceph)
 - **Certificates**: cert-manager + Let's Encrypt
+- **CI/CD**: GitHub Actions + Droid AI automation
 
 ## Cluster Nodes
 
@@ -30,6 +32,16 @@ Welcome to the comprehensive documentation for the Ragas Homelab Kubernetes clus
 | talos-worker-1 | Worker | 172.16.1.53 | 8 CPU, 16GB RAM, 200GB |
 
 **Cluster VIP**: 172.16.1.49
+
+## Storage
+
+| PVC | Size | Purpose |
+|-----|------|---------|
+| prometheus-db | 50Gi | Metrics (7d retention) |
+| grafana | 10Gi | Dashboards |
+| alertmanager-db | 5Gi | Alert state |
+
+**Backend**: Proxmox Ceph cluster via ceph-csi-rbd
 
 ## Documentation Sections
 
@@ -64,20 +76,26 @@ Welcome to the comprehensive documentation for the Ragas Homelab Kubernetes clus
 
 ```
 k3s-homelab/
-├── docs/                    # This documentation
+├── .github/
+│   └── workflows/          # CI/CD workflows
+│       ├── validate.yaml   # YAML lint, Kubeconform, Flux Local
+│       ├── droid-review.yaml  # AI code review
+│       ├── droid-fix.yaml  # AI CI auto-fix
+│       └── auto-merge.yaml # Auto-merge dependency PRs
+├── docs/                   # This documentation
 ├── kubernetes/
 │   ├── apps/               # Application deployments
 │   │   ├── cert-manager/   # TLS certificates
 │   │   ├── default/        # Default namespace apps
-│   │   ├── flux-system/    # GitOps components
+│   │   ├── flux-system/    # GitOps + image automation
 │   │   ├── kube-system/    # Core cluster services
-│   │   ├── monitoring/     # Prometheus, Grafana
-│   │   └── network/        # Ingress, DNS
+│   │   ├── monitoring/     # Prometheus, Grafana, Alertmanager
+│   │   ├── network/        # Envoy Gateway, k8s-gateway
+│   │   └── storage/        # Ceph CSI driver
 │   ├── components/         # Shared Kustomize components
-│   └── flux/              # Flux configuration
+│   └── flux/               # Flux bootstrap configuration
 ├── talos/                  # Talos machine configs
-├── bootstrap/              # Initial cluster setup
-└── templates/              # Config generation templates
+└── scripts/                # Helper scripts
 ```
 
 ## Getting Started
