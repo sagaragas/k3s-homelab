@@ -1,0 +1,64 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mkdocs
+  labels:
+    app: mkdocs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mkdocs
+  template:
+    metadata:
+      labels:
+        app: mkdocs
+    spec:
+      containers:
+        - name: mkdocs
+          image: squidfunk/mkdocs-material:9.5
+          ports:
+            - containerPort: 8000
+          command:
+            - mkdocs
+            - serve
+            - --dev-addr=0.0.0.0:8000
+          workingDir: /docs
+          volumeMounts:
+            - name: docs
+              mountPath: /docs
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+      initContainers:
+        - name: git-clone
+          image: alpine/git:latest
+          command:
+            - /bin/sh
+            - -c
+            - |
+              git clone --depth 1 https://github.com/sagaragas/k3s-homelab.git /tmp/repo
+              cp -r /tmp/repo/docs/* /docs/
+              cp /tmp/repo/mkdocs.yml /docs/ 2>/dev/null || echo "No mkdocs.yml, using default"
+          volumeMounts:
+            - name: docs
+              mountPath: /docs
+      volumes:
+        - name: docs
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mkdocs
+spec:
+  selector:
+    app: mkdocs
+  ports:
+    - port: 8000
+      targetPort: 8000
