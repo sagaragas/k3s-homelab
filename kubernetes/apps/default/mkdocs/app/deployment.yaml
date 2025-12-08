@@ -4,17 +4,24 @@ kind: Deployment
 metadata:
   name: mkdocs
   labels:
-    app: mkdocs
+    app.kubernetes.io/name: mkdocs
+    app.kubernetes.io/component: documentation
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mkdocs
+      app.kubernetes.io/name: mkdocs
   template:
     metadata:
       labels:
-        app: mkdocs
+        app.kubernetes.io/name: mkdocs
     spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
       containers:
         - name: mkdocs
           image: squidfunk/mkdocs-material:9.5
@@ -25,6 +32,27 @@ spec:
             - serve
             - --dev-addr=0.0.0.0:8000
           workingDir: /docs
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop: ["ALL"]
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
           volumeMounts:
             - name: docs
               mountPath: /docs
@@ -38,6 +66,12 @@ spec:
       initContainers:
         - name: git-clone
           image: alpine/git:latest
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 1000
+            capabilities:
+              drop: ["ALL"]
           command:
             - /bin/sh
             - -c
@@ -58,7 +92,7 @@ metadata:
   name: mkdocs
 spec:
   selector:
-    app: mkdocs
+    app.kubernetes.io/name: mkdocs
   ports:
     - port: 8000
       targetPort: 8000
