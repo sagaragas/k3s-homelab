@@ -1,0 +1,12 @@
+---
+# Uncomment and configure to enable Discord notifications
+# apiVersion: notification.toolkit.fluxcd.io/v1beta3
+# kind: Provider
+# metadata:
+#   name: discord
+#   namespace: flux-system
+# spec:
+#   type: discord
+#   address: https://discord.com/api/webhooks/...
+#   secretRef:
+#     name: discord-webhook

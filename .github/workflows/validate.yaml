@@ -1,0 +1,78 @@
+---
+name: Validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  yaml-lint:
+    name: YAML Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: YAML Lint
+        uses: ibiqlik/action-yamllint@v3
+        with:
+          config_file: .yamllint.yaml
+          file_or_dir: kubernetes/
+          strict: false
+
+  kubeconform:
+    name: Kubeconform
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flux CLI
+        uses: fluxcd/flux2/action@main
+
+      - name: Setup kubeconform
+        uses: yokawasa/action-setup-kube-tools@v0.11.2
+        with:
+          setup-tools: kubeconform
+          kubeconform: 0.6.7
+
+      - name: Run kubeconform
+        shell: bash
+        run: |
+          find kubernetes -name '*.yaml' -type f \
+            ! -name '*.sops.yaml' \
+            ! -name 'kustomization.yaml' \
+            ! -path '*/components/*' \
+            -print0 | \
+          xargs -0 kubeconform \
+            -strict \
+            -ignore-missing-schemas \
+            -skip Secret,SopsSecret \
+            -kubernetes-version 1.34.0 \
+            -summary
+
+  flux-validate:
+    name: Flux Validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flux CLI
+        uses: fluxcd/flux2/action@main
+
+      - name: Validate Flux resources
+        run: |
+          flux check --pre
+          echo "---"
+          echo "Validating Flux resources..."
+          find kubernetes -name '*.yaml' -type f \
+            ! -name '*.sops.yaml' \
+            -print0 | \
+          xargs -0 -I{} sh -c 'flux validate --file {} || true'

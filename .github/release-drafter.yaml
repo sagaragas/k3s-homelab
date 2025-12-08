@@ -1,0 +1,70 @@
+---
+name-template: "v$RESOLVED_VERSION"
+tag-template: "v$RESOLVED_VERSION"
+template: |
+  ## Changes
+
+  $CHANGES
+
+  **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION
+
+categories:
+  - title: "🚀 Features"
+    labels:
+      - feature
+      - enhancement
+      - type/minor
+  - title: "🐛 Bug Fixes"
+    labels:
+      - fix
+      - bugfix
+      - type/patch
+  - title: "📦 Dependencies"
+    labels:
+      - dependencies
+      - renovate/container
+      - renovate/helm
+  - title: "📝 Documentation"
+    labels:
+      - documentation
+      - area/docs
+  - title: "🔧 Maintenance"
+    labels:
+      - chore
+      - maintenance
+      - type/digest
+
+change-template: "- $TITLE @$AUTHOR (#$NUMBER)"
+change-title-escapes: '\<*_&'
+
+version-resolver:
+  major:
+    labels:
+      - type/major
+      - breaking
+  minor:
+    labels:
+      - type/minor
+      - feature
+      - enhancement
+  patch:
+    labels:
+      - type/patch
+      - fix
+      - bugfix
+  default: patch
+
+autolabeler:
+  - label: area/kubernetes
+    files:
+      - kubernetes/**/*
+  - label: area/docs
+    files:
+      - docs/**/*
+      - "*.md"
+  - label: area/ci
+    files:
+      - .github/**/*
+
+exclude-labels:
+  - skip-changelog

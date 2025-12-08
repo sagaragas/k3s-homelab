@@ -1,0 +1,44 @@
+---
+# Pull request labeler configuration
+
+area/kubernetes:
+  - changed-files:
+      - any-glob-to-any-file: kubernetes/**
+
+area/docs:
+  - changed-files:
+      - any-glob-to-any-file:
+          - docs/**
+          - "*.md"
+
+area/ci:
+  - changed-files:
+      - any-glob-to-any-file: .github/**
+
+area/talos:
+  - changed-files:
+      - any-glob-to-any-file: talos/**
+
+area/apps:
+  - changed-files:
+      - any-glob-to-any-file: kubernetes/apps/**
+
+area/flux:
+  - changed-files:
+      - any-glob-to-any-file:
+          - kubernetes/flux/**
+          - kubernetes/apps/flux-system/**
+
+area/monitoring:
+  - changed-files:
+      - any-glob-to-any-file: kubernetes/apps/monitoring/**
+
+area/network:
+  - changed-files:
+      - any-glob-to-any-file: kubernetes/apps/network/**
+
+area/security:
+  - changed-files:
+      - any-glob-to-any-file:
+          - kubernetes/apps/cert-manager/**
+          - "**/*.sops.yaml"

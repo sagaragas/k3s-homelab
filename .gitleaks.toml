@@ -1,0 +1,10 @@
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Allowlist for homelab repo"
+paths = [
+    '''\.sops\.ya?ml$''',
+    '''talsecret\.sops\.ya?ml$''',
+    '''talos/.*\.ya?ml$''',
+]
