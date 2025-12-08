@@ -40,6 +40,8 @@ spec:
       enabled: true
       defaultDashboardsEnabled: true
       defaultDashboardsTimezone: America/Los_Angeles
+      deploymentStrategy:
+        type: Recreate
       admin:
         existingSecret: grafana-admin
         userKey: admin-user
