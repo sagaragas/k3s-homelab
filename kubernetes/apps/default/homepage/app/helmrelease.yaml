@@ -1,0 +1,139 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: homepage
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: homepage
+      version: 2.0.1
+      sourceRef:
+        kind: HelmRepository
+        name: jameswynn
+        namespace: flux-system
+  values:
+    image:
+      repository: ghcr.io/gethomepage/homepage
+      tag: v0.9.13
+    
+    enableRbac: true
+    
+    serviceAccount:
+      create: true
+      name: homepage
+    
+    service:
+      main:
+        ports:
+          http:
+            port: 3000
+    
+    ingress:
+      main:
+        enabled: false  # Using Gateway API instead
+    
+    config:
+      bookmarks:
+        - Developer:
+            - Github:
+                - abbr: GH
+                  href: https://github.com/sagaragas
+            - Cloudflare:
+                - abbr: CF
+                  href: https://dash.cloudflare.com
+        - Infrastructure:
+            - Proxmox:
+                - abbr: PVE
+                  href: https://172.16.1.2:8006
+            - AdGuard:
+                - abbr: AG
+                  href: http://172.16.1.11
+            - Technitium:
+                - abbr: DNS
+                  href: http://172.16.1.10:5380
+      
+      services:
+        - Kubernetes:
+            - Flux:
+                icon: flux-cd
+                href: https://github.com/sagaragas/k3s-homelab
+                description: GitOps Repository
+            - Grafana:
+                icon: grafana
+                href: https://grafana.ragas.cc
+                description: Monitoring Dashboard
+            - Documentation:
+                icon: bookstack
+                href: https://docs.ragas.cc
+                description: Homelab Docs
+        
+        - Media:
+            - Plex:
+                icon: plex
+                href: http://172.16.1.33:32400
+                description: Media Server
+            - Jellyfin:
+                icon: jellyfin
+                href: http://172.16.1.30:8096
+                description: Media Server
+            - Sonarr:
+                icon: sonarr
+                href: http://172.16.1.31:8989
+                description: TV Shows
+            - Radarr:
+                icon: radarr
+                href: http://172.16.1.31:7878
+                description: Movies
+        
+        - Infrastructure:
+            - Proxmox:
+                icon: proxmox
+                href: https://172.16.1.2:8006
+                description: Hypervisor Cluster
+            - TrueNAS:
+                icon: truenas
+                href: http://172.16.1.250
+                description: Network Storage
+            - UniFi:
+                icon: unifi
+                href: https://172.16.1.253:8443
+                description: Network Controller
+      
+      widgets:
+        - kubernetes:
+            cluster:
+              show: true
+              cpu: true
+              memory: true
+              showLabel: true
+              label: "Talos Cluster"
+            nodes:
+              show: true
+              cpu: true
+              memory: true
+              showLabel: true
+        - datetime:
+            text_size: xl
+            format:
+              dateStyle: long
+              timeStyle: short
+              hourCycle: h12
+      
+      settings:
+        title: Ragas Homelab
+        favicon: https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/png/heimdall.png
+        theme: dark
+        color: slate
+        headerStyle: clean
+        layout:
+          Kubernetes:
+            style: row
+            columns: 3
+          Media:
+            style: row
+            columns: 4
+          Infrastructure:
+            style: row
+            columns: 3
