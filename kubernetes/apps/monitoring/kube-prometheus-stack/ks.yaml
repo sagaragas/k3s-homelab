@@ -16,7 +16,7 @@ spec:
   prune: true
   sourceRef:
     kind: GitRepository
-    name: k3s-homelab
+    name: flux-system
   wait: true
   interval: 30m
   timeout: 15m
