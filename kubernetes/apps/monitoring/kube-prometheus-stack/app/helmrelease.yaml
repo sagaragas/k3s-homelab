@@ -12,7 +12,6 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: prometheus-community
-        namespace: flux-system
   values:
     crds:
       enabled: true
