@@ -2,24 +2,25 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: kube-prometheus-stack
+  name: ceph-csi-rbd
   namespace: flux-system
 spec:
-  targetNamespace: monitoring
+  targetNamespace: storage
   commonMetadata:
     labels:
-      app.kubernetes.io/name: kube-prometheus-stack
+      app.kubernetes.io/name: ceph-csi-rbd
   dependsOn:
-    - name: ceph-csi-rbd
+    - name: cilium
       namespace: flux-system
-  path: ./kubernetes/apps/monitoring/kube-prometheus-stack/app
+  path: ./kubernetes/apps/storage/ceph-csi-rbd/app
   prune: true
   sourceRef:
     kind: GitRepository
     name: k3s-homelab
   wait: true
   interval: 30m
-  timeout: 15m
+  retryInterval: 1m
+  timeout: 10m
   decryption:
     provider: sops
     secretRef:
