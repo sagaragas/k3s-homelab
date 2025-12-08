@@ -19,10 +19,8 @@ spec:
         email: flux@ragas.cc
       messageTemplate: |
         chore(container): update images
-
-        {{range $image, $_ := .Changed}}
-        - {{$image.Repository}}:{{$image.PreviousTag}} → {{$image.Tag}}
-        {{end}}
+        
+        Automated image update
     push:
       branch: main
   update:
