@@ -1,234 +1,204 @@
-# Homelab Kubernetes Cluster
+<div align="center">
 
-Production-grade Kubernetes cluster running on Proxmox VE with Talos Linux, managed via GitOps.
+# 🏠 Homelab Kubernetes
 
-## Overview
+### Production-grade Kubernetes on Proxmox with Talos Linux & GitOps
 
-| Component | Details |
-|-----------|---------|
-| **OS** | [Talos Linux](https://www.talos.dev/) v1.11.5 |
-| **Kubernetes** | v1.34.2 |
-| **CNI** | [Cilium](https://cilium.io/) v1.18.4 |
-| **GitOps** | [Flux](https://fluxcd.io/) v0.36.0 |
-| **Secrets** | [SOPS](https://github.com/getsops/sops) with Age encryption |
-| **Ingress** | [Envoy Gateway](https://gateway.envoyproxy.io/) v1.6.1 |
-| **Certificates** | [cert-manager](https://cert-manager.io/) v1.19.1 with Let's Encrypt |
+[![Talos](https://img.shields.io/badge/Talos-v1.11.5-orange?style=for-the-badge&logo=talos)](https://www.talos.dev/)
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-v1.34.2-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)](https://kubernetes.io/)
+[![Flux](https://img.shields.io/badge/Flux-v0.36.0-5468FF?style=for-the-badge&logo=flux&logoColor=white)](https://fluxcd.io/)
+[![Renovate](https://img.shields.io/badge/Renovate-enabled-brightgreen?style=for-the-badge&logo=renovatebot&logoColor=white)](https://www.mend.io/renovate/)
 
-## Cluster Architecture
+</div>
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                      Proxmox VE Cluster                         │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐              │
-│  │    pve1     │  │    pve2     │  │    pve3     │              │
-│  │  (ceph)     │  │  (ceph)     │  │  (ceph)     │              │
-│  └─────────────┘  └─────────────┘  └─────────────┘              │
-│         │               │               │                       │
-│  ┌──────┴───────────────┴───────────────┴──────┐                │
-│  │              Talos Kubernetes               │                │
-│  │  ┌─────────┐ ┌─────────┐ ┌─────────┐       │                │
-│  │  │ cp-1    │ │ cp-2    │ │ cp-3    │ ← HA  │                │
-│  │  │ control │ │ control │ │ control │       │                │
-│  │  └─────────┘ └─────────┘ └─────────┘       │                │
-│  │  ┌─────────────────────────────────┐       │                │
-│  │  │          worker-1               │       │                │
-│  │  └─────────────────────────────────┘       │                │
-│  └─────────────────────────────────────────────┘                │
-└─────────────────────────────────────────────────────────────────┘
-```
+---
 
-### Nodes
+## 📖 Overview
 
-| Node | Role | IP | Resources |
-|------|------|-----|-----------|
-| talos-cp-1 | Control Plane | 172.16.1.50 | 4 CPU, 8GB RAM |
-| talos-cp-2 | Control Plane | 172.16.1.51 | 4 CPU, 8GB RAM |
-| talos-cp-3 | Control Plane | 172.16.1.52 | 4 CPU, 8GB RAM |
-| talos-worker-1 | Worker | 172.16.1.53 | 4 CPU, 16GB RAM |
+This repository contains Infrastructure as Code for my personal Kubernetes homelab cluster. The cluster runs on [Talos Linux](https://www.talos.dev/) - an immutable, secure OS built specifically for Kubernetes - deployed on Proxmox VE virtual machines.
 
-**Cluster VIP**: `172.16.1.49`
+All cluster configuration is managed declaratively through [Flux](https://fluxcd.io/) GitOps, with secrets encrypted using [SOPS](https://github.com/getsops/sops) and [Age](https://github.com/FiloSottile/age).
 
-## Network
+## 🖥️ Hardware
 
-| Service | IP | Purpose |
-|---------|-----|---------|
-| Cluster VIP | 172.16.1.49 | Kubernetes API |
-| k8s-gateway | 172.16.1.60 | Split-horizon DNS |
-| envoy-internal | 172.16.1.61 | Internal ingress |
-| envoy-external | 172.16.1.62 | External ingress (unused) |
+The cluster runs on a 3-node Proxmox VE cluster with Ceph storage:
 
-### DNS Configuration
+| Node | CPU | RAM | Storage | Role |
+|:-----|:----|:----|:--------|:-----|
+| pve1 | Intel i5 | 64GB | 2TB NVMe | Proxmox + Ceph |
+| pve2 | Intel i5 | 64GB | 2TB NVMe | Proxmox + Ceph |
+| pve3 | Intel i5 | 64GB | 2TB NVMe | Proxmox + Ceph |
 
-Configure your DNS server (AdGuard Home, Pi-hole, etc.) to forward `*.ragas.cc` queries to `172.16.1.60`.
+## 🌐 Cluster
 
-## Applications
+<table>
+<tr><th>Nodes</th><th>Network</th></tr>
+<tr><td>
 
-### Core Infrastructure
+| Name | Role | IP |
+|:-----|:-----|:---|
+| talos-cp-1 | Control Plane | `172.16.1.50` |
+| talos-cp-2 | Control Plane | `172.16.1.51` |
+| talos-cp-3 | Control Plane | `172.16.1.52` |
+| talos-worker-1 | Worker | `172.16.1.53` |
 
-| App | Version | Namespace | Description |
-|-----|---------|-----------|-------------|
-| Cilium | 1.18.4 | kube-system | CNI with L2 LoadBalancer |
-| CoreDNS | 1.45.0 | kube-system | Cluster DNS |
-| cert-manager | 1.19.1 | cert-manager | TLS certificate management |
-| Envoy Gateway | 1.6.1 | network | Gateway API implementation |
-| k8s-gateway | 3.2.8 | network | External DNS for split-horizon |
-| Flux | 0.36.0 | flux-system | GitOps operator |
-| Spegel | 0.5.1 | kube-system | P2P image distribution |
-| Reloader | 2.2.5 | kube-system | Secret/ConfigMap reload |
-| Metrics Server | 3.13.0 | kube-system | Resource metrics |
+</td><td>
 
-### Applications
+| Service | IP |
+|:--------|:---|
+| Cluster VIP | `172.16.1.49` |
+| DNS Gateway | `172.16.1.60` |
+| Internal Ingress | `172.16.1.61` |
+| External Ingress | `172.16.1.62` |
+
+</td></tr>
+</table>
+
+## ⚙️ Core Components
+
+<table>
+<tr><td width="50%">
+
+### 🔧 Infrastructure
+| Component | Purpose |
+|:----------|:--------|
+| [Cilium](https://cilium.io/) | CNI & Load Balancer |
+| [CoreDNS](https://coredns.io/) | Cluster DNS |
+| [Spegel](https://github.com/spegel-org/spegel) | P2P Image Registry |
+| [Reloader](https://github.com/stakater/Reloader) | Secret Reloading |
+
+</td><td>
+
+### 🔐 Security & Networking
+| Component | Purpose |
+|:----------|:--------|
+| [cert-manager](https://cert-manager.io/) | TLS Certificates |
+| [Envoy Gateway](https://gateway.envoyproxy.io/) | Ingress Controller |
+| [k8s-gateway](https://github.com/ori-edge/k8s_gateway) | Split-horizon DNS |
+| [SOPS](https://github.com/getsops/sops) | Secret Encryption |
+
+</td></tr>
+</table>
+
+## 📦 Applications
 
 | App | URL | Description |
-|-----|-----|-------------|
-| Homepage | https://home.ragas.cc | Dashboard |
-| Grafana | https://grafana.ragas.cc | Monitoring dashboards |
-| Prometheus | https://prometheus.ragas.cc | Metrics collection |
-| Alertmanager | https://alertmanager.ragas.cc | Alert management |
+|:----|:----|:------------|
+| 🏠 **Homepage** | [home.ragas.cc](https://home.ragas.cc) | Dashboard with service widgets |
+| 📊 **Grafana** | [grafana.ragas.cc](https://grafana.ragas.cc) | Monitoring dashboards |
+| 📈 **Prometheus** | [prometheus.ragas.cc](https://prometheus.ragas.cc) | Metrics & alerting |
+| 🔔 **Alertmanager** | [alertmanager.ragas.cc](https://alertmanager.ragas.cc) | Alert management |
+| 📚 **Docs** | [docs.ragas.cc](https://docs.ragas.cc) | Documentation site |
 
-## Repository Structure
+## 📂 Repository Structure
 
 ```
-├── docs/                    # Documentation (MkDocs)
-├── kubernetes/
-│   ├── apps/               # Application deployments
-│   │   ├── cert-manager/   # TLS certificates
-│   │   ├── default/        # User applications
-│   │   ├── flux-system/    # GitOps
-│   │   ├── kube-system/    # Core services
-│   │   ├── monitoring/     # Prometheus stack
-│   │   └── network/        # Ingress & DNS
-│   ├── bootstrap/          # Initial cluster setup
-│   │   ├── helmfile.yaml   # Bootstrap apps
-│   │   └── talos/          # Talos configuration
-│   ├── components/         # Reusable Kustomize components
-│   └── flux/               # Flux configuration
-├── scripts/                # Utility scripts
-└── talos/                  # Generated Talos configs
+📁 kubernetes/
+├── 📁 apps/                 # Application deployments
+│   ├── 📁 cert-manager/     # TLS certificates
+│   ├── 📁 default/          # User applications
+│   ├── 📁 flux-system/      # GitOps operator
+│   ├── 📁 kube-system/      # Core services
+│   ├── 📁 monitoring/       # Prometheus stack
+│   └── 📁 network/          # Ingress & DNS
+├── 📁 bootstrap/            # Initial cluster setup
+│   ├── 📄 helmfile.yaml     # Bootstrap apps
+│   └── 📁 talos/            # Talos machine configs
+├── 📁 components/           # Reusable Kustomize components
+└── 📁 flux/                 # Flux configuration
+📁 docs/                     # MkDocs documentation
+📁 talos/                    # Generated Talos configs
 ```
 
-## Quick Start
+## 🚀 Quick Start
 
-### Prerequisites
+<details>
+<summary>Prerequisites</summary>
 
-- [mise](https://mise.jdx.dev/) - Tool version manager
-- [kubectl](https://kubernetes.io/docs/tasks/tools/) - Kubernetes CLI
-- [flux](https://fluxcd.io/flux/cmd/) - Flux CLI
-- [talosctl](https://www.talos.dev/latest/talos-guides/install/talosctl/) - Talos CLI
-- [sops](https://github.com/getsops/sops) - Secrets encryption
-- [age](https://github.com/FiloSottile/age) - Encryption tool
-
-### Install Tools
+Install tools via [mise](https://mise.jdx.dev/):
 
 ```bash
-mise trust
-mise install
+mise trust && mise install
 ```
 
-### Access Cluster
+Or install manually:
+- `kubectl` - Kubernetes CLI
+- `flux` - Flux CLI  
+- `talosctl` - Talos CLI
+- `sops` - Secret encryption
+- `age` - Encryption tool
+
+</details>
+
+<details>
+<summary>Access Cluster</summary>
 
 ```bash
 export KUBECONFIG=/path/to/kubeconfig
+
+# Verify access
 kubectl get nodes
 ```
 
-### Useful Commands
+</details>
+
+<details>
+<summary>Common Commands</summary>
 
 ```bash
-# Check Flux status
+# Flux status
 flux get ks -A
 flux get hr -A
 
-# Force reconciliation
+# Force sync
 flux reconcile ks cluster-apps --with-source
 
-# Check Cilium
+# Cilium status  
 cilium status
 
-# View logs
-kubectl logs -n <namespace> <pod> -f
-
-# Decrypt a secret
+# Decrypt secret
 sops -d kubernetes/apps/cert-manager/cert-manager/app/secret.sops.yaml
 ```
 
-## GitOps Workflow
+</details>
 
-1. Make changes to manifests in `kubernetes/apps/`
-2. Commit and push to GitHub
-3. Flux automatically detects changes and reconciles
+## 🔄 GitOps Workflow
 
-```bash
-# Watch reconciliation
-flux get ks -A --watch
-
-# Manual sync
-flux reconcile source git flux-system
+```mermaid
+graph LR
+    A[Git Push] --> B[GitHub]
+    B --> C[Flux Detects Change]
+    C --> D[Reconcile Cluster]
+    D --> E[Apps Updated]
 ```
 
-## Adding Applications
+1. **Edit** manifests in `kubernetes/apps/`
+2. **Commit** and push to GitHub
+3. **Flux** automatically reconciles the cluster
 
-1. Create app directory under `kubernetes/apps/<namespace>/<app-name>/`
-2. Add HelmRelease or Kustomization
-3. Create `ks.yaml` for Flux Kustomization
-4. Add to parent `kustomization.yaml`
-5. Commit and push
+## 📚 Documentation
 
-See [docs/guides/deploy-service.md](docs/guides/deploy-service.md) for detailed instructions.
+Full documentation is available in the [`docs/`](docs/) directory:
 
-## TLS Certificates
+| Section | Description |
+|:--------|:------------|
+| [Architecture](docs/architecture/) | Cluster design, networking, storage, security |
+| [Services](docs/services/) | Application-specific documentation |
+| [Guides](docs/guides/) | How-to guides for common tasks |
+| [Runbooks](docs/runbooks/) | Operational procedures |
 
-All services use Let's Encrypt certificates via cert-manager with Cloudflare DNS-01 challenge.
+## 🙏 Acknowledgments
 
-```yaml
-# Add to HTTPRoute
-metadata:
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-production
-```
+This cluster is built on the excellent work of:
 
-## Monitoring
+- [onedr0p/cluster-template](https://github.com/onedr0p/cluster-template) - GitOps template
+- [Talos Linux](https://www.talos.dev/) - Secure Kubernetes OS
+- [Flux](https://fluxcd.io/) - GitOps toolkit
 
-Access Grafana at https://grafana.ragas.cc (default: admin/admin)
+---
 
-Pre-configured dashboards:
-- Kubernetes cluster overview
-- Node metrics
-- Pod metrics
-- Cilium networking
+<div align="center">
 
-## Backup & Recovery
+**[Documentation](https://docs.ragas.cc)** · **[Architecture](docs/architecture/)** · **[Guides](docs/guides/)**
 
-### etcd Snapshots
-
-```bash
-talosctl -n 172.16.1.50 etcd snapshot db.snapshot
-```
-
-### Flux Recovery
-
-```bash
-# Re-bootstrap from git
-flux bootstrap github \
-  --owner=sagaragas \
-  --repository=k3s-homelab \
-  --branch=main \
-  --path=kubernetes/flux
-```
-
-## Documentation
-
-Full documentation available at [docs/](docs/) or https://docs.ragas.cc
-
-- [Architecture](docs/architecture/)
-- [Services](docs/services/)
-- [Guides](docs/guides/)
-- [Runbooks](docs/runbooks/)
-
-## Credits
-
-Based on [onedr0p/cluster-template](https://github.com/onedr0p/cluster-template) - a battle-tested GitOps template for Talos Kubernetes.
-
-## License
-
-MIT
+</div>
