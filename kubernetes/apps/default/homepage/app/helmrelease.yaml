@@ -12,7 +12,6 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: jameswynn
-        namespace: flux-system
   values:
     image:
       repository: ghcr.io/gethomepage/homepage
