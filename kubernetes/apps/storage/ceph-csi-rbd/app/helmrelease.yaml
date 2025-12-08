@@ -12,7 +12,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: ceph-csi
-        namespace: flux-system
+        namespace: storage
   values:
     csiConfig:
       - clusterID: "eb53e78d-4b17-4e8c-8186-cd82025a8917"

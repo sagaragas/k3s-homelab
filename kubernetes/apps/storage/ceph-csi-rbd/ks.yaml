@@ -11,7 +11,7 @@ spec:
       app.kubernetes.io/name: ceph-csi-rbd
   dependsOn:
     - name: cilium
-      namespace: flux-system
+      namespace: kube-system
   path: ./kubernetes/apps/storage/ceph-csi-rbd/app
   prune: true
   sourceRef:
