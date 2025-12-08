@@ -5,7 +5,7 @@ all:
     
     # k3s configuration
     k3s_version: v1.31.3+k3s1
-    k3s_token: "{{ lookup('env', 'K3S_TOKEN') | default('k3s-homelab-token', true) }}"
+    k3s_token: "{{ lookup('env', 'K3S_TOKEN') }}"  # Set K3S_TOKEN env var
     
     # Cluster networking
     k3s_vip: 172.16.1.49
