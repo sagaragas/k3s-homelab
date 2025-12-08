@@ -19,7 +19,7 @@ spec:
         email: flux@ragas.cc
       messageTemplate: |
         chore(container): update images
-        
+
         Automated image update
     push:
       branch: main
