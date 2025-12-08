@@ -1,34 +1,48 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended",
-    "docker:enableMajor",
-    ":disableRateLimiting",
-    ":semanticCommits"
+  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
+  extends: [
+    'config:recommended',
+    'docker:enableMajor',
+    ':disableRateLimiting',
+    ':semanticCommits',
   ],
-  "dependencyDashboard": true,
-  "dependencyDashboardTitle": "Renovate Dashboard",
-  "suppressNotifications": ["prEditedNotification"],
-  "flux": {
-    "fileMatch": ["kubernetes/.+\\.ya?ml$"]
+  dependencyDashboard: true,
+  dependencyDashboardTitle: 'Renovate Dashboard',
+  suppressNotifications: [
+    'prEditedNotification',
+  ],
+  flux: {
+    managerFilePatterns: [
+      '/kubernetes/.+\\.ya?ml$/',
+    ],
   },
-  "helm-values": {
-    "fileMatch": ["kubernetes/.+\\.ya?ml$"]
+  'helm-values': {
+    managerFilePatterns: [
+      '/kubernetes/.+\\.ya?ml$/',
+    ],
   },
-  "kubernetes": {
-    "fileMatch": ["kubernetes/.+\\.ya?ml$"]
+  kubernetes: {
+    managerFilePatterns: [
+      '/kubernetes/.+\\.ya?ml$/',
+    ],
   },
-  "packageRules": [
+  packageRules: [
     {
-      "description": "Auto-merge patch updates",
-      "matchUpdateTypes": ["patch"],
-      "automerge": true,
-      "automergeType": "pr"
+      description: 'Auto-merge patch updates',
+      matchUpdateTypes: [
+        'patch',
+      ],
+      automerge: true,
+      automergeType: 'pr',
     },
     {
-      "description": "Group infrastructure updates",
-      "matchPackagePatterns": ["cert-manager", "external-dns", "traefik"],
-      "groupName": "infrastructure"
-    }
-  ]
+      description: 'Group infrastructure updates',
+      groupName: 'infrastructure',
+      matchPackageNames: [
+        '/cert-manager/',
+        '/external-dns/',
+        '/traefik/',
+      ],
+    },
+  ],
 }
