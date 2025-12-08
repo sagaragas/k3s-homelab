@@ -1,0 +1,95 @@
+version: '3'
+
+vars:
+  KUBECONFIG: ~/.kube/config
+  K3S_VIP: 172.16.1.49
+
+tasks:
+  # Terraform tasks
+  tf-init:
+    desc: Initialize Terraform
+    dir: terraform/nodes
+    cmds:
+      - tofu init
+
+  tf-plan:
+    desc: Plan k3s VM changes
+    dir: terraform/nodes
+    cmds:
+      - tofu plan
+
+  tf-apply:
+    desc: Apply k3s VM changes
+    dir: terraform/nodes
+    cmds:
+      - tofu apply
+
+  # Ansible tasks
+  k3s-install:
+    desc: Install k3s cluster
+    dir: ansible
+    cmds:
+      - ansible-playbook -i inventory/k3s.yml playbooks/k3s-install.yml
+
+  k3s-upgrade:
+    desc: Upgrade k3s cluster
+    dir: ansible
+    cmds:
+      - ansible-playbook -i inventory/k3s.yml playbooks/k3s-upgrade.yml
+
+  # Flux tasks
+  flux-bootstrap:
+    desc: Bootstrap Flux (run once)
+    cmds:
+      - |
+        flux bootstrap github \
+          --owner=sagaragas \
+          --repository=k3s-homelab \
+          --branch=main \
+          --path=kubernetes \
+          --personal
+
+  flux-reconcile:
+    desc: Force Flux reconciliation
+    cmds:
+      - flux reconcile kustomization flux-system --with-source
+
+  flux-status:
+    desc: Show Flux status
+    cmds:
+      - flux get all -A
+
+  # SOPS tasks
+  sops-encrypt:
+    desc: Encrypt a file with SOPS
+    cmds:
+      - sops --encrypt --in-place {{.CLI_ARGS}}
+
+  sops-decrypt:
+    desc: Decrypt a file with SOPS (view only)
+    cmds:
+      - sops --decrypt {{.CLI_ARGS}}
+
+  # Kubernetes tasks
+  pods:
+    desc: List all pods
+    cmds:
+      - kubectl get pods -A
+
+  nodes:
+    desc: List cluster nodes
+    cmds:
+      - kubectl get nodes -o wide
+
+  events:
+    desc: Show recent events
+    cmds:
+      - kubectl get events -A --sort-by='.lastTimestamp' | tail -20
+
+  # Utility tasks
+  kubeconfig:
+    desc: Copy kubeconfig from first control plane
+    cmds:
+      - scp root@172.16.1.50:/etc/rancher/k3s/k3s.yaml ~/.kube/config
+      - sed -i 's/127.0.0.1/{{.K3S_VIP}}/g' ~/.kube/config
+      - chmod 600 ~/.kube/config

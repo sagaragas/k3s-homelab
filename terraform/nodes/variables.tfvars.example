@@ -1,0 +1,7 @@
+# Copy this file to variables.tfvars and fill in the values
+# DO NOT commit variables.tfvars to git
+
+proxmox_api_url          = "https://172.16.1.2:8006/api2/json"
+proxmox_api_token_id     = "root@pam!terraform"
+proxmox_api_token_secret = "your-token-secret-here"
+ssh_public_key           = "ssh-ed25519 AAAA... your-key-here"

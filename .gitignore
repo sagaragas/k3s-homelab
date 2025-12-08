@@ -1,0 +1,21 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+!*.tfvars.example
+
+# SOPS
+*.decrypted.*
+
+# Kubernetes
+kubeconfig
+*.kubeconfig
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store

@@ -1,0 +1,34 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "docker:enableMajor",
+    ":disableRateLimiting",
+    ":semanticCommits"
+  ],
+  "dependencyDashboard": true,
+  "dependencyDashboardTitle": "Renovate Dashboard",
+  "suppressNotifications": ["prEditedNotification"],
+  "flux": {
+    "fileMatch": ["kubernetes/.+\\.ya?ml$"]
+  },
+  "helm-values": {
+    "fileMatch": ["kubernetes/.+\\.ya?ml$"]
+  },
+  "kubernetes": {
+    "fileMatch": ["kubernetes/.+\\.ya?ml$"]
+  },
+  "packageRules": [
+    {
+      "description": "Auto-merge patch updates",
+      "matchUpdateTypes": ["patch"],
+      "automerge": true,
+      "automergeType": "pr"
+    },
+    {
+      "description": "Group infrastructure updates",
+      "matchPackagePatterns": ["cert-manager", "external-dns", "traefik"],
+      "groupName": "infrastructure"
+    }
+  ]
+}

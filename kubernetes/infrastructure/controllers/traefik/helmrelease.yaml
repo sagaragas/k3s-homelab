@@ -1,0 +1,72 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: traefik
+  namespace: traefik
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: traefik
+      version: "32.x"
+      sourceRef:
+        kind: HelmRepository
+        name: traefik
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  values:
+    deployment:
+      replicas: 2
+    
+    service:
+      type: LoadBalancer
+      spec:
+        loadBalancerIP: 172.16.1.60
+    
+    ingressClass:
+      enabled: true
+      isDefaultClass: true
+    
+    ingressRoute:
+      dashboard:
+        enabled: true
+        matchRule: Host(`traefik.ragas.cc`)
+        entryPoints:
+          - websecure
+        middlewares: []
+    
+    ports:
+      web:
+        redirectTo:
+          port: websecure
+      websecure:
+        tls:
+          enabled: true
+    
+    providers:
+      kubernetesCRD:
+        enabled: true
+        allowCrossNamespace: true
+      kubernetesIngress:
+        enabled: true
+        publishedService:
+          enabled: true
+    
+    logs:
+      general:
+        level: INFO
+      access:
+        enabled: true
+    
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
