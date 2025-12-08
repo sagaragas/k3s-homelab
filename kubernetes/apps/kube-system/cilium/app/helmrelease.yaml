@@ -55,11 +55,23 @@ spec:
           enabled: true
       replicas: 1
       rollOutPods: true
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          memory: 512Mi
     prometheus:
       enabled: true
       serviceMonitor:
         enabled: true
         trustCRDsExist: true
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        memory: 1Gi
     rollOutCiliumPods: true
     routingMode: native
     securityContext:
