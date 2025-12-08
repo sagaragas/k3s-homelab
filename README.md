@@ -21,26 +21,27 @@ All cluster configuration is managed declaratively through [Flux](https://fluxcd
 
 ## 🖥️ Hardware
 
-The cluster runs on a 3-node Proxmox VE cluster with Ceph storage:
+4-node Proxmox VE cluster with Ceph distributed storage:
 
-| Node | CPU | RAM | Storage | Role |
-|:-----|:----|:----|:--------|:-----|
-| pve1 | Intel i5 | 64GB | 2TB NVMe | Proxmox + Ceph |
-| pve2 | Intel i5 | 64GB | 2TB NVMe | Proxmox + Ceph |
-| pve3 | Intel i5 | 64GB | 2TB NVMe | Proxmox + Ceph |
+| Node | CPU | RAM | NIC | Role |
+|:-----|:----|:----|:----|:-----|
+| pve1 | Ryzen 9 6900HX | 28GB | 2x1Gb bond | Compute + Ceph |
+| pve2 | Ryzen 9 6900HX | 28GB | 2x1Gb bond | Compute + Ceph |
+| pve3 | Intel N150 | 16GB | 2.5Gb | Download + Ceph |
+| pve4 | Intel i5-12500T | 64GB | 1Gb | Media (UHD 770 GPU) |
 
 ## 🌐 Cluster
 
 <table>
-<tr><th>Nodes</th><th>Network</th></tr>
+<tr><th>Virtual Machines</th><th>Network</th></tr>
 <tr><td>
 
-| Name | Role | IP |
-|:-----|:-----|:---|
-| talos-cp-1 | Control Plane | `172.16.1.50` |
-| talos-cp-2 | Control Plane | `172.16.1.51` |
-| talos-cp-3 | Control Plane | `172.16.1.52` |
-| talos-worker-1 | Worker | `172.16.1.53` |
+| Name | Role | IP | Specs |
+|:-----|:-----|:---|:------|
+| talos-cp-1 | Control Plane | `172.16.1.50` | 4c/8GB |
+| talos-cp-2 | Control Plane | `172.16.1.51` | 4c/8GB |
+| talos-cp-3 | Control Plane | `172.16.1.52` | 4c/8GB |
+| talos-worker-1 | Worker | `172.16.1.53` | 8c/16GB |
 
 </td><td>
 
@@ -102,12 +103,11 @@ The cluster runs on a 3-node Proxmox VE cluster with Ceph storage:
 │   ├── 📁 monitoring/       # Prometheus stack
 │   └── 📁 network/          # Ingress & DNS
 ├── 📁 bootstrap/            # Initial cluster setup
-│   ├── 📄 helmfile.yaml     # Bootstrap apps
-│   └── 📁 talos/            # Talos machine configs
+│   └── 📄 helmfile.yaml     # Bootstrap apps
 ├── 📁 components/           # Reusable Kustomize components
 └── 📁 flux/                 # Flux configuration
+📁 talos/                    # Talos machine configs
 📁 docs/                     # MkDocs documentation
-📁 talos/                    # Generated Talos configs
 ```
 
 ## 🚀 Quick Start
