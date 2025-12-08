@@ -24,7 +24,7 @@ spec:
         fsGroup: 1000
       containers:
         - name: mkdocs
-          image: squidfunk/mkdocs-material:9.5
+          image: squidfunk/mkdocs-material:9.5 # {"$imagepolicy": "flux-system:mkdocs-material"}
           ports:
             - containerPort: 8000
           command:

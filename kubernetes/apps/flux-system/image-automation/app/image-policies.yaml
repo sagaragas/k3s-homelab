@@ -1,0 +1,36 @@
+---
+# Homepage - follow semver
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: homepage
+spec:
+  imageRepositoryRef:
+    name: homepage
+  policy:
+    semver:
+      range: ">=0.9.0"
+---
+# MkDocs Material - follow semver major 9.x
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: mkdocs-material
+spec:
+  imageRepositoryRef:
+    name: mkdocs-material
+  policy:
+    semver:
+      range: "9.x"
+---
+# Grafana - follow semver 11.x
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: grafana
+spec:
+  imageRepositoryRef:
+    name: grafana
+  policy:
+    semver:
+      range: ">=11.0.0"

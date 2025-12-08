@@ -11,3 +11,4 @@ resources:
   - ./flux-instance/ks.yaml
   - ./flux-operator/ks.yaml
   - ./notifications/ks.yaml
+  - ./image-automation/ks.yaml

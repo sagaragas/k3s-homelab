@@ -1,0 +1,31 @@
+---
+# Homepage
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: homepage
+spec:
+  image: ghcr.io/gethomepage/homepage
+  interval: 6h
+  exclusionList:
+    - "^.*-dev$"
+---
+# MkDocs Material
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: mkdocs-material
+spec:
+  image: squidfunk/mkdocs-material
+  interval: 6h
+---
+# Grafana
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: grafana
+spec:
+  image: grafana/grafana
+  interval: 6h
+  exclusionList:
+    - "^.*-.*$"  # Exclude pre-release versions
