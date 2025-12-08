@@ -1,0 +1,103 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kube-prometheus-stack
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: kube-prometheus-stack
+      version: 72.6.2
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus-community
+        namespace: flux-system
+  values:
+    crds:
+      enabled: true
+    
+    alertmanager:
+      enabled: true
+      ingress:
+        enabled: false
+      alertmanagerSpec:
+        storage:
+          volumeClaimTemplate:
+            spec:
+              accessModes: ["ReadWriteOnce"]
+              resources:
+                requests:
+                  storage: 1Gi
+    
+    grafana:
+      enabled: true
+      defaultDashboardsEnabled: true
+      defaultDashboardsTimezone: America/Los_Angeles
+      adminPassword: admin  # Change this!
+      ingress:
+        enabled: false  # Using Gateway API
+      persistence:
+        enabled: true
+        size: 5Gi
+      sidecar:
+        dashboards:
+          enabled: true
+          searchNamespace: ALL
+        datasources:
+          enabled: true
+    
+    prometheus:
+      enabled: true
+      ingress:
+        enabled: false
+      prometheusSpec:
+        retention: 7d
+        retentionSize: 10GB
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              accessModes: ["ReadWriteOnce"]
+              resources:
+                requests:
+                  storage: 20Gi
+        serviceMonitorSelectorNilUsesHelmValues: false
+        podMonitorSelectorNilUsesHelmValues: false
+        ruleSelectorNilUsesHelmValues: false
+    
+    kubeApiServer:
+      enabled: true
+    
+    kubeControllerManager:
+      enabled: true
+      endpoints:
+        - 172.16.1.50
+        - 172.16.1.51
+        - 172.16.1.52
+    
+    kubeScheduler:
+      enabled: true
+      endpoints:
+        - 172.16.1.50
+        - 172.16.1.51
+        - 172.16.1.52
+    
+    kubeProxy:
+      enabled: false  # Cilium replaces kube-proxy
+    
+    kubeEtcd:
+      enabled: true
+      endpoints:
+        - 172.16.1.50
+        - 172.16.1.51
+        - 172.16.1.52
+      service:
+        enabled: true
+        port: 2381
+        targetPort: 2381
+    
+    nodeExporter:
+      enabled: true
+    
+    prometheusOperator:
+      enabled: true
