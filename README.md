@@ -7,198 +7,458 @@
 [![Talos](https://img.shields.io/badge/Talos-v1.11.5-orange?style=for-the-badge&logo=talos)](https://www.talos.dev/)
 [![Kubernetes](https://img.shields.io/badge/Kubernetes-v1.34.2-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)](https://kubernetes.io/)
 [![Flux](https://img.shields.io/badge/Flux-v0.36.0-5468FF?style=for-the-badge&logo=flux&logoColor=white)](https://fluxcd.io/)
-[![Renovate](https://img.shields.io/badge/Renovate-enabled-brightgreen?style=for-the-badge&logo=renovatebot&logoColor=white)](https://www.mend.io/renovate/)
 
 </div>
 
 ---
 
-## 📖 Overview
+## Table of Contents
 
-This repository contains Infrastructure as Code for my personal Kubernetes homelab cluster. The cluster runs on [Talos Linux](https://www.talos.dev/) - an immutable, secure OS built specifically for Kubernetes - deployed on Proxmox VE virtual machines.
+- [Overview](#overview)
+- [Architecture](#architecture)
+  - [Infrastructure Layer](#infrastructure-layer)
+  - [Kubernetes Cluster](#kubernetes-cluster)
+  - [Networking](#networking)
+  - [Storage](#storage)
+- [GitOps & CI/CD](#gitops--cicd)
+  - [Flux GitOps](#flux-gitops)
+  - [Branch Protection](#branch-protection)
+  - [Automated Testing](#automated-testing)
+  - [Image Automation](#image-automation)
+- [Security](#security)
+- [Applications](#applications)
+- [Repository Structure](#repository-structure)
+- [Documentation](#documentation)
 
-All cluster configuration is managed declaratively through [Flux](https://fluxcd.io/) GitOps, with secrets encrypted using [SOPS](https://github.com/getsops/sops) and [Age](https://github.com/FiloSottile/age).
+---
 
-## 🖥️ Hardware
+## Overview
 
-4-node Proxmox VE cluster with Ceph distributed storage:
+This repository contains the complete Infrastructure as Code for a production-grade Kubernetes homelab. Every component is declaratively defined, version controlled, and automatically deployed via GitOps.
 
-| Node | CPU | RAM | NIC | Role |
-|:-----|:----|:----|:----|:-----|
-| pve1 | Ryzen 9 6900HX | 28GB | 2x1Gb bond | Compute + Ceph |
-| pve2 | Ryzen 9 6900HX | 28GB | 2x1Gb bond | Compute + Ceph |
-| pve3 | Intel N150 | 16GB | 2.5Gb | Download + Ceph |
-| pve4 | Intel i5-12500T | 64GB | 1Gb | Media (UHD 770 GPU) |
+### Design Principles
 
-## 🌐 Cluster
+- **Immutable Infrastructure** - Talos Linux provides an immutable, API-driven OS
+- **GitOps Everything** - All changes flow through Git with full audit trail
+- **Defense in Depth** - Multiple layers of security from OS to application
+- **High Availability** - 3 control plane nodes with automated failover
+- **Automated Operations** - Self-healing, auto-updates, auto-scaling
 
-<table>
-<tr><th>Virtual Machines</th><th>Network</th></tr>
-<tr><td>
+---
 
-| Name | Role | IP | Specs |
-|:-----|:-----|:---|:------|
-| talos-cp-1 | Control Plane | `172.16.1.50` | 4c/8GB |
-| talos-cp-2 | Control Plane | `172.16.1.51` | 4c/8GB |
-| talos-cp-3 | Control Plane | `172.16.1.52` | 4c/8GB |
-| talos-worker-1 | Worker | `172.16.1.53` | 8c/16GB |
+## Architecture
 
-</td><td>
+### Infrastructure Layer
 
-| Service | IP |
-|:--------|:---|
-| Cluster VIP | `172.16.1.49` |
-| DNS Gateway | `172.16.1.60` |
-| Internal Ingress | `172.16.1.61` |
-| External Ingress | `172.16.1.62` |
-
-</td></tr>
-</table>
-
-## ⚙️ Core Components
-
-<table>
-<tr><td width="50%">
-
-### 🔧 Infrastructure
-| Component | Purpose |
-|:----------|:--------|
-| [Cilium](https://cilium.io/) | CNI & Load Balancer |
-| [CoreDNS](https://coredns.io/) | Cluster DNS |
-| [Spegel](https://github.com/spegel-org/spegel) | P2P Image Registry |
-| [Reloader](https://github.com/stakater/Reloader) | Secret Reloading |
-
-</td><td>
-
-### 🔐 Security & Networking
-| Component | Purpose |
-|:----------|:--------|
-| [cert-manager](https://cert-manager.io/) | TLS Certificates |
-| [Envoy Gateway](https://gateway.envoyproxy.io/) | Ingress Controller |
-| [k8s-gateway](https://github.com/ori-edge/k8s_gateway) | Split-horizon DNS |
-| [SOPS](https://github.com/getsops/sops) | Secret Encryption |
-
-</td></tr>
-</table>
-
-## 📦 Applications
-
-| App | URL | Description |
-|:----|:----|:------------|
-| 🏠 **Homepage** | [home.ragas.cc](https://home.ragas.cc) | Dashboard with service widgets |
-| 📊 **Grafana** | [grafana.ragas.cc](https://grafana.ragas.cc) | Monitoring dashboards |
-| 📈 **Prometheus** | [prometheus.ragas.cc](https://prometheus.ragas.cc) | Metrics & alerting |
-| 🔔 **Alertmanager** | [alertmanager.ragas.cc](https://alertmanager.ragas.cc) | Alert management |
-| 📚 **Docs** | [docs.ragas.cc](https://docs.ragas.cc) | Documentation site |
-
-## 📂 Repository Structure
+The cluster runs on a 4-node Proxmox VE hypervisor cluster with Ceph distributed storage:
 
 ```
-📁 kubernetes/
-├── 📁 apps/                 # Application deployments
-│   ├── 📁 cert-manager/     # TLS certificates
-│   ├── 📁 default/          # User applications
-│   ├── 📁 flux-system/      # GitOps operator
-│   ├── 📁 kube-system/      # Core services
-│   ├── 📁 monitoring/       # Prometheus stack
-│   └── 📁 network/          # Ingress & DNS
-├── 📁 bootstrap/            # Initial cluster setup
-│   └── 📄 helmfile.yaml     # Bootstrap apps
-├── 📁 components/           # Reusable Kustomize components
-└── 📁 flux/                 # Flux configuration
-📁 talos/                    # Talos machine configs
-📁 docs/                     # MkDocs documentation
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         Physical Infrastructure                          │
+├─────────────────┬─────────────────┬─────────────────┬───────────────────┤
+│      pve1       │      pve2       │      pve3       │       pve4        │
+│  Ryzen 9 6900HX │  Ryzen 9 6900HX │   Intel N150    │  Intel i5-12500T  │
+│      28GB       │      28GB       │      16GB       │       64GB        │
+│   Compute+Ceph  │   Compute+Ceph  │  Download+Ceph  │    Media+GPU      │
+└────────┬────────┴────────┬────────┴────────┬────────┴─────────┬─────────┘
+         │                 │                 │                  │
+         └─────────────────┴────────┬────────┴──────────────────┘
+                                    │
+                          ┌─────────┴─────────┐
+                          │   Ceph Storage    │
+                          │   (Distributed)   │
+                          └───────────────────┘
 ```
 
-## 🚀 Quick Start
+### Kubernetes Cluster
 
-<details>
-<summary>Prerequisites</summary>
+4 Talos Linux VMs form the Kubernetes cluster:
 
-Install tools via [mise](https://mise.jdx.dev/):
-
-```bash
-mise trust && mise install
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        Talos Kubernetes Cluster                          │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │                    Control Plane (HA)                             │   │
+│  │  ┌────────────┐  ┌────────────┐  ┌────────────┐                  │   │
+│  │  │ talos-cp-1 │  │ talos-cp-2 │  │ talos-cp-3 │                  │   │
+│  │  │ 172.16.1.50│  │ 172.16.1.51│  │ 172.16.1.52│                  │   │
+│  │  │  4c / 8GB  │  │  4c / 8GB  │  │  4c / 8GB  │                  │   │
+│  │  └─────┬──────┘  └──────┬─────┘  └──────┬─────┘                  │   │
+│  │        │                │               │                         │   │
+│  │        └────────────────┼───────────────┘                         │   │
+│  │                         │                                         │   │
+│  │              ┌──────────┴──────────┐                              │   │
+│  │              │   Cluster VIP       │                              │   │
+│  │              │   172.16.1.49:6443  │                              │   │
+│  │              └─────────────────────┘                              │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │                       Worker Nodes                                │   │
+│  │  ┌─────────────────┐                                             │   │
+│  │  │ talos-worker-1  │                                             │   │
+│  │  │  172.16.1.53    │                                             │   │
+│  │  │   8c / 16GB     │                                             │   │
+│  │  └─────────────────┘                                             │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
-Or install manually:
-- `kubectl` - Kubernetes CLI
-- `flux` - Flux CLI  
-- `talosctl` - Talos CLI
-- `sops` - Secret encryption
-- `age` - Encryption tool
+### Networking
 
-</details>
+Cilium provides advanced networking with eBPF:
 
-<details>
-<summary>Access Cluster</summary>
-
-```bash
-export KUBECONFIG=/path/to/kubeconfig
-
-# Verify access
-kubectl get nodes
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                           Network Architecture                           │
+│                                                                          │
+│  External Traffic                                                        │
+│        │                                                                 │
+│        ▼                                                                 │
+│  ┌─────────────┐     ┌─────────────┐     ┌─────────────┐                │
+│  │   Cilium    │     │   Envoy     │     │    Apps     │                │
+│  │     L2      │────▶│   Gateway   │────▶│  (Pods)     │                │
+│  │ Announcer   │     │  (Ingress)  │     │             │                │
+│  └─────────────┘     └─────────────┘     └─────────────┘                │
+│                                                                          │
+│  LoadBalancer IPs:                                                       │
+│  ├── 172.16.1.60  k8s-gateway (DNS)                                     │
+│  ├── 172.16.1.61  envoy-internal (HTTPS)                                │
+│  └── 172.16.1.62  envoy-external (HTTPS)                                │
+│                                                                          │
+│  ┌─────────────────────────────────────────────────────────────────┐    │
+│  │                      DNS Architecture                            │    │
+│  │                                                                  │    │
+│  │   Client DNS Query (*.ragas.cc)                                  │    │
+│  │          │                                                       │    │
+│  │          ▼                                                       │    │
+│  │   ┌─────────────┐    ┌─────────────┐    ┌─────────────┐         │    │
+│  │   │  AdGuard    │───▶│ k8s-gateway │───▶│   CoreDNS   │         │    │
+│  │   │  (Router)   │    │ (Split DNS) │    │  (Cluster)  │         │    │
+│  │   └─────────────┘    └─────────────┘    └─────────────┘         │    │
+│  │                                                                  │    │
+│  └─────────────────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
-</details>
+### Storage
 
-<details>
-<summary>Common Commands</summary>
+Currently using local storage with plans for Ceph CSI:
 
-```bash
-# Flux status
-flux get ks -A
-flux get hr -A
+| Type | Provider | Use Case |
+|------|----------|----------|
+| etcd | Local NVMe | Kubernetes state |
+| Ephemeral | EmptyDir | Temporary data |
+| Persistent | Ceph (planned) | Application data |
 
-# Force sync
-flux reconcile ks cluster-apps --with-source
+---
 
-# Cilium status  
-cilium status
+## GitOps & CI/CD
 
-# Decrypt secret
-sops -d kubernetes/apps/cert-manager/cert-manager/app/secret.sops.yaml
+### Flux GitOps
+
+All cluster state is managed through Flux GitOps:
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                          GitOps Flow                                     │
+│                                                                          │
+│   Developer                                                              │
+│       │                                                                  │
+│       │ git push                                                         │
+│       ▼                                                                  │
+│   ┌─────────┐    webhook    ┌─────────────┐    reconcile   ┌─────────┐  │
+│   │ GitHub  │──────────────▶│    Flux     │───────────────▶│ Cluster │  │
+│   │  Repo   │               │  Operator   │                │  State  │  │
+│   └─────────┘               └─────────────┘                └─────────┘  │
+│                                    │                                     │
+│                                    │ notifies                            │
+│                                    ▼                                     │
+│                             ┌─────────────┐                              │
+│                             │   Discord   │                              │
+│                             │   Webhook   │                              │
+│                             └─────────────┘                              │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
-</details>
+**Components:**
+- **Source Controller** - Watches Git repositories
+- **Kustomize Controller** - Applies Kustomizations
+- **Helm Controller** - Manages HelmReleases
+- **Notification Controller** - Sends alerts to Discord
+- **Image Reflector** - Scans container registries
+- **Image Automation** - Updates image tags automatically
 
-## 🔄 GitOps Workflow
+### Branch Protection
 
-```mermaid
-graph LR
-    A[Git Push] --> B[GitHub]
-    B --> C[Flux Detects Change]
-    C --> D[Reconcile Cluster]
-    D --> E[Apps Updated]
+The `main` branch is protected with strict rules:
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        Branch Protection                                 │
+│                                                                          │
+│   ┌─────────────┐                                                        │
+│   │  Developer  │                                                        │
+│   └──────┬──────┘                                                        │
+│          │                                                               │
+│          │ Push to feature branch                                        │
+│          ▼                                                               │
+│   ┌─────────────┐     ┌─────────────┐     ┌─────────────┐               │
+│   │   Feature   │────▶│  Create PR  │────▶│   CI Runs   │               │
+│   │   Branch    │     │   to main   │     │             │               │
+│   └─────────────┘     └─────────────┘     └──────┬──────┘               │
+│                                                  │                       │
+│                              ┌───────────────────┼───────────────────┐   │
+│                              │                   │                   │   │
+│                              ▼                   ▼                   ▼   │
+│                       ┌───────────┐       ┌───────────┐       ┌─────────┐│
+│                       │ YAML Lint │       │Kubeconform│       │Flux Local││
+│                       └─────┬─────┘       └─────┬─────┘       └────┬────┘│
+│                             │                   │                  │     │
+│                             └───────────────────┼──────────────────┘     │
+│                                                 │                        │
+│                                    ┌────────────┴────────────┐           │
+│                                    │                         │           │
+│                                 PASS                       FAIL          │
+│                                    │                         │           │
+│                                    ▼                         ▼           │
+│                             ┌─────────────┐          ┌─────────────┐     │
+│                             │  Auto-merge │          │   Blocked   │     │
+│                             │  to main    │          │   (Fix CI)  │     │
+│                             └─────────────┘          └─────────────┘     │
+│                                                                          │
+│   Protected Rules:                                                       │
+│   ✓ Required status checks (YAML Lint, Kubeconform, Flux Local)         │
+│   ✓ Enforce for administrators                                          │
+│   ✗ Force pushes blocked                                                │
+│   ✗ Branch deletion blocked                                             │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **Edit** manifests in `kubernetes/apps/`
-2. **Commit** and push to GitHub
-3. **Flux** automatically reconciles the cluster
+### Automated Testing
 
-## 📚 Documentation
+Every PR runs through comprehensive CI:
 
-Full documentation is available in the [`docs/`](docs/) directory:
+| Check | Tool | Purpose |
+|-------|------|---------|
+| **YAML Lint** | yamllint | Syntax and style validation |
+| **Kubeconform** | kubeconform | Kubernetes schema validation |
+| **Flux Local** | flux-local | Offline Flux validation |
+| **Security Scan** | Trivy | Vulnerability detection |
+| **Secret Scan** | Gitleaks | Credential leak prevention |
+
+### Image Automation
+
+Container images are automatically updated via Flux:
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                      Image Automation Pipeline                           │
+│                                                                          │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐                  │
+│  │  Container  │    │   Image     │    │   Image     │                  │
+│  │  Registry   │───▶│  Reflector  │───▶│   Policy    │                  │
+│  │(Docker,GHCR)│    │ (scan tags) │    │  (semver)   │                  │
+│  └─────────────┘    └─────────────┘    └──────┬──────┘                  │
+│                                               │                          │
+│                                               │ new version detected     │
+│                                               ▼                          │
+│                                        ┌─────────────┐                   │
+│                                        │   Image     │                   │
+│                                        │  Automation │                   │
+│                                        └──────┬──────┘                   │
+│                                               │                          │
+│                                               │ push to branch           │
+│                                               ▼                          │
+│   ┌─────────────────────────────────────────────────────────────────┐   │
+│   │                    flux-image-updates branch                     │   │
+│   └───────────────────────────────┬─────────────────────────────────┘   │
+│                                   │                                      │
+│                                   │ GitHub Action                        │
+│                                   ▼                                      │
+│   ┌─────────────────────────────────────────────────────────────────┐   │
+│   │                    Create PR to main                             │   │
+│   └───────────────────────────────┬─────────────────────────────────┘   │
+│                                   │                                      │
+│                                   │ CI passes                            │
+│                                   ▼                                      │
+│   ┌─────────────────────────────────────────────────────────────────┐   │
+│   │                    Auto-merge & Deploy                           │   │
+│   └─────────────────────────────────────────────────────────────────┘   │
+│                                                                          │
+│   Tracked Images:                                                        │
+│   ├── ghcr.io/gethomepage/homepage  (>=0.9.0)                           │
+│   ├── squidfunk/mkdocs-material     (9.x)                               │
+│   └── grafana/grafana               (>=11.0.0)                          │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Security
+
+### Layers of Security
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         Security Architecture                            │
+│                                                                          │
+│  ┌─────────────────────────────────────────────────────────────────┐    │
+│  │ Layer 1: OS Security (Talos Linux)                               │    │
+│  │  • Immutable filesystem                                          │    │
+│  │  • No SSH, no shell                                              │    │
+│  │  • API-only management                                           │    │
+│  │  • Minimal attack surface                                        │    │
+│  └─────────────────────────────────────────────────────────────────┘    │
+│                                                                          │
+│  ┌─────────────────────────────────────────────────────────────────┐    │
+│  │ Layer 2: Network Security (Cilium)                               │    │
+│  │  • eBPF-based network policies                                   │    │
+│  │  • Encrypted pod-to-pod traffic (WireGuard)                      │    │
+│  │  • L7 visibility and filtering                                   │    │
+│  └─────────────────────────────────────────────────────────────────┘    │
+│                                                                          │
+│  ┌─────────────────────────────────────────────────────────────────┐    │
+│  │ Layer 3: Secret Management (SOPS + Age)                          │    │
+│  │  • All secrets encrypted at rest in Git                          │    │
+│  │  • Decrypted only in-cluster by Flux                             │    │
+│  │  • Age key stored securely                                       │    │
+│  └─────────────────────────────────────────────────────────────────┘    │
+│                                                                          │
+│  ┌─────────────────────────────────────────────────────────────────┐    │
+│  │ Layer 4: TLS Everywhere (cert-manager)                           │    │
+│  │  • Let's Encrypt certificates                                    │    │
+│  │  • Automatic renewal                                             │    │
+│  │  • Wildcard cert for *.ragas.cc                                  │    │
+│  └─────────────────────────────────────────────────────────────────┘    │
+│                                                                          │
+│  ┌─────────────────────────────────────────────────────────────────┐    │
+│  │ Layer 5: Git Security (Branch Protection)                        │    │
+│  │  • Required CI checks                                            │    │
+│  │  • No direct pushes                                              │    │
+│  │  • Secret scanning                                               │    │
+│  │  • Signed commits (optional)                                     │    │
+│  └─────────────────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Applications
+
+### Deployed Services
+
+| Category | Service | URL | Description |
+|----------|---------|-----|-------------|
+| **Dashboard** | Homepage | [home.ragas.cc](https://home.ragas.cc) | Service dashboard with widgets |
+| **Monitoring** | Grafana | [grafana.ragas.cc](https://grafana.ragas.cc) | Metrics visualization |
+| **Monitoring** | Prometheus | [prometheus.ragas.cc](https://prometheus.ragas.cc) | Metrics collection |
+| **Monitoring** | Alertmanager | [alertmanager.ragas.cc](https://alertmanager.ragas.cc) | Alert routing |
+| **Docs** | MkDocs | [docs.ragas.cc](https://docs.ragas.cc) | This documentation |
+
+### Core Infrastructure
+
+| Component | Version | Purpose |
+|-----------|---------|---------|
+| Cilium | 1.18.4 | CNI, LoadBalancer, Network Policies |
+| CoreDNS | 1.45.0 | Cluster DNS |
+| cert-manager | 1.19.1 | TLS certificate management |
+| Envoy Gateway | 1.6.1 | Gateway API ingress |
+| Flux | 0.36.0 | GitOps operator |
+| kube-prometheus-stack | 72.6.2 | Full monitoring stack |
+
+---
+
+## Repository Structure
+
+```
+k3s-homelab/
+├── .github/
+│   ├── workflows/           # GitHub Actions
+│   │   ├── validate.yaml    # CI: lint, validate, test
+│   │   ├── auto-merge.yaml  # Auto-merge Dependabot PRs
+│   │   ├── flux-image-pr.yaml # Create PRs for image updates
+│   │   ├── flux-diff.yaml   # Show Flux changes on PRs
+│   │   ├── security.yaml    # Trivy + Gitleaks scanning
+│   │   ├── labeler.yaml     # Auto-label PRs
+│   │   └── release-drafter.yaml # Generate release notes
+│   ├── dependabot.yaml      # Dependabot config
+│   └── labeler.yaml         # Label rules
+├── .githooks/
+│   └── pre-push             # Local validation hook
+├── kubernetes/
+│   ├── apps/                # Application deployments
+│   │   ├── cert-manager/    # TLS certificates
+│   │   ├── default/         # User applications
+│   │   │   ├── homepage/    # Dashboard
+│   │   │   ├── mkdocs/      # Documentation
+│   │   │   └── echo/        # Test app
+│   │   ├── flux-system/     # GitOps components
+│   │   │   ├── flux-operator/
+│   │   │   ├── flux-instance/
+│   │   │   ├── notifications/  # Discord alerts
+│   │   │   └── image-automation/ # Auto-update images
+│   │   ├── kube-system/     # Core services
+│   │   │   ├── cilium/      # CNI
+│   │   │   ├── coredns/     # DNS
+│   │   │   ├── metrics-server/
+│   │   │   ├── reloader/
+│   │   │   └── spegel/      # Image cache
+│   │   ├── monitoring/      # Observability
+│   │   │   └── kube-prometheus-stack/
+│   │   └── network/         # Ingress & DNS
+│   │       ├── envoy-gateway/
+│   │       └── k8s-gateway/
+│   ├── components/          # Shared Kustomize components
+│   │   └── sops/            # SOPS decryption
+│   └── flux/                # Flux bootstrap
+│       └── cluster/
+├── talos/                   # Talos machine configs
+│   ├── talconfig.yaml       # Cluster definition
+│   ├── talsecret.sops.yaml  # Encrypted secrets
+│   └── clusterconfig/       # Generated configs
+├── docs/                    # MkDocs documentation
+│   ├── architecture/
+│   ├── services/
+│   ├── guides/
+│   └── runbooks/
+├── scripts/
+│   └── setup-hooks.sh       # Git hooks setup
+├── .pre-commit-config.yaml  # Pre-commit hooks
+├── .yamllint.yaml           # YAML linting rules
+├── .sops.yaml               # SOPS encryption config
+└── mkdocs.yml               # Documentation config
+```
+
+---
+
+## Documentation
+
+Comprehensive documentation is available at [docs.ragas.cc](https://docs.ragas.cc):
 
 | Section | Description |
-|:--------|:------------|
-| [Architecture](docs/architecture/) | Cluster design, networking, storage, security |
-| [Services](docs/services/) | Application-specific documentation |
-| [Guides](docs/guides/) | How-to guides for common tasks |
-| [Runbooks](docs/runbooks/) | Operational procedures |
+|---------|-------------|
+| **[Architecture](docs/architecture/)** | System design, networking, storage, security, CI/CD |
+| **[Services](docs/services/)** | Configuration guides for each deployed service |
+| **[Guides](docs/guides/)** | How-to guides for common operations |
+| **[Runbooks](docs/runbooks/)** | Incident response procedures |
 
-## 🙏 Acknowledgments
+---
 
-This cluster is built on the excellent work of:
+## Acknowledgments
 
-- [onedr0p/cluster-template](https://github.com/onedr0p/cluster-template) - GitOps template
+This project builds on the work of:
+
+- [onedr0p/cluster-template](https://github.com/onedr0p/cluster-template) - GitOps patterns
 - [Talos Linux](https://www.talos.dev/) - Secure Kubernetes OS
 - [Flux](https://fluxcd.io/) - GitOps toolkit
+- [Cilium](https://cilium.io/) - eBPF networking
 
 ---
 
 <div align="center">
 
-**[Documentation](https://docs.ragas.cc)** · **[Architecture](docs/architecture/)** · **[Guides](docs/guides/)**
+**[Documentation](https://docs.ragas.cc)** · **[GitHub](https://github.com/sagaragas/k3s-homelab)**
 
 </div>
