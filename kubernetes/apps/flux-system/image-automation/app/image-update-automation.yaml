@@ -22,7 +22,7 @@ spec:
 
         Automated image update
     push:
-      branch: main
+      branch: flux-image-updates
   update:
     path: ./kubernetes
     strategy: Setters

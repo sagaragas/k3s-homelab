@@ -1,0 +1,53 @@
+---
+name: Flux Image PR
+
+on:
+  push:
+    branches:
+      - flux-image-updates
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  create-pr:
+    name: Create PR for Image Updates
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: flux-image-updates
+          fetch-depth: 0
+
+      - name: Create Pull Request
+        id: create-pr
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: flux-image-updates
+          base: main
+          title: "chore(container): automated image updates"
+          body: |
+            ## Automated Image Updates
+
+            This PR was automatically created by Flux Image Automation.
+
+            ### Changes
+            Container images have been updated to their latest versions based on the configured policies.
+
+            ### Auto-merge
+            This PR will be automatically merged once CI passes.
+          labels: |
+            dependencies
+            automated
+          delete-branch: false
+
+      - name: Enable Auto-merge
+        if: steps.create-pr.outputs.pull-request-number
+        run: |
+          gh pr merge ${{ steps.create-pr.outputs.pull-request-number }} \
+            --auto --squash --delete-branch=false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
