@@ -10,3 +10,8 @@ updates:
     labels:
       - area/ci
       - dependencies
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 10
