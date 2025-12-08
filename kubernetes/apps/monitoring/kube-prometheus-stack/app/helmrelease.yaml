@@ -28,7 +28,10 @@ spec:
       enabled: true
       defaultDashboardsEnabled: true
       defaultDashboardsTimezone: America/Los_Angeles
-      adminPassword: admin  # Change this!
+      admin:
+        existingSecret: grafana-admin
+        userKey: admin-user
+        passwordKey: admin-password
       ingress:
         enabled: false  # Using Gateway API
       # Persistence disabled until Ceph CSI is configured
