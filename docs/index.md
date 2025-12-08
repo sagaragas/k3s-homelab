@@ -38,6 +38,7 @@ Welcome to the comprehensive documentation for the Ragas Homelab Kubernetes clus
 - [Network Architecture](./architecture/networking.md)
 - [Storage](./architecture/storage.md)
 - [Security](./architecture/security.md)
+- [CI/CD Pipeline](./architecture/ci-cd.md)
 
 ### [Services](./services/)
 - [Homepage Dashboard](./services/homepage.md)
@@ -47,6 +48,7 @@ Welcome to the comprehensive documentation for the Ragas Homelab Kubernetes clus
 
 ### [Guides](./guides/)
 - [Deploying a New Service](./guides/deploy-service.md)
+- [Image Automation](./guides/image-automation.md)
 - [Adding a New Node](./guides/add-node.md)
 - [Backup & Restore](./guides/backup-restore.md)
 - [Upgrading Talos](./guides/upgrade-talos.md)

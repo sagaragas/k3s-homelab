@@ -65,6 +65,7 @@ nav:
       - Networking: architecture/networking.md
       - Storage: architecture/storage.md
       - Security: architecture/security.md
+      - CI/CD Pipeline: architecture/ci-cd.md
   - Services:
       - Homepage: services/homepage.md
       - Monitoring: services/monitoring.md
@@ -72,6 +73,7 @@ nav:
       - DNS & Ingress: services/networking.md
   - Guides:
       - Deploy a Service: guides/deploy-service.md
+      - Image Automation: guides/image-automation.md
       - Add a Node: guides/add-node.md
       - Backup & Restore: guides/backup-restore.md
       - Upgrade Talos: guides/upgrade-talos.md
