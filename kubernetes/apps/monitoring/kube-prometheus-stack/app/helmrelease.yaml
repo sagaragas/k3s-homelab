@@ -15,7 +15,7 @@ spec:
   values:
     crds:
       enabled: true
-    
+
     alertmanager:
       enabled: true
       ingress:
@@ -23,7 +23,7 @@ spec:
       alertmanagerSpec:
         # Storage disabled until Ceph CSI is configured
         storage: {}
-    
+
     grafana:
       enabled: true
       defaultDashboardsEnabled: true
@@ -40,7 +40,7 @@ spec:
           searchNamespace: ALL
         datasources:
           enabled: true
-    
+
     prometheus:
       enabled: true
       ingress:
@@ -53,27 +53,27 @@ spec:
         serviceMonitorSelectorNilUsesHelmValues: false
         podMonitorSelectorNilUsesHelmValues: false
         ruleSelectorNilUsesHelmValues: false
-    
+
     kubeApiServer:
       enabled: true
-    
+
     kubeControllerManager:
       enabled: true
       endpoints:
         - 172.16.1.50
         - 172.16.1.51
         - 172.16.1.52
-    
+
     kubeScheduler:
       enabled: true
       endpoints:
         - 172.16.1.50
         - 172.16.1.51
         - 172.16.1.52
-    
+
     kubeProxy:
       enabled: false  # Cilium replaces kube-proxy
-    
+
     kubeEtcd:
       enabled: true
       endpoints:
@@ -84,9 +84,9 @@ spec:
         enabled: true
         port: 2381
         targetPort: 2381
-    
+
     nodeExporter:
       enabled: true
-    
+
     prometheusOperator:
       enabled: true
