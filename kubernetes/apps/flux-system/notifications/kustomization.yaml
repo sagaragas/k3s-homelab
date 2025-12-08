@@ -3,7 +3,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: flux-system
 resources:
-  - github-provider.yaml
-  - github-alert.yaml
-  # - discord-provider.yaml  # Uncomment when configured
-  # - discord-alert.yaml     # Uncomment when configured
+  # - github-provider.yaml   # Needs github-token secret
+  # - github-alert.yaml
+  - discord-provider.yaml
+  - discord-alert.yaml

@@ -1,17 +1,21 @@
 ---
-# Uncomment and configure to enable Discord notifications
-# apiVersion: notification.toolkit.fluxcd.io/v1beta3
-# kind: Alert
-# metadata:
-#   name: discord
-#   namespace: flux-system
-# spec:
-#   providerRef:
-#     name: discord
-#   eventSeverity: error
-#   eventSources:
-#     - kind: Kustomization
-#       name: "*"
-#     - kind: HelmRelease
-#       name: "*"
-#   summary: "Cluster: kubernetes"
+apiVersion: notification.toolkit.fluxcd.io/v1beta3
+kind: Alert
+metadata:
+  name: discord
+  namespace: flux-system
+spec:
+  providerRef:
+    name: discord
+  eventSeverity: info
+  eventSources:
+    - kind: Kustomization
+      name: "*"
+    - kind: HelmRelease
+      name: "*"
+  exclusionList:
+    - "error.*lookup.*no such host"
+    - "error.*timeout"
+    - "waiting.*to be available"
+    - "dependency.*is not ready"
+  summary: "Homelab Kubernetes"
