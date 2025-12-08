@@ -1,4 +1,3 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -24,7 +23,7 @@ spec:
         fsGroup: 1000
       containers:
         - name: mkdocs
-          image: squidfunk/mkdocs-material:9.5 # {"$imagepolicy": "flux-system:mkdocs-material"}
+          image: squidfunk/mkdocs-material:9.7.0 # {"$imagepolicy": "flux-system:mkdocs-material"}
           ports:
             - containerPort: 8000
           command:
