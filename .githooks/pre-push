@@ -1,0 +1,35 @@
+#!/bin/bash
+# Pre-push hook - validates YAML before allowing push
+
+set -e
+
+echo "🔍 Running pre-push validation..."
+
+# Check for trailing spaces
+echo "  Checking for trailing spaces..."
+if grep -r --include="*.yaml" --include="*.yml" '[[:space:]]$' kubernetes/ 2>/dev/null | grep -v ".sops."; then
+    echo "❌ Found trailing spaces in YAML files!"
+    echo "   Run: find kubernetes -name '*.yaml' -exec sed -i 's/[[:space:]]*$//' {} \;"
+    exit 1
+fi
+
+# Check YAML syntax
+echo "  Checking YAML syntax..."
+for file in $(find kubernetes -name "*.yaml" -type f ! -name "*.sops.yaml" 2>/dev/null | head -20); do
+    python3 -c "import yaml; yaml.safe_load(open('$file'))" 2>/dev/null || {
+        echo "❌ Invalid YAML: $file"
+        exit 1
+    }
+done
+
+# Run pre-commit if available
+if command -v pre-commit &> /dev/null; then
+    echo "  Running pre-commit hooks..."
+    pre-commit run --all-files || {
+        echo "❌ Pre-commit checks failed!"
+        exit 1
+    }
+fi
+
+echo "✅ Pre-push validation passed!"
+exit 0
