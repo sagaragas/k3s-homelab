@@ -21,8 +21,14 @@ spec:
       ingress:
         enabled: false
       alertmanagerSpec:
-        # Storage disabled until Ceph CSI is configured
-        storage: {}
+        storage:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: ceph-block
+              accessModes: ["ReadWriteOnce"]
+              resources:
+                requests:
+                  storage: 5Gi
 
     grafana:
       enabled: true
@@ -34,9 +40,10 @@ spec:
         passwordKey: admin-password
       ingress:
         enabled: false  # Using Gateway API
-      # Persistence disabled until Ceph CSI is configured
       persistence:
-        enabled: false
+        enabled: true
+        storageClassName: ceph-block
+        size: 10Gi
       sidecar:
         dashboards:
           enabled: true
@@ -50,9 +57,15 @@ spec:
         enabled: false
       prometheusSpec:
         retention: 7d
-        retentionSize: 10GB
-        # Storage disabled until Ceph CSI is configured
-        storageSpec: {}
+        retentionSize: 45GB
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: ceph-block
+              accessModes: ["ReadWriteOnce"]
+              resources:
+                requests:
+                  storage: 50Gi
         serviceMonitorSelectorNilUsesHelmValues: false
         podMonitorSelectorNilUsesHelmValues: false
         ruleSelectorNilUsesHelmValues: false
