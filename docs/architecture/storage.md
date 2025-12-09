@@ -2,35 +2,74 @@
 
 ## Overview
 
-The cluster uses multiple storage backends for different use cases.
+The cluster uses Ceph CSI to connect Kubernetes directly to the Proxmox Ceph cluster, providing persistent block storage for stateful workloads.
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                    Kubernetes Cluster                                │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐                 │
+│  │ Prometheus  │  │   Grafana   │  │ Alertmanager│                 │
+│  │   (50Gi)    │  │   (10Gi)    │  │    (5Gi)    │                 │
+│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘                 │
+│         │                │                │                         │
+│         └────────────────┼────────────────┘                         │
+│                          │                                          │
+│                 ┌────────┴────────┐                                 │
+│                 │  ceph-csi-rbd   │                                 │
+│                 │   (CSI Driver)  │                                 │
+│                 └────────┬────────┘                                 │
+└──────────────────────────┼──────────────────────────────────────────┘
+                           │
+┌──────────────────────────┼──────────────────────────────────────────┐
+│                          ▼                                          │
+│  ┌───────────────────────────────────────────────────────────────┐  │
+│  │                    Proxmox Ceph Cluster                        │  │
+│  │  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐          │  │
+│  │  │  pve1   │  │  pve2   │  │  pve3   │  │  pve4   │          │  │
+│  │  │ MON+OSD │  │ MON+OSD │  │ MON+OSD │  │ MON+OSD │          │  │
+│  │  └─────────┘  └─────────┘  └─────────┘  └─────────┘          │  │
+│  │                                                               │  │
+│  │  Pool: kubernetes (2x replication, 32 PGs)                   │  │
+│  │  FSID: eb53e78d-4b17-4e8c-8186-cd82025a8917                  │  │
+│  └───────────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────┘
+```
 
 ## Storage Classes
 
-| Storage Class | Backend | Use Case |
-|---------------|---------|----------|
-| ceph-rbd | Ceph RBD | Default block storage |
-| cephfs | CephFS | Shared filesystem |
-| local-path | Local disk | Node-local storage |
+| Storage Class | Backend | Access Mode | Default |
+|---------------|---------|-------------|---------|
+| `ceph-block` | Ceph RBD | RWO | Yes |
 
-## Ceph Storage
+## Ceph Cluster Details
 
-### Ceph Cluster
+### Proxmox Ceph
 
-The Proxmox cluster runs Ceph with OSDs on 3 nodes:
+| Component | Details |
+|-----------|---------|
+| **FSID** | `eb53e78d-4b17-4e8c-8186-cd82025a8917` |
+| **Monitors** | 172.16.1.2, .3, .4, .5 (port 6789) |
+| **OSDs** | 5 OSDs across 4 nodes |
+| **Total Capacity** | ~3.6 TiB |
 
-| Node | OSD | Disk |
-|------|-----|------|
-| pve1 | osd.0 | NVMe |
-| pve2 | osd.1 | NVMe |
-| pve3 | osd.2 | NVMe |
+### Kubernetes Pool
 
-### Ceph Pools
+| Setting | Value |
+|---------|-------|
+| **Pool Name** | `kubernetes` |
+| **PG Count** | 32 |
+| **Replication** | 2x |
+| **User** | `client.kubernetes` |
 
-| Pool | Type | Replication |
-|------|------|-------------|
-| vm-storage | RBD | 2 |
-| cephfs-data | CephFS | 2 |
-| cephfs-metadata | CephFS | 2 |
+## Current PVCs
+
+| Namespace | PVC | Size | Workload |
+|-----------|-----|------|----------|
+| monitoring | prometheus-db | 50Gi | Metrics storage (7d retention) |
+| monitoring | grafana | 10Gi | Dashboards & settings |
+| monitoring | alertmanager-db | 5Gi | Alert state |
 
 ## Using Persistent Volumes
 

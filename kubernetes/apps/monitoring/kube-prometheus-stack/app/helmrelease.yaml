@@ -5,6 +5,7 @@ metadata:
   name: kube-prometheus-stack
 spec:
   interval: 30m
+  timeout: 15m
   chart:
     spec:
       chart: kube-prometheus-stack
@@ -12,6 +13,11 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: prometheus-community
+  upgrade:
+    cleanupOnFail: true
+    crds: CreateReplace
+    remediation:
+      retries: 3
   values:
     crds:
       enabled: true
@@ -34,6 +40,8 @@ spec:
       enabled: true
       defaultDashboardsEnabled: true
       defaultDashboardsTimezone: America/Los_Angeles
+      deploymentStrategy:
+        type: Recreate
       admin:
         existingSecret: grafana-admin
         userKey: admin-user

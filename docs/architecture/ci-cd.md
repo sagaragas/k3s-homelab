@@ -6,27 +6,39 @@ This document describes the continuous integration and deployment pipeline for t
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                         Git Push                                     │
+│                         Git Push / PR                                │
 └───────────────────────────┬─────────────────────────────────────────┘
                             │
-            ┌───────────────┼───────────────┐
-            ▼               ▼               ▼
-    ┌───────────────┐ ┌───────────────┐ ┌───────────────┐
-    │   Validate    │ │ Auto-Merge    │ │ Release       │
-    │   Workflow    │ │ Workflow      │ │ Drafter       │
-    └───────┬───────┘ └───────────────┘ └───────────────┘
-            │
-    ┌───────┴───────┐
-    │   YAML Lint   │
-    │  Kubeconform  │
-    │  Flux Local   │
-    └───────┬───────┘
-            │
-            ▼
-    ┌───────────────┐
-    │  Flux GitOps  │──────► Cluster
-    └───────────────┘
+        ┌───────────────────┼───────────────────┐
+        ▼                   ▼                   ▼
+┌───────────────┐   ┌───────────────┐   ┌───────────────┐
+│   Validate    │   │ Droid Review  │   │  Auto-Merge   │
+│   Workflow    │   │  (AI Review)  │   │   Workflow    │
+└───────┬───────┘   └───────────────┘   └───────────────┘
+        │
+┌───────┴───────┐
+│   YAML Lint   │
+│  Kubeconform  │◄──── On Failure ────► Droid CI Fix
+│  Flux Local   │                       (Auto-repairs)
+└───────┬───────┘
+        │
+        ▼
+┌───────────────┐
+│  Flux GitOps  │──────► Cluster ──────► Discord
+└───────────────┘                        Notifications
 ```
+
+## Automation Stack
+
+| Component | Purpose | Trigger |
+|-----------|---------|---------|
+| **Validate** | YAML/K8s validation | Every push/PR |
+| **Droid Review** | AI code review | PR opened |
+| **Droid CI Fix** | Auto-fix failures | CI failure on branch |
+| **Auto-Merge** | Merge dependency PRs | CI passes |
+| **Renovate** | Dependency updates | Daily scan |
+| **Flux Image Automation** | Container updates | New image tags |
+| **Release Drafter** | Release notes | PR merged |
 
 ## GitHub Actions Workflows
 
@@ -79,28 +91,63 @@ Automatically labels PRs based on changed files.
 | `kubernetes/apps/monitoring/**` | `area/monitoring` |
 | `kubernetes/apps/network/**` | `area/network` |
 
-## Dependabot
+### Droid Code Review (`droid-review.yaml`)
 
-Configured in `.github/dependabot.yaml` to update GitHub Actions.
+AI-powered code review using Factory's Droid.
+
+- Triggers on PR open/sync
+- Reviews Kubernetes/Flux manifests
+- Posts inline comments for issues
+- Focuses on: YAML errors, security issues, misconfigurations
 
 ```yaml
-version: 2
-updates:
-  - package-ecosystem: github-actions
-    directory: /
-    schedule:
-      interval: weekly
-    groups:
-      github-actions:
-        patterns:
-          - "*"
+# Requires FACTORY_API_KEY secret
+droid exec --auto high -f prompt.txt
 ```
 
-**Why Dependabot over Renovate?**
+### Droid CI Fix (`droid-fix.yaml`)
 
-- Works natively with private repositories
-- No additional authentication setup required
-- Integrated into GitHub
+Automatically fixes CI failures on feature branches.
+
+- Triggers when Validate workflow fails
+- Analyzes failure logs
+- Auto-fixes common issues (syntax, validation)
+- Commits and pushes the fix
+
+```
+Workflow: Validate fails → Droid analyzes → Fixes code → Pushes commit
+```
+
+## Renovate
+
+Configured in `.github/renovate.json5` for automated dependency updates.
+
+### What Renovate Updates
+
+| Category | Examples |
+|----------|----------|
+| **Helm Charts** | kube-prometheus-stack, cert-manager, cilium |
+| **Container Images** | grafana, prometheus, homepage |
+| **GitHub Actions** | actions/checkout, actions/upload-artifact |
+| **Flux Components** | flux-operator, flux-instance |
+
+### Configuration Highlights
+
+```json5
+{
+  "extends": ["config:recommended"],
+  "flux": { "fileMatch": ["kubernetes/.+\\.ya?ml$"] },
+  "helm-values": { "fileMatch": ["kubernetes/.+\\.ya?ml$"] },
+  "automerge": true,
+  "automergeType": "squash"
+}
+```
+
+### Auto-merge Rules
+
+- **Patch/minor updates**: Auto-merge after CI passes
+- **Major updates**: Require manual review
+- **Security updates**: Prioritized and auto-merged
 
 ## Pre-commit Hooks
 
