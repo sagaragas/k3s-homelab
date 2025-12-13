@@ -32,3 +32,19 @@ tasks:
     preconditions:
       - test -f {{.KUBECONFIG}}
       - which flux
+
+  test:
+    desc: Run all validation tests
+    cmd: ./tests/run_all.sh
+
+  test:yaml:
+    desc: Run YAML lint validation
+    cmd: ./tests/test_yaml.sh
+
+  test:schema:
+    desc: Run Kubernetes schema validation
+    cmd: ./tests/test_schema.sh
+
+  test:flux:
+    desc: Run Flux configuration validation
+    cmd: ./tests/test_flux.sh

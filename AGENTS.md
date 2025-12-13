@@ -77,6 +77,12 @@ flux get hr -A                   # Check HelmRelease status
 task cluster:pods                # List all pods
 cilium status                    # Check Cilium CNI status
 kubectl get nodes -o wide        # Check node status
+
+# Testing / Validation
+task test                        # Run all validation tests
+task test:yaml                   # YAML lint validation
+task test:schema                 # Kubernetes schema validation (kubeconform)
+task test:flux                   # Flux configuration validation
 ```
 
 ## Adding a New Application
