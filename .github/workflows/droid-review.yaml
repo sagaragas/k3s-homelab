@@ -13,7 +13,10 @@ jobs:
   droid-review:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    if: github.event.pull_request.draft == false
+    # Skip draft PRs and Renovate PRs (simple dependency updates don't need AI review)
+    if: |
+      github.event.pull_request.draft == false &&
+      github.actor != 'renovate[bot]'
     permissions:
       contents: write
       pull-requests: write
