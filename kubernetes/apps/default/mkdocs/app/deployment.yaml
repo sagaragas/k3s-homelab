@@ -64,7 +64,7 @@ spec:
               memory: 256Mi
       initContainers:
         - name: git-clone
-          image: alpine/git:2.47.1
+          image: alpine/git:v2.49.1
           securityContext:
             allowPrivilegeEscalation: false
             runAsNonRoot: true
