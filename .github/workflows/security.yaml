@@ -2,12 +2,10 @@
 name: Security Scan
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - kubernetes/**
+  # Only run on schedule and manual trigger - not on every PR
   schedule:
     - cron: "0 6 * * 1" # Weekly on Monday at 6am
+  workflow_dispatch: # Allow manual trigger
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
