@@ -1,0 +1,23 @@
+# CODEOWNERS - Defines code ownership for automatic review assignment
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owners for everything
+* @sagaragas
+
+# Kubernetes manifests and Flux configuration
+/kubernetes/ @sagaragas
+
+# Talos configuration (critical infrastructure)
+/talos/ @sagaragas
+
+# CI/CD workflows
+/.github/workflows/ @sagaragas
+
+# Security-sensitive files
+/.sops.yaml @sagaragas
+/bootstrap/*.sops.yaml @sagaragas
+
+# Documentation
+/docs/ @sagaragas
+/AGENTS.md @sagaragas
+/README.md @sagaragas
