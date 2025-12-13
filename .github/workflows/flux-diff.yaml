@@ -43,7 +43,7 @@ jobs:
         id: diff
         with:
           live-branch: main
-          path: pr/kubernetes/flux
+          path: kubernetes/flux
           resource: ${{ matrix.resource }}
 
       - name: Add comment
