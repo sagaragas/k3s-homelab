@@ -44,5 +44,12 @@
         '/traefik/',
       ],
     },
+    {
+      description: 'Limit Python to stable versions (no pre-release)',
+      matchPackageNames: [
+        'python',
+      ],
+      allowedVersions: '<3.13',
+    },
   ],
 }
