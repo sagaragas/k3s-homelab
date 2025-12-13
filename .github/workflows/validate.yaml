@@ -65,9 +65,9 @@ jobs:
         uses: fluxcd/flux2/action@main
 
       - name: Setup Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.14"
+          python-version: "3.12"
 
       - name: Install flux-local
         run: pip install flux-local
