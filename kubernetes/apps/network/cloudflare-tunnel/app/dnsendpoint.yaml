@@ -5,6 +5,6 @@ metadata:
   name: cloudflare-tunnel
 spec:
   endpoints:
-    - dnsName: "external.${SECRET_DOMAIN}"
+    - dnsName: "request.ragas.sh"
       recordType: CNAME
-      targets: ["00000000-0000-0000-0000-000000000000.cfargotunnel.com"]
+      targets: ["30286f86-9062-47bd-92f2-80d94cdb17b0.cfargotunnel.com"]

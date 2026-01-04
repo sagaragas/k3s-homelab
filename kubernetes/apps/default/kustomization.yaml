@@ -13,4 +13,5 @@ resources:
   - ./echo/ks.yaml
   - ./homepage/ks.yaml
   - ./mkdocs/ks.yaml
+  - ./seerr/ks.yaml
   - ./speedtest-tracker/ks.yaml

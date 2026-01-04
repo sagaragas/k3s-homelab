@@ -9,6 +9,6 @@ components:
 resources:
   - ./namespace.yaml
   # - ./cloudflare-dns/ks.yaml  # Disabled - not needed for local-only, cert-manager handles DNS-01 directly
-  # - ./cloudflare-tunnel/ks.yaml  # Disabled - local access only
+  - ./cloudflare-tunnel/ks.yaml
   - ./envoy-gateway/ks.yaml
   - ./k8s-gateway/ks.yaml
