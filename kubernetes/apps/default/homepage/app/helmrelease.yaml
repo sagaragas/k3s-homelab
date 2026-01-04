@@ -23,6 +23,10 @@ spec:
       create: true
       name: homepage
 
+    envFrom:
+      - secretRef:
+          name: homepage-config
+
     service:
       main:
         ports:
@@ -31,76 +35,242 @@ spec:
 
     ingress:
       main:
-        enabled: false  # Using Gateway API instead
+        enabled: false
 
     config:
       bookmarks:
         - Developer:
             - Github:
                 - abbr: GH
-                  href: https://github.com/sagaragas
-            - Cloudflare:
-                - abbr: CF
-                  href: https://dash.cloudflare.com
-        - Infrastructure:
-            - Proxmox:
-                - abbr: PVE
-                  href: https://172.16.1.2:8006
-            - AdGuard:
-                - abbr: AG
-                  href: http://172.16.1.11
-            - Technitium:
-                - abbr: DNS
-                  href: http://172.16.1.10:5380
+                  href: https://github.com/
+        - Social:
+            - Reddit:
+                - abbr: RE
+                  href: https://reddit.com/
+        - Entertainment:
+            - YouTube:
+                - abbr: YT
+                  href: https://youtube.com/
 
       services:
-        - Kubernetes:
-            - Flux:
-                icon: flux-cd
-                href: https://github.com/sagaragas/k3s-homelab
-                description: GitOps Repository
-            - Grafana:
-                icon: grafana
-                href: https://grafana.ragas.cc
-                description: Monitoring Dashboard
-            - Documentation:
-                icon: bookstack
-                href: https://docs.ragas.cc
-                description: Homelab Docs
+        - Hypervisor:
+            - Server-1:
+                icon: proxmox.svg
+                href: https://172.16.1.2:8006
+                description: pve1
+                widget:
+                  type: proxmox
+                  url: https://172.16.1.2:8006
+                  username: "{{HOMEPAGE_VAR_PROXMOX_USER}}"
+                  password: "{{HOMEPAGE_VAR_PROXMOX_PASS}}"
+                  node: pve1
+            - Server-2:
+                icon: proxmox.svg
+                href: https://172.16.1.3:8006
+                description: pve2
+                widget:
+                  type: proxmox
+                  url: https://172.16.1.3:8006
+                  username: "{{HOMEPAGE_VAR_PROXMOX_USER}}"
+                  password: "{{HOMEPAGE_VAR_PROXMOX_PASS}}"
+                  node: pve2
+            - Server-3:
+                icon: proxmox.svg
+                href: https://172.16.1.4:8006
+                description: pve3
+                widget:
+                  type: proxmox
+                  url: https://172.16.1.4:8006
+                  username: "{{HOMEPAGE_VAR_PROXMOX_USER}}"
+                  password: "{{HOMEPAGE_VAR_PROXMOX_PASS}}"
+                  node: pve3
+            - Server-4:
+                icon: proxmox.svg
+                href: https://172.16.1.5:8006
+                description: pve4
+                widget:
+                  type: proxmox
+                  url: https://172.16.1.5:8006
+                  username: "{{HOMEPAGE_VAR_PROXMOX_USER}}"
+                  password: "{{HOMEPAGE_VAR_PROXMOX_PASS}}"
+                  node: pve4
+
+        - Storage:
+            - Volume-1:
+                icon: https://cdn.jsdelivr.net/gh/selfhst/icons/svg/synology-light.svg
+                href: https://172.16.1.250:5001/
+                description: Backup
+                widget:
+                  type: diskstation
+                  url: https://172.16.1.250:5001/
+                  username: "{{HOMEPAGE_VAR_NAS_USER}}"
+                  password: "{{HOMEPAGE_VAR_NAS_PASS}}"
+                  volume: volume_1
+            - Volume-2:
+                icon: https://cdn.jsdelivr.net/gh/selfhst/icons/svg/synology-light.svg
+                href: https://172.16.1.250:5001/
+                description: Media
+                widget:
+                  type: diskstation
+                  url: https://172.16.1.250:5001/
+                  username: "{{HOMEPAGE_VAR_NAS_USER}}"
+                  password: "{{HOMEPAGE_VAR_NAS_PASS}}"
+                  volume: volume_2
+            - PBS:
+                icon: proxmox.svg
+                href: https://172.16.1.12:8007/
+                description: Proxmox Backup
+                widget:
+                  type: proxmoxbackupserver
+                  url: https://172.16.1.12:8007
+                  username: "{{HOMEPAGE_VAR_PBS_USER}}"
+                  password: "{{HOMEPAGE_VAR_PBS_PASS}}"
 
         - Media:
             - Plex:
-                icon: plex
-                href: http://172.16.1.33:32400
+                icon: plex.svg
+                href: https://plex.ragas.sh
                 description: Media Server
+                widget:
+                  type: plex
+                  url: https://plex.ragas.sh
+                  key: "{{HOMEPAGE_VAR_PLEX_KEY}}"
             - Jellyfin:
-                icon: jellyfin
+                icon: jellyfin.svg
                 href: http://172.16.1.30:8096
-                description: Media Server
+                description: Jellyfin
+                widget:
+                  type: jellyfin
+                  url: http://172.16.1.30:8096
+                  key: "{{HOMEPAGE_VAR_JELLYFIN_KEY}}"
+                  enableBlocks: true
+                  enableNowPlaying: true
+                  enableUser: true
+            - Tautulli:
+                icon: tautulli.svg
+                href: http://172.16.1.33:8181
+                description: Plex stats
+                widget:
+                  type: tautulli
+                  url: http://172.16.1.33:8181
+                  key: "{{HOMEPAGE_VAR_TAUTULLI_KEY}}"
+
+        - Requests:
+            - Overseerr:
+                icon: overseerr.svg
+                href: https://request.ragas.sh
+                description: Plex Requests
+                widget:
+                  type: overseerr
+                  url: http://172.16.1.31:5055
+                  key: "{{HOMEPAGE_VAR_OVERSEERR_KEY}}"
+            - Jellyseerr:
+                icon: jellyseerr.svg
+                href: http://172.16.1.31:5056
+                description: Jelly Requests
+                widget:
+                  type: jellyseerr
+                  url: http://172.16.1.31:5056
+                  key: "{{HOMEPAGE_VAR_JELLYSEERR_KEY}}"
+
+        - Media Management:
             - Sonarr:
-                icon: sonarr
+                icon: sonarr.svg
                 href: http://172.16.1.31:8989
                 description: TV Shows
+                widget:
+                  type: sonarr
+                  url: http://172.16.1.31:8989
+                  key: "{{HOMEPAGE_VAR_SONARR_KEY}}"
             - Radarr:
-                icon: radarr
+                icon: radarr.svg
                 href: http://172.16.1.31:7878
                 description: Movies
+                widget:
+                  type: radarr
+                  url: http://172.16.1.31:7878
+                  key: "{{HOMEPAGE_VAR_RADARR_KEY}}"
+            - Prowlarr:
+                icon: prowlarr.svg
+                href: http://172.16.1.31:9696
+                description: Indexers
+                widget:
+                  type: prowlarr
+                  url: http://172.16.1.31:9696
+                  key: "{{HOMEPAGE_VAR_PROWLARR_KEY}}"
 
-        - Infrastructure:
-            - Proxmox:
-                icon: proxmox
-                href: https://172.16.1.2:8006
-                description: Hypervisor Cluster
-            - TrueNAS:
-                icon: truenas
-                href: http://172.16.1.250
-                description: Network Storage
-            - UniFi:
-                icon: unifi
+        - Network:
+            - OpnSense:
+                icon: opnsense.svg
+                href: http://172.16.1.1/
+                description: Firewall
+                widget:
+                  type: opnsense
+                  url: https://172.16.1.1/
+                  username: "{{HOMEPAGE_VAR_OPNSENSE_USER}}"
+                  password: "{{HOMEPAGE_VAR_OPNSENSE_PASS}}"
+            - Adguard:
+                icon: https://cdn.jsdelivr.net/gh/selfhst/icons/svg/adguard-home.svg
+                href: https://172.16.1.11
+                description: Adblocker
+                widget:
+                  type: adguard
+                  url: https://172.16.1.11
+                  username: "{{HOMEPAGE_VAR_ADGUARD_USER}}"
+                  password: "{{HOMEPAGE_VAR_ADGUARD_PASS}}"
+            - qBittorrent:
+                icon: qbittorrent.svg
+                href: http://172.16.1.32:8080
+                description: Downloads
+                widget:
+                  type: qbittorrent
+                  url: http://172.16.1.32:8080
+                  username: "{{HOMEPAGE_VAR_QBIT_USER}}"
+                  password: "{{HOMEPAGE_VAR_QBIT_PASS}}"
+            - Cloudflare:
+                icon: cloudflare.svg
+                href: https://one.dash.cloudflare.com
+                description: Tunnel
+                widget:
+                  type: cloudflared
+                  accountid: "{{HOMEPAGE_VAR_CF_ACCOUNT}}"
+                  tunnelid: "{{HOMEPAGE_VAR_CF_TUNNEL}}"
+                  key: "{{HOMEPAGE_VAR_CF_KEY}}"
+            - Uptime-Kuma:
+                icon: uptime-kuma.svg
+                href: http://172.16.1.249:3001
+                description: Monitoring
+                widget:
+                  type: uptimekuma
+                  url: http://172.16.1.249:3001
+                  slug: 1
+            - Unifi:
+                icon: unifi.svg
                 href: https://172.16.1.253:8443
-                description: Network Controller
+                description: Network
+                widget:
+                  type: unifi
+                  url: https://172.16.1.253:8443
+                  site: home
+                  username: "{{HOMEPAGE_VAR_UNIFI_USER}}"
+                  password: "{{HOMEPAGE_VAR_UNIFI_PASS}}"
 
       widgets:
+        - resources:
+            cpu: true
+            memory: true
+            disk: /
+        - datetime:
+            text_size: xl
+            format:
+              timeStyle: short
+              dateStyle: long
+        - openweathermap:
+            label: San Mateo
+            units: metric
+            provider: openweathermap
+            apiKey: "{{HOMEPAGE_VAR_WEATHER_KEY}}"
+            cache: 5
         - kubernetes:
             cluster:
               show: true
@@ -113,26 +283,52 @@ spec:
               cpu: true
               memory: true
               showLabel: true
-        - datetime:
-            text_size: xl
-            format:
-              dateStyle: long
-              timeStyle: short
-              hourCycle: h12
 
       settings:
-        title: Ragas Homelab
-        favicon: https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/png/heimdall.png
+        title: Sagar's Dashboard
+        background:
+          image: https://images.unsplash.com/photo-1505699261378-c372af38134c?q=80&w=3270&auto=format&fit=crop
+          blur: sm
+          saturate: 50
+          brightness: 100
+          opacity: 50
         theme: dark
-        color: slate
-        headerStyle: clean
+        color: zinc
+        disableCollapse: true
+        useEqualHeights: true
+        headerStyle: boxed
+        hideVersion: true
+        showStats: true
+        statusStyle: dot
+        hideErrors: true
         layout:
-          Kubernetes:
-            style: row
-            columns: 3
-          Media:
+          Hypervisor:
+            header: true
             style: row
             columns: 4
-          Infrastructure:
+            icon: proxmox.svg
+          Storage:
+            header: true
             style: row
             columns: 3
+            icon: https://cdn.jsdelivr.net/gh/selfhst/icons/svg/synology-light.svg
+          Media:
+            header: true
+            style: row
+            columns: 3
+            icon: plex.svg
+          Requests:
+            header: true
+            style: row
+            columns: 2
+            icon: overseerr.svg
+          Media Management:
+            header: true
+            style: row
+            columns: 3
+            icon: sonarr.svg
+          Network:
+            header: true
+            style: row
+            columns: 4
+            icon: ubiquiti.svg
