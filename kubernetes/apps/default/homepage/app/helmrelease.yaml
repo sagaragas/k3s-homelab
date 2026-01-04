@@ -108,6 +108,7 @@ spec:
                 icon: kubernetes.svg
                 href: https://grafana.ragas.cc
                 description: Talos Cluster
+                ping: 172.16.1.49
                 widget:
                   type: kubernetes
                   cluster:
