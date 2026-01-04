@@ -1,0 +1,119 @@
+---
+name: Discord Notifications
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - kubernetes/**
+  pull_request:
+    types: [opened, closed]
+    branches: [main]
+
+jobs:
+  notify-push:
+    name: Notify on Push
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 2
+
+      - name: Get commit info
+        id: commit
+        run: |
+          # Get changed files
+          CHANGED=$(git diff --name-only HEAD~1 HEAD | grep -E '\.ya?ml$' | head -10 | tr '\n' ', ' | sed 's/,$//')
+
+          # Extract version changes from commit
+          VERSIONS=$(git diff HEAD~1 HEAD -- '*.yaml' '*.yml' | grep -E '^\+.*tag:|^\+.*version:' | sed 's/+/→/' | head -5 | tr '\n' ' ')
+
+          # Get commit message
+          MESSAGE=$(git log -1 --pretty=%B | head -1)
+
+          echo "changed=$CHANGED" >> $GITHUB_OUTPUT
+          echo "versions=$VERSIONS" >> $GITHUB_OUTPUT
+          echo "message=$MESSAGE" >> $GITHUB_OUTPUT
+
+      - name: Send Discord notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          # Color based on commit type
+          if [[ "${{ steps.commit.outputs.message }}" == *"chore(deps)"* ]]; then
+            COLOR=3447003  # Blue for dependency updates
+            TITLE="📦 Dependency Update"
+          elif [[ "${{ steps.commit.outputs.message }}" == *"feat"* ]]; then
+            COLOR=3066993  # Green for features
+            TITLE="✨ New Feature"
+          elif [[ "${{ steps.commit.outputs.message }}" == *"fix"* ]]; then
+            COLOR=15158332  # Red for fixes
+            TITLE="🔧 Bug Fix"
+          else
+            COLOR=9807270  # Gray for other
+            TITLE="📝 Update"
+          fi
+
+          # Build description
+          DESC="${{ steps.commit.outputs.message }}"
+          if [[ -n "${{ steps.commit.outputs.versions }}" ]]; then
+            DESC="$DESC\n\n**Version changes:**\n\`\`\`${{ steps.commit.outputs.versions }}\`\`\`"
+          fi
+
+          curl -H "Content-Type: application/json" \
+            -d "{
+              \"embeds\": [{
+                \"title\": \"$TITLE\",
+                \"description\": \"$DESC\",
+                \"color\": $COLOR,
+                \"fields\": [
+                  {
+                    \"name\": \"Files Changed\",
+                    \"value\": \"\`${{ steps.commit.outputs.changed }}\`\",
+                    \"inline\": false
+                  }
+                ],
+                \"footer\": {
+                  \"text\": \"${{ github.repository }}\"
+                },
+                \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"
+              }]
+            }" \
+            "$DISCORD_WEBHOOK"
+
+  notify-pr:
+    name: Notify on PR
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Send Discord notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          if [[ "${{ github.event.action }}" == "opened" ]]; then
+            COLOR=16776960  # Yellow
+            TITLE="🔔 New PR: ${{ github.event.pull_request.title }}"
+            DESC="**Author:** ${{ github.event.pull_request.user.login }}\n**Branch:** \`${{ github.event.pull_request.head.ref }}\`\n\n[View PR](${{ github.event.pull_request.html_url }})"
+          elif [[ "${{ github.event.action }}" == "closed" && "${{ github.event.pull_request.merged }}" == "true" ]]; then
+            COLOR=3066993  # Green
+            TITLE="✅ PR Merged: ${{ github.event.pull_request.title }}"
+            DESC="Merged by **${{ github.event.pull_request.merged_by.login }}**\n\n[View PR](${{ github.event.pull_request.html_url }})"
+          else
+            exit 0  # Don't notify on closed without merge
+          fi
+
+          curl -H "Content-Type: application/json" \
+            -d "{
+              \"embeds\": [{
+                \"title\": \"$TITLE\",
+                \"description\": \"$DESC\",
+                \"color\": $COLOR,
+                \"footer\": {
+                  \"text\": \"${{ github.repository }}\"
+                },
+                \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"
+              }]
+            }" \
+            "$DISCORD_WEBHOOK"

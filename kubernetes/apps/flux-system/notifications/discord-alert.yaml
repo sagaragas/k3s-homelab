@@ -7,7 +7,8 @@ metadata:
 spec:
   providerRef:
     name: discord
-  eventSeverity: info
+  # Only notify on errors, not every reconciliation
+  eventSeverity: error
   eventSources:
     - kind: Kustomization
       name: "*"
@@ -18,4 +19,5 @@ spec:
     - "error.*timeout"
     - "waiting.*to be available"
     - "dependency.*is not ready"
+    - "retrying in"
   summary: "Homelab Kubernetes"
