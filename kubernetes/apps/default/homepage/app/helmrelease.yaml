@@ -347,11 +347,11 @@ spec:
       customCss:
         - |
           @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
-          
+
           body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
           }
-          
+
           /* Glass morphism cards */
           .service-card {
             background: rgba(255, 255, 255, 0.05) !important;
@@ -362,14 +362,14 @@ spec:
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
           }
-          
+
           .service-card:hover {
             background: rgba(255, 255, 255, 0.08) !important;
             border-color: rgba(255, 255, 255, 0.2) !important;
             transform: translateY(-4px) !important;
             box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4) !important;
           }
-          
+
           /* Widget containers */
           .widget {
             background: rgba(255, 255, 255, 0.03) !important;
@@ -377,7 +377,7 @@ spec:
             border: 1px solid rgba(255, 255, 255, 0.08) !important;
             border-radius: 12px !important;
           }
-          
+
           /* Search bar */
           .information-widget-search input {
             background: rgba(255, 255, 255, 0.05) !important;
@@ -387,24 +387,24 @@ spec:
             color: rgba(255, 255, 255, 0.9) !important;
             transition: all 0.2s ease !important;
           }
-          
+
           .information-widget-search input:focus {
             background: rgba(255, 255, 255, 0.08) !important;
             border-color: rgba(255, 255, 255, 0.2) !important;
             outline: none !important;
           }
-          
+
           /* Headers */
           h1, h2 {
             font-weight: 500 !important;
             letter-spacing: -0.02em !important;
           }
-          
+
           /* Status dots with subtle glow */
           .status-dot {
             box-shadow: 0 0 6px currentColor !important;
           }
-          
+
           /* Smooth scrollbar */
           ::-webkit-scrollbar {
             width: 8px;
