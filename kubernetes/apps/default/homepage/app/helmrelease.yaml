@@ -23,6 +23,9 @@ spec:
       create: true
       name: homepage
 
+    env:
+      HOMEPAGE_ALLOWED_HOSTS: "home.ragas.cc,homepage.default.svc.cluster.local"
+
     envFrom:
       - secretRef:
           name: homepage-config
