@@ -286,6 +286,12 @@ spec:
             format:
               timeStyle: short
               dateStyle: long
+        - openweathermap:
+            label: San Mateo
+            units: metric
+            provider: openweathermap
+            apiKey: "{{HOMEPAGE_VAR_WEATHER_KEY}}"
+            cache: 5
         - kubernetes:
             cluster:
               show: true
