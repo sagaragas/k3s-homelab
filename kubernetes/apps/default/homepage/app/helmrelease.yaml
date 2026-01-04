@@ -238,7 +238,7 @@ spec:
                   username: "{{HOMEPAGE_VAR_QBIT_USER}}"
                   password: "{{HOMEPAGE_VAR_QBIT_PASS}}"
             - Speedtest:
-                icon: speedtest-tracker.svg
+                icon: si-speedtest
                 href: https://speed.ragas.cc
                 description: Network Speed
                 widget:
