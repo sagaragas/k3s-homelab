@@ -169,43 +169,31 @@ spec:
                   key: "{{HOMEPAGE_VAR_TAUTULLI_KEY}}"
 
         - Requests:
-            - Overseerr:
+            - Seerr:
                 icon: overseerr.svg
                 href: https://request.ragas.sh
-                description: Plex Requests
-                ping: 172.16.1.31
+                description: Media Requests
                 widget:
                   type: overseerr
-                  url: http://172.16.1.31:5055
+                  url: http://seerr.default.svc.cluster.local:5055
                   key: "{{HOMEPAGE_VAR_OVERSEERR_KEY}}"
-            - Jellyseerr:
-                icon: jellyseerr.svg
-                href: http://172.16.1.31:5056
-                description: Jelly Requests
-                ping: 172.16.1.31
-                widget:
-                  type: jellyseerr
-                  url: http://172.16.1.31:5056
-                  key: "{{HOMEPAGE_VAR_JELLYSEERR_KEY}}"
 
         - Media Management:
             - Sonarr:
                 icon: sonarr.svg
-                href: http://172.16.1.31:8989
+                href: https://sonarr.ragas.cc
                 description: TV Shows
-                ping: 172.16.1.31
                 widget:
                   type: sonarr
-                  url: http://172.16.1.31:8989
+                  url: http://sonarr.default.svc.cluster.local:8989
                   key: "{{HOMEPAGE_VAR_SONARR_KEY}}"
             - Radarr:
                 icon: radarr.svg
-                href: http://172.16.1.31:7878
+                href: https://radarr.ragas.cc
                 description: Movies
-                ping: 172.16.1.31
                 widget:
                   type: radarr
-                  url: http://172.16.1.31:7878
+                  url: http://radarr.default.svc.cluster.local:7878
                   key: "{{HOMEPAGE_VAR_RADARR_KEY}}"
             - Prowlarr:
                 icon: prowlarr.svg
@@ -343,7 +331,7 @@ spec:
           - Requests:
               header: true
               style: row
-              columns: 2
+              columns: 1
               icon: overseerr.svg
           - Media Management:
               header: true
@@ -353,7 +341,7 @@ spec:
           - Network:
               header: true
               style: row
-              columns: 6
+              columns: 3
               icon: ubiquiti.svg
 
       customCss:
