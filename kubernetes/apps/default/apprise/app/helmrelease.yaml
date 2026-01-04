@@ -19,10 +19,12 @@ spec:
         containers:
           app:
             image:
-              repository: caronc/apprise
+              repository: lscr.io/linuxserver/apprise-api
               tag: latest
             env:
               TZ: America/Los_Angeles
+              PUID: "1000"
+              PGID: "1000"
             probes:
               liveness:
                 enabled: false
