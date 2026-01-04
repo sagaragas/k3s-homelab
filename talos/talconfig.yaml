@@ -93,6 +93,57 @@ nodes:
           - network: "0.0.0.0/0"
             gateway: "172.16.1.1"
         mtu: 1500
+  - hostname: "talos-worker-2"
+    ipAddress: "172.16.1.54"
+    installDisk: "/dev/sda"
+    machineSpec:
+      secureboot: false
+    talosImageURL: factory.talos.dev/installer/376567988ad370138ad8b2698212367b8edcb69b5fd68c80be1f2ec7d603b4ba
+    controlPlane: false
+    networkInterfaces:
+      - deviceSelector:
+          hardwareAddr: "bc:24:11:a4:b6:e5"
+        dhcp: false
+        addresses:
+          - "172.16.1.54/24"
+        routes:
+          - network: "0.0.0.0/0"
+            gateway: "172.16.1.1"
+        mtu: 1500
+  - hostname: "talos-worker-3"
+    ipAddress: "172.16.1.55"
+    installDisk: "/dev/sda"
+    machineSpec:
+      secureboot: false
+    talosImageURL: factory.talos.dev/installer/376567988ad370138ad8b2698212367b8edcb69b5fd68c80be1f2ec7d603b4ba
+    controlPlane: false
+    networkInterfaces:
+      - deviceSelector:
+          hardwareAddr: "bc:24:11:f9:19:f1"
+        dhcp: false
+        addresses:
+          - "172.16.1.55/24"
+        routes:
+          - network: "0.0.0.0/0"
+            gateway: "172.16.1.1"
+        mtu: 1500
+  - hostname: "talos-worker-4"
+    ipAddress: "172.16.1.56"
+    installDisk: "/dev/sda"
+    machineSpec:
+      secureboot: false
+    talosImageURL: factory.talos.dev/installer/376567988ad370138ad8b2698212367b8edcb69b5fd68c80be1f2ec7d603b4ba
+    controlPlane: false
+    networkInterfaces:
+      - deviceSelector:
+          hardwareAddr: "bc:24:11:9d:3a:4f"
+        dhcp: false
+        addresses:
+          - "172.16.1.56/24"
+        routes:
+          - network: "0.0.0.0/0"
+            gateway: "172.16.1.1"
+        mtu: 1500
 
 # Global patches
 patches:

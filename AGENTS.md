@@ -43,12 +43,15 @@ All internal services use `*.ragas.cc` via bind9 DNS.
 
 ### Talos K8s Nodes
 
-| Name | IP | Role | Host |
-|------|-----|------|------|
-| talos-cp-1 | 172.16.1.50 | controlplane | pve1 |
-| talos-cp-2 | 172.16.1.51 | controlplane | pve2 |
-| talos-cp-3 | 172.16.1.52 | controlplane | pve1 |
-| talos-worker-1 | 172.16.1.53 | worker | pve2 |
+| Name | IP | Role | Host | VMID |
+|------|-----|------|------|------|
+| talos-cp-1 | 172.16.1.50 | controlplane | pve1 | 500 |
+| talos-cp-2 | 172.16.1.51 | controlplane | pve1 | 501 |
+| talos-cp-3 | 172.16.1.52 | controlplane | pve2 | 502 |
+| talos-worker-1 | 172.16.1.53 | worker | pve2 | 510 |
+| talos-worker-2 | 172.16.1.54 | worker | pve4 | 511 |
+| talos-worker-3 | 172.16.1.55 | worker | pve4 | 512 |
+| talos-worker-4 | 172.16.1.56 | worker | pve3 | 513 |
 
 ### K8s Network
 
