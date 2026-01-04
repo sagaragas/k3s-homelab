@@ -287,51 +287,14 @@ spec:
               memory: true
               showLabel: true
 
-      settings:
-        title: Sagar's Dashboard
-        background:
-          image: https://images.unsplash.com/photo-1505699261378-c372af38134c?q=80&w=3270&auto=format&fit=crop
-          blur: sm
-          saturate: 50
-          brightness: 100
-          opacity: 50
-        theme: dark
-        color: zinc
-        disableCollapse: true
-        useEqualHeights: true
-        headerStyle: boxed
-        hideVersion: true
-        showStats: true
-        statusStyle: dot
-        hideErrors: true
-        layout:
-          Hypervisor:
-            header: true
-            style: row
-            columns: 4
-            icon: proxmox.svg
-          Storage:
-            header: true
-            style: row
-            columns: 3
-            icon: https://cdn.jsdelivr.net/gh/selfhst/icons/svg/synology-light.svg
-          Media:
-            header: true
-            style: row
-            columns: 3
-            icon: plex.svg
-          Requests:
-            header: true
-            style: row
-            columns: 2
-            icon: overseerr.svg
-          Media Management:
-            header: true
-            style: row
-            columns: 3
-            icon: sonarr.svg
-          Network:
-            header: true
-            style: row
-            columns: 4
-            icon: ubiquiti.svg
+      settings: {}
+
+    persistence:
+      config:
+        enabled: true
+        type: configMap
+        name: homepage-config-files
+        globalMounts:
+          - path: /app/config/settings.yaml
+            subPath: settings.yaml
+            readOnly: true
