@@ -61,6 +61,16 @@ spec:
                   periodSeconds: 5
                   timeoutSeconds: 5
                   failureThreshold: 30
+            securityContext:
+              allowPrivilegeEscalation: true
+              readOnlyRootFilesystem: false
+              capabilities:
+                add:
+                  - CHOWN
+                  - SETGID
+                  - SETUID
+                  - DAC_OVERRIDE
+                  - FOWNER
             resources:
               requests:
                 cpu: 10m
