@@ -10,39 +10,149 @@
 | **GitOps** | Flux v2 |
 | **CNI** | Cilium (eBPF) |
 | **Ingress** | Envoy Gateway |
-| **DNS** | external-dns → Cloudflare |
+| **DNS** | bind9 (172.16.1.10) + AdGuard (172.16.1.11) |
+| **External DNS** | Cloudflare (ragas.cc public) |
 | **Secrets** | SOPS + age |
-| **Domain** | ragas.cc |
-| **Updates** | Renovate (auto PRs) |
+| **Updates** | Renovate (auto-merge patch/minor to main) |
 
-## Nodes
+## Domains
 
-| Name | IP | Role | Proxmox | Specs |
-|------|-----|------|---------|-------|
-| talos-cp-1 | 172.16.1.50 | controlplane | pve1 | 4c/16GB |
-| talos-cp-2 | 172.16.1.51 | controlplane | pve2 | 4c/16GB |
-| talos-cp-3 | 172.16.1.52 | controlplane | pve1 | 4c/16GB |
-| talos-worker-1 | 172.16.1.53 | worker | pve2 | 8c/32GB |
+| Domain | Purpose | DNS Provider |
+|--------|---------|--------------|
+| `ragas.cc` | Internal services (K8s, LXC) | bind9 → AdGuard |
+| `ragas.sh` | Public-facing services | Cloudflare |
 
-## Directory Structure
+### Public Services (ragas.sh) - DO NOT MIGRATE DOMAINS
+- `request.ragas.sh` → Overseerr (public requests)
+- `plex.ragas.sh` → Plex (public streaming)
+- `jelly.ragas.sh` → Jellyfin (public streaming)
 
-```
-.
-├── kubernetes/
-│   ├── apps/                 # User applications
-│   │   ├── default/          # Default namespace apps
-│   │   ├── media/            # Media apps (arr stack, etc.)
-│   │   ├── home/             # Home automation
-│   │   └── ...
-│   ├── bootstrap/            # Bootstrap components (cilium, flux)
-│   └── flux/                 # Flux configuration
-├── talos/                    # Talos machine configurations
-│   ├── clusterconfig/        # Generated node configs
-│   └── talconfig.yaml        # Talhelper configuration
-├── cluster.yaml              # Main cluster configuration
-├── nodes.yaml                # Node definitions
-└── Taskfile.yaml             # Task automation
-```
+### Internal Services (ragas.cc)
+All internal services use `*.ragas.cc` via bind9 DNS.
+
+## Infrastructure
+
+### Proxmox Nodes
+
+| Name | IP | Role |
+|------|-----|------|
+| pve1 | 172.16.1.2 | Proxmox host |
+| pve2 | 172.16.1.3 | Proxmox host |
+| pve3 | 172.16.1.4 | Proxmox host |
+| pve4 | 172.16.1.5 | Proxmox host (GPU) |
+
+### Talos K8s Nodes
+
+| Name | IP | Role | Host |
+|------|-----|------|------|
+| talos-cp-1 | 172.16.1.50 | controlplane | pve1 |
+| talos-cp-2 | 172.16.1.51 | controlplane | pve2 |
+| talos-cp-3 | 172.16.1.52 | controlplane | pve1 |
+| talos-worker-1 | 172.16.1.53 | worker | pve2 |
+
+### K8s Network
+
+| Resource | IP |
+|----------|-----|
+| Talos API VIP | 172.16.1.49 |
+| k8s-gateway | 172.16.1.60 |
+| envoy-internal | 172.16.1.61 |
+| envoy-external | 172.16.1.62 |
+
+## Service Inventory
+
+### On Kubernetes (ragas.cc)
+
+| Service | URL | Status |
+|---------|-----|--------|
+| Homepage | home.ragas.cc | ✅ Deployed |
+| Bazarr | bazarr.ragas.cc | ✅ Deployed |
+| Grafana | grafana.ragas.cc | ✅ Deployed |
+| Prometheus | prometheus.ragas.cc | ✅ Deployed |
+| MkDocs | docs.ragas.cc | ✅ Deployed |
+
+### On LXC: arr (172.16.1.31) - Docker
+
+| Service | URL | Port |
+|---------|-----|------|
+| Sonarr | sonarr.ragas.cc | 8989 |
+| Radarr | radarr.ragas.cc | 7878 |
+| Prowlarr | prowlarr.ragas.cc | 9696 |
+| Overseerr | seerr.ragas.cc | 5055 |
+| Requestrr | requestrr.ragas.cc | 4545 |
+| Huntarr | huntarr.ragas.cc | 9705 |
+| Dockge | dockge.ragas.cc | 5001 |
+
+### On LXC: torrent (172.16.1.32) - Docker
+
+| Service | URL | Port | Notes |
+|---------|-----|------|-------|
+| qBittorrent | qbit.ragas.cc | 8080 | 2.5Gb NIC - keep on LXC |
+
+### On LXC: fun (172.16.1.7) - Runtipi
+
+| Service | URL | Status |
+|---------|-----|--------|
+| Homepage | ~~homepage.ragas.cc~~ | ✅ Migrated to K8s |
+| Bazarr | ~~bazarr.ragas.cc~~ | ✅ Migrated to K8s |
+| Speedtest | speedtest.ragas.cc | 🔄 Pending migration |
+| Overseerr | overseerr.ragas.cc | 🔄 Pending migration |
+| NextGBA | nextgba.ragas.cc | 🔄 Pending migration |
+
+### On LXC: Media (GPU required - stay on LXC)
+
+| Service | IP | URL | Notes |
+|---------|-----|-----|-------|
+| Plex | 172.16.1.33 | plex.ragas.sh | GPU passthrough |
+| Jellyfin | 172.16.1.30 | jelly.ragas.sh | GPU + USB |
+
+### On LXC: Infrastructure (stay on LXC)
+
+| Service | IP | Notes |
+|---------|-----|-------|
+| AdGuard | 172.16.1.11 | DNS must be outside K8s |
+| bind9 | 172.16.1.10 | Internal DNS for ragas.cc |
+| PBS | 172.16.1.12 | Proxmox Backup Server |
+| Uptime Kuma | 172.16.1.249 | Status monitoring |
+| Unifi | 172.16.1.253 | Network controller |
+
+### NAS (172.16.1.250)
+
+Synology NAS with NFS shares:
+- `/volume2/media` - Media files (movies, TV, music)
+
+**NFS Access:** Currently only LXC containers can mount. K8s workers (172.16.1.50-53) need to be added to NAS allowed hosts.
+
+## Decision Rules: K8s vs LXC
+
+| Condition | Deploy To |
+|-----------|-----------|
+| Needs GPU? | LXC on pve4 |
+| Needs 2.5Gb NIC? | LXC (torrent) |
+| Is DNS service? | LXC (outside K8s) |
+| Needs USB passthrough? | LXC |
+| Stateless web app? | K8s |
+| Arr stack app? | K8s (preferred) or LXC |
+| Public-facing (ragas.sh)? | Keep existing setup |
+
+## Migration Notes
+
+### Domain Changes
+- **Old internal domain:** `*.ragas.sh` (some services)
+- **New internal domain:** `*.ragas.cc`
+- When migrating, update `base_url` configs from `/app.ragas.sh/` to `/`
+- Update DNS in bind9 (`/etc/bind/db.ragas.cc` on 172.16.1.10)
+
+### Config Migration Pattern
+1. Backup config from source: `tar -czf /tmp/app-config.tar.gz -C /path/to/config .`
+2. Copy to K8s pod: `kubectl cp /tmp/app-config.tar.gz namespace/pod:/tmp/`
+3. Extract in pod: `kubectl exec pod -- tar -xzf /tmp/app-config.tar.gz -C /config`
+4. Fix base_url if needed: `sed -i 's|base_url:.*|base_url: /|' config.yaml`
+5. Restart pod to apply
+
+### NFS Media Mount (Pending)
+K8s pods cannot mount NAS NFS until NAS is configured to allow worker IPs.
+Workaround: Apps can still connect to Sonarr/Radarr via API without direct media access.
 
 ## Key Tools
 
@@ -51,155 +161,43 @@
 | `talosctl` | Manage Talos nodes (no SSH!) |
 | `kubectl` | Kubernetes CLI |
 | `flux` | GitOps CLI |
-| `task` | Task runner (like make) |
+| `task` | Task runner |
 | `sops` | Encrypt/decrypt secrets |
-| `mise` | Dev environment manager |
 | `talhelper` | Generate Talos configs |
 
-## Common Tasks
+## Common Commands
 
 ```bash
-# Task runner commands (run from repo root)
-task --list                      # List all available tasks
+# Flux reconciliation
+flux reconcile ks <app> -n <namespace> --with-source
 
-# Talos management
-task talos:generate-config       # Generate Talos configs from talconfig.yaml
-task talos:apply-node IP=x.x.x.x # Apply config to a node
-task talos:upgrade-node IP=x.x.x.x # Upgrade Talos on a node
-task talos:upgrade-k8s           # Upgrade Kubernetes version
+# Check status
+flux get ks -A
+flux get hr -A
+kubectl get pods -A
 
-# Flux / GitOps
-task flux:reconcile              # Force Flux to sync
-flux get ks -A                   # Check Kustomization status
-flux get hr -A                   # Check HelmRelease status
+# Talos (NO SSH - API only)
+talosctl --nodes <ip> health
+talosctl --nodes <ip> dashboard
 
-# Cluster health
-task cluster:pods                # List all pods
-cilium status                    # Check Cilium CNI status
-kubectl get nodes -o wide        # Check node status
+# DNS updates (on 172.16.1.10)
+ssh root@172.16.1.10 "vim /etc/bind/db.ragas.cc"
+ssh root@172.16.1.10 "systemctl reload bind9"
 
-# Testing / Validation
-task test                        # Run all validation tests
-task test:yaml                   # YAML lint validation
-task test:schema                 # Kubernetes schema validation (kubeconform)
-task test:flux                   # Flux configuration validation
-```
-
-## Adding a New Application
-
-1. **Create app directory:**
-   ```bash
-   mkdir -p kubernetes/apps/<namespace>/<app-name>
-   ```
-
-2. **Add HelmRelease:**
-   ```yaml
-   # kubernetes/apps/<namespace>/<app-name>/helmrelease.yaml
-   apiVersion: helm.toolkit.fluxcd.io/v2
-   kind: HelmRelease
-   metadata:
-     name: app-name
-   spec:
-     interval: 30m
-     chart:
-       spec:
-         chart: app-chart
-         version: "1.x.x"
-         sourceRef:
-           kind: HelmRepository
-           name: repo-name
-           namespace: flux-system
-     values:
-       # Your values here
-   ```
-
-3. **Add Kustomization:**
-   ```yaml
-   # kubernetes/apps/<namespace>/<app-name>/kustomization.yaml
-   apiVersion: kustomize.config.k8s.io/v1beta1
-   kind: Kustomization
-   resources:
-     - helmrelease.yaml
-   ```
-
-4. **Register in parent ks.yaml** and push to git
-
-## Ingress Pattern (Envoy Gateway)
-
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: app-name
-  namespace: app-namespace
-spec:
-  parentRefs:
-    - name: envoy-external  # or envoy-internal for private
-      namespace: network
-  hostnames:
-    - "app.ragas.cc"
-  rules:
-    - backendRefs:
-        - name: app-service
-          port: 80
-```
-
-- `envoy-external` → Public internet via Cloudflare Tunnel
-- `envoy-internal` → Private network only
-
-## Secrets Management
-
-```bash
-# Create secret
-cat > secret.sops.yaml << 'EOF'
-apiVersion: v1
-kind: Secret
-metadata:
-  name: my-secret
-stringData:
-  API_KEY: your-secret-value
-EOF
-
-# Encrypt (uses .sops.yaml rules)
+# SOPS secrets
 sops --encrypt --in-place secret.sops.yaml
-
-# Decrypt for viewing
 sops --decrypt secret.sops.yaml
 ```
 
-## Services NOT on Kubernetes
+## Repositories
 
-These remain on Proxmox LXC (managed in `/root/homelab/iac`):
-
-| Service | IP | Reason |
-|---------|-----|--------|
-| Plex | 172.16.1.33 | GPU passthrough |
-| Jellyfin | 172.16.1.30 | GPU + USB |
-| qBittorrent | 172.16.1.32 | 2.5Gb NIC |
-| AdGuard | 172.16.1.11 | DNS outside k8s |
-| PBS | 172.16.1.12 | Proxmox service |
-
-## Network Layout
-
-| Resource | IP/URL |
-|----------|--------|
-| Talos API VIP | 172.16.1.49 |
-| Kubernetes API | https://172.16.1.49:6443 |
-| Internal Gateway | 172.16.1.60 |
-| External Gateway | Via Cloudflare Tunnel |
-| Apps | https://<app>.ragas.cc |
-
-## Deployment Flow
-
-```
-git push → GitHub → Flux detects change → Reconciles → Apps deployed
-                         ↓
-              Renovate creates PRs for updates
-```
+| Repo | Path | Purpose |
+|------|------|---------|
+| k3s-homelab | /root/homelab/k3s | K8s manifests (this repo) |
+| iac | /root/homelab/iac | LXC/Proxmox configs |
 
 ## References
 
-- [onedr0p/cluster-template](https://github.com/onedr0p/cluster-template) - This cluster is based on
-- [onedr0p/home-ops](https://github.com/onedr0p/home-ops) - Reference implementation
-- [Home Operations Discord](https://discord.gg/home-operations) - Community support
+- [onedr0p/cluster-template](https://github.com/onedr0p/cluster-template)
+- [onedr0p/home-ops](https://github.com/onedr0p/home-ops)
 - [kubesearch.dev](https://kubesearch.dev/) - Search for app configs
