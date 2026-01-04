@@ -61,10 +61,6 @@ spec:
                   periodSeconds: 5
                   timeoutSeconds: 5
                   failureThreshold: 30
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: false
-              capabilities: {drop: ["ALL"]}
             resources:
               requests:
                 cpu: 10m
@@ -77,8 +73,6 @@ spec:
         runAsNonRoot: false
         runAsUser: 0
         runAsGroup: 0
-        fsGroup: 1000
-        fsGroupChangePolicy: OnRootMismatch
 
     service:
       app:
