@@ -19,3 +19,6 @@ talosconfig
 .venv/
 .DS_Store
 Thumbs.db
+
+# Agentic docs (local only, not for public repo)
+.factory/
