@@ -49,6 +49,12 @@
       automerge: false,
     },
     {
+      description: 'Postgres major updates disabled (require data migration)',
+      matchPackageNames: ['/postgres/'],
+      matchUpdateTypes: ['major'],
+      enabled: false,
+    },
+    {
       description: 'Group infrastructure updates',
       groupName: 'infrastructure',
       matchPackageNames: [
