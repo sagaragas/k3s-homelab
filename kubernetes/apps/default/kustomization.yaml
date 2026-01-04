@@ -8,6 +8,7 @@ components:
 
 resources:
   - ./namespace.yaml
+  - ./apprise/ks.yaml
   - ./bazarr/ks.yaml
   - ./echo/ks.yaml
   - ./homepage/ks.yaml
