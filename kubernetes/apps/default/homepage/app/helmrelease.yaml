@@ -297,13 +297,13 @@ spec:
         title: "Sagar's Homelab"
         favicon: https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/png/heimdall.png
         background:
-          image: https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=1920&q=80
-          blur: sm
-          saturate: 100
-          brightness: 50
-          opacity: 80
+          image: https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80
+          blur: md
+          saturate: 80
+          brightness: 40
+          opacity: 60
         theme: dark
-        color: cyan
+        color: slate
         disableCollapse: true
         useEqualHeights: true
         headerStyle: clean
@@ -311,7 +311,7 @@ spec:
         showStats: true
         statusStyle: dot
         hideErrors: false
-        cardBlur: md
+        cardBlur: xl
         layout:
           - Hypervisor:
               header: true
@@ -346,44 +346,76 @@ spec:
 
       customCss:
         - |
-          :root {
-            --color-cyan: #00f0ff;
-            --color-magenta: #ff00ff;
-            --color-yellow: #fcee0a;
-          }
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+          
           body {
-            font-family: 'Share Tech Mono', 'Courier New', monospace;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
           }
-          #page_container {
-            background: linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(20,20,40,0.95) 100%);
-          }
+          
+          /* Glass morphism cards */
           .service-card {
-            border: 1px solid rgba(0, 240, 255, 0.3) !important;
-            background: rgba(0, 20, 40, 0.7) !important;
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2), inset 0 0 20px rgba(0, 240, 255, 0.05) !important;
-            transition: all 0.3s ease !important;
+            background: rgba(255, 255, 255, 0.05) !important;
+            backdrop-filter: blur(20px) saturate(180%) !important;
+            -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 16px !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
           }
+          
           .service-card:hover {
-            border-color: rgba(0, 240, 255, 0.8) !important;
-            box-shadow: 0 0 30px rgba(0, 240, 255, 0.5), inset 0 0 30px rgba(0, 240, 255, 0.1) !important;
-            transform: translateY(-2px) !important;
+            background: rgba(255, 255, 255, 0.08) !important;
+            border-color: rgba(255, 255, 255, 0.2) !important;
+            transform: translateY(-4px) !important;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4) !important;
           }
+          
+          /* Widget containers */
           .widget {
-            border: 1px solid rgba(255, 0, 255, 0.2) !important;
-            background: rgba(20, 0, 30, 0.6) !important;
+            background: rgba(255, 255, 255, 0.03) !important;
+            backdrop-filter: blur(16px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-radius: 12px !important;
           }
-          h1, h2, .text-theme-700 {
-            color: #00f0ff !important;
-            text-shadow: 0 0 10px rgba(0, 240, 255, 0.5) !important;
-          }
-          .status-dot {
-            box-shadow: 0 0 8px currentColor !important;
-          }
+          
+          /* Search bar */
           .information-widget-search input {
-            background: rgba(0, 20, 40, 0.8) !important;
-            border: 1px solid rgba(0, 240, 255, 0.5) !important;
-            color: #00f0ff !important;
+            background: rgba(255, 255, 255, 0.05) !important;
+            backdrop-filter: blur(12px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 12px !important;
+            color: rgba(255, 255, 255, 0.9) !important;
+            transition: all 0.2s ease !important;
           }
-          .bookmark-icon {
-            filter: drop-shadow(0 0 3px rgba(0, 240, 255, 0.5));
+          
+          .information-widget-search input:focus {
+            background: rgba(255, 255, 255, 0.08) !important;
+            border-color: rgba(255, 255, 255, 0.2) !important;
+            outline: none !important;
+          }
+          
+          /* Headers */
+          h1, h2 {
+            font-weight: 500 !important;
+            letter-spacing: -0.02em !important;
+          }
+          
+          /* Status dots with subtle glow */
+          .status-dot {
+            box-shadow: 0 0 6px currentColor !important;
+          }
+          
+          /* Smooth scrollbar */
+          ::-webkit-scrollbar {
+            width: 8px;
+          }
+          ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+          }
+          ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+          }
+          ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
           }
