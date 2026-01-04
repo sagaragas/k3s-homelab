@@ -7,38 +7,79 @@ spec:
   interval: 30m
   chart:
     spec:
-      chart: postgresql
-      version: 16.4.1
+      chart: app-template
+      version: 3.6.1
       sourceRef:
         kind: HelmRepository
-        name: bitnami
+        name: bjw-s
         namespace: database
   values:
-    image:
-      registry: docker.io
-      repository: bitnami/postgresql
-      tag: 15.10.0-debian-12-r9
+    controllers:
+      postgres:
+        type: statefulset
+        containers:
+          app:
+            image:
+              repository: postgres
+              tag: "15"
+            env:
+              POSTGRES_DB: speedtest-tracker
+              POSTGRES_USER: tipi
+              PGDATA: /var/lib/postgresql/data/pgdata
+            envFrom:
+              - secretRef:
+                  name: postgres-secret
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command:
+                      - pg_isready
+                      - -U
+                      - tipi
+                      - -d
+                      - speedtest-tracker
+                  initialDelaySeconds: 30
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command:
+                      - pg_isready
+                      - -U
+                      - tipi
+                      - -d
+                      - speedtest-tracker
+                  initialDelaySeconds: 5
+                  periodSeconds: 5
+                  timeoutSeconds: 3
+                  failureThreshold: 3
+            resources:
+              requests:
+                cpu: 50m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
 
-    auth:
-      database: speedtest-tracker
-      username: tipi
-      existingSecret: postgres-secret
-      secretKeys:
-        adminPasswordKey: postgres-password
-        userPasswordKey: password
+    service:
+      app:
+        controller: postgres
+        ports:
+          postgres:
+            port: 5432
 
-    primary:
-      persistence:
+    persistence:
+      data:
         enabled: true
-        storageClass: ceph-block
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
         size: 1Gi
-
-      resources:
-        requests:
-          cpu: 50m
-          memory: 128Mi
-        limits:
-          memory: 512Mi
-
-    metrics:
-      enabled: false
+        storageClass: ceph-block
+        globalMounts:
+          - path: /var/lib/postgresql/data

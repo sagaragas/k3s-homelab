@@ -28,7 +28,7 @@ spec:
               PUID: "1000"
               PGID: "1000"
               DB_CONNECTION: pgsql
-              DB_HOST: postgres-postgresql.database.svc.cluster.local
+              DB_HOST: postgres.database.svc.cluster.local
               DB_PORT: "5432"
               DB_DATABASE: speedtest-tracker
               DB_USERNAME: tipi
