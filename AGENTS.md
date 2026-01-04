@@ -70,6 +70,8 @@ All internal services use `*.ragas.cc` via bind9 DNS.
 | Grafana | grafana.ragas.cc | ✅ Deployed |
 | Prometheus | prometheus.ragas.cc | ✅ Deployed |
 | MkDocs | docs.ragas.cc | ✅ Deployed |
+| Speedtest Tracker | speedtest.ragas.cc | ✅ Deployed |
+| PostgreSQL | postgres.database.svc | ✅ Deployed |
 
 ### On LXC: arr (172.16.1.31) - Docker
 
@@ -95,7 +97,8 @@ All internal services use `*.ragas.cc` via bind9 DNS.
 |---------|-----|--------|
 | Homepage | ~~homepage.ragas.cc~~ | ✅ Migrated to K8s |
 | Bazarr | ~~bazarr.ragas.cc~~ | ✅ Migrated to K8s |
-| Speedtest | speedtest.ragas.cc | 🔄 Pending migration |
+| Speedtest | ~~speedtest.ragas.cc~~ | ✅ Migrated to K8s |
+| PostgreSQL | ~~(internal)~~ | ✅ Migrated to K8s |
 | Overseerr | overseerr.ragas.cc | 🔄 Pending migration |
 | NextGBA | nextgba.ragas.cc | 🔄 Pending migration |
 
