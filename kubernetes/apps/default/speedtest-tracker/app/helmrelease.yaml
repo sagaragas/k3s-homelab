@@ -1,0 +1,98 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: speedtest-tracker
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.6.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: default
+  values:
+    controllers:
+      speedtest-tracker:
+        containers:
+          app:
+            image:
+              repository: lscr.io/linuxserver/speedtest-tracker
+              tag: 1.10.3
+            env:
+              TZ: America/Los_Angeles
+              APP_TIMEZONE: America/Los_Angeles
+              DISPLAY_TIMEZONE: America/Los_Angeles
+              PUID: "1000"
+              PGID: "1000"
+              DB_CONNECTION: pgsql
+              DB_HOST: postgres-postgresql.database.svc.cluster.local
+              DB_PORT: "5432"
+              DB_DATABASE: speedtest-tracker
+              DB_USERNAME: tipi
+              SPEEDTEST_SCHEDULE: "0 7 * * *"
+              SPEEDTEST_SERVERS: "19900,"
+            envFrom:
+              - secretRef:
+                  name: speedtest-tracker-secret
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/healthcheck
+                    port: 80
+                  initialDelaySeconds: 30
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              readiness: *probes
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/healthcheck
+                    port: 80
+                  initialDelaySeconds: 10
+                  periodSeconds: 5
+                  timeoutSeconds: 5
+                  failureThreshold: 30
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: false
+              capabilities: {drop: ["ALL"]}
+            resources:
+              requests:
+                cpu: 10m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: false
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+
+    service:
+      app:
+        controller: speedtest-tracker
+        ports:
+          http:
+            port: 80
+
+    persistence:
+      config:
+        enabled: true
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 256Mi
+        storageClass: ceph-block
+        globalMounts:
+          - path: /config
