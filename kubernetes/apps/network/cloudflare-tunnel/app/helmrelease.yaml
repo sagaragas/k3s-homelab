@@ -72,13 +72,9 @@ spec:
             tunnel: 30286f86-9062-47bd-92f2-80d94cdb17b0
             ingress:
               - hostname: "request.ragas.sh"
-                originRequest:
-                  http2Origin: true
-                service: https://envoy-external.{{ .Release.Namespace }}.svc.cluster.local:443
+                service: http://seerr.default.svc.cluster.local:5055
               - hostname: "*.ragas.sh"
-                originRequest:
-                  http2Origin: true
-                service: https://envoy-external.{{ .Release.Namespace }}.svc.cluster.local:443
+                service: http://envoy-external.{{ .Release.Namespace }}.svc.cluster.local:80
               - service: http_status:404
     persistence:
       config-file:
