@@ -104,6 +104,20 @@ spec:
                   username: "{{HOMEPAGE_VAR_PROXMOX_USER}}"
                   password: "{{HOMEPAGE_VAR_PROXMOX_PASS}}"
                   node: pve4
+            - Kubernetes:
+                icon: kubernetes.svg
+                href: https://grafana.ragas.cc
+                description: Talos Cluster
+                widget:
+                  type: kubernetes
+                  cluster:
+                    show: true
+                    cpu: true
+                    memory: true
+                    showLabel: true
+                    label: "Cluster"
+                  nodes:
+                    show: false
 
         - Storage:
             - Volume-1:
@@ -283,18 +297,6 @@ spec:
             provider: openweathermap
             apiKey: "{{HOMEPAGE_VAR_WEATHER_KEY}}"
             cache: 5
-        - kubernetes:
-            cluster:
-              show: true
-              cpu: true
-              memory: true
-              showLabel: true
-              label: "Talos Cluster"
-            nodes:
-              show: true
-              cpu: true
-              memory: true
-              showLabel: true
 
       settings:
         title: "Sagar's Homelab"
@@ -319,7 +321,7 @@ spec:
           - Hypervisor:
               header: true
               style: row
-              columns: 4
+              columns: 5
               icon: proxmox.svg
           - Storage:
               header: true
