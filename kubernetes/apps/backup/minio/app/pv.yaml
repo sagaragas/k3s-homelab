@@ -1,0 +1,28 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: backup-nfs-pv
+spec:
+  capacity:
+    storage: 500Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  nfs:
+    server: 172.16.1.250
+    path: /volume1/k8s-backup
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: backup-nfs
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ""
+  volumeName: backup-nfs-pv
+  resources:
+    requests:
+      storage: 500Gi
