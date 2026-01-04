@@ -1,4 +1,11 @@
 ---
+# NOTE: This talconfig.yaml is for DOCUMENTATION ONLY.
+# The cluster was NOT created with talhelper - it was bootstrapped manually.
+# To add new nodes, copy config from an existing node and modify.
+# See: talosctl -n 172.16.1.53 get machineconfig -o jsonpath='{.spec}'
+#
+# The talsecret.sops.yaml was removed because it contained wrong secrets.
+
 clusterName: kubernetes
 
 talosVersion: "${talosVersion}"

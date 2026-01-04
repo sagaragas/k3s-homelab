@@ -169,7 +169,30 @@ Workaround: Apps can still connect to Sonarr/Radarr via API without direct media
 | `flux` | GitOps CLI |
 | `task` | Task runner |
 | `sops` | Encrypt/decrypt secrets |
-| `talhelper` | Generate Talos configs |
+| `talhelper` | Generate Talos configs (NOT USED - see below) |
+
+## Adding New Talos Nodes
+
+**IMPORTANT:** This cluster was NOT created with talhelper. The `talsecret.sops.yaml` was removed because it contained incorrect secrets.
+
+To add a new worker node:
+
+```bash
+# 1. Get config template from existing worker
+talosctl -n 172.16.1.53 get machineconfig -o jsonpath='{.spec}' > /tmp/new-worker.yaml
+
+# 2. Edit the config - change hostname, IP, MAC address
+sed -i 's/talos-worker-1/talos-worker-X/g' /tmp/new-worker.yaml
+sed -i 's/172.16.1.53/172.16.1.XX/g' /tmp/new-worker.yaml
+sed -i 's/bc:24:11:45:62:22/NEW:MAC:ADDR/g' /tmp/new-worker.yaml
+
+# 3. Boot VM from Talos ISO (maintenance mode)
+# 4. Apply config
+talosctl apply-config --insecure --nodes <DHCP_IP> --file /tmp/new-worker.yaml
+
+# 5. Verify node joins cluster
+kubectl get nodes
+```
 
 ## Common Commands
 

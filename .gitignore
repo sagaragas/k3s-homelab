@@ -22,3 +22,4 @@ Thumbs.db
 
 # Agentic docs (local only, not for public repo)
 .factory/
+talosconfig.backup
