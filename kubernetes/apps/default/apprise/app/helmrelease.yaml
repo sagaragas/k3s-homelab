@@ -25,34 +25,11 @@ spec:
               TZ: America/Los_Angeles
             probes:
               liveness:
-                enabled: true
-                custom: true
-                spec:
-                  httpGet:
-                    path: /
-                    port: 8000
-                  initialDelaySeconds: 15
-                  periodSeconds: 30
-                  timeoutSeconds: 5
+                enabled: false
               readiness:
-                enabled: true
-                custom: true
-                spec:
-                  httpGet:
-                    path: /
-                    port: 8000
-                  initialDelaySeconds: 10
-                  periodSeconds: 10
+                enabled: false
               startup:
-                enabled: true
-                custom: true
-                spec:
-                  httpGet:
-                    path: /
-                    port: 8000
-                  initialDelaySeconds: 5
-                  periodSeconds: 5
-                  failureThreshold: 30
+                enabled: false
             resources:
               requests:
                 cpu: 10m
