@@ -216,16 +216,6 @@ spec:
                   type: prowlarr
                   url: http://172.16.1.31:9696
                   key: "{{HOMEPAGE_VAR_PROWLARR_KEY}}"
-            - Bazarr:
-                icon: bazarr.svg
-                href: http://172.16.1.7:6767
-                description: Subtitles
-                ping: 172.16.1.7
-                widget:
-                  type: bazarr
-                  url: http://172.16.1.7:6767
-                  key: "{{HOMEPAGE_VAR_BAZARR_KEY}}"
-
         - Network:
             - OpnSense:
                 icon: opnsense.svg
@@ -296,12 +286,6 @@ spec:
             format:
               timeStyle: short
               dateStyle: long
-        - openweathermap:
-            label: San Mateo
-            units: metric
-            provider: openweathermap
-            apiKey: "{{HOMEPAGE_VAR_WEATHER_KEY}}"
-            cache: 5
         - kubernetes:
             cluster:
               show: true
@@ -316,7 +300,7 @@ spec:
               showLabel: true
 
       settings:
-        title: "// RAGAS_NET //"
+        title: "Sagar's Homelab"
         favicon: https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/png/heimdall.png
         background:
           image: https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=1920&q=80
@@ -358,7 +342,7 @@ spec:
           - Media Management:
               header: true
               style: row
-              columns: 4
+              columns: 3
               icon: sonarr.svg
           - Network:
               header: true
