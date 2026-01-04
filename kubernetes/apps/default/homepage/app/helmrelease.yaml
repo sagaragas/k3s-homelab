@@ -23,7 +23,8 @@ spec:
       create: true
       name: homepage
 
-    replicaCount: 2
+    controller:
+      replicas: 2
 
     tolerations:
       - key: "node.kubernetes.io/not-ready"
