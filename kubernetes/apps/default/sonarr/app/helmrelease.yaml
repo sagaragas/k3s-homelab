@@ -57,6 +57,30 @@ spec:
         runAsGroup: 0
         fsGroup: 1000
         fsGroupChangePolicy: OnRootMismatch
+      tolerations:
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 30
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 30
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: seerr
+                topologyKey: topology.kubernetes.io/zone
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: radarr
+                topologyKey: topology.kubernetes.io/zone
 
     service:
       app:
