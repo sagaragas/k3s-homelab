@@ -70,10 +70,11 @@ spec:
         accessMode: ReadWriteOnce
         size: 1Gi
         storageClass: ceph-block
-      media:
-        enabled: true
-        type: nfs
-        server: 172.16.1.250
-        path: /volume2/media
-        globalMounts:
-          - path: /media
+      # TODO: Add NFS media mount after configuring NAS to allow K8s workers
+      # media:
+      #   enabled: true
+      #   type: nfs
+      #   server: 172.16.1.250
+      #   path: /volume2/media
+      #   globalMounts:
+      #     - path: /media
