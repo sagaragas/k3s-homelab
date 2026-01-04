@@ -25,7 +25,6 @@ spec:
 
     env:
       HOMEPAGE_ALLOWED_HOSTS: "home.ragas.cc,homepage.default.svc.cluster.local"
-      LOG_LEVEL: debug
 
     envFrom:
       - secretRef:
@@ -42,6 +41,9 @@ spec:
         enabled: false
 
     config:
+      kubernetes:
+        mode: cluster
+
       bookmarks:
         - Developer:
             - Github:
