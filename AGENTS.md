@@ -75,14 +75,14 @@ All internal services use `*.ragas.cc` via bind9 DNS.
 | MkDocs | docs.ragas.cc | ✅ Deployed |
 | Speedtest Tracker | speed.ragas.cc | ✅ Deployed |
 | Seerr | request.ragas.sh | ✅ Deployed (public via CF tunnel) |
+| Sonarr | sonarr.ragas.cc | ✅ Deployed |
+| Radarr | radarr.ragas.cc | ✅ Deployed |
 | PostgreSQL | postgres.database.svc | ✅ Deployed |
 
 ### On LXC: arr (172.16.1.31) - Docker
 
 | Service | URL | Port |
 |---------|-----|------|
-| Sonarr | sonarr.ragas.cc | 8989 |
-| Radarr | radarr.ragas.cc | 7878 |
 | Prowlarr | prowlarr.ragas.cc | 9696 |
 | Requestrr | requestrr.ragas.cc | 4545 |
 | Huntarr | huntarr.ragas.cc | 9705 |
