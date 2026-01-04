@@ -8,10 +8,13 @@ components:
 
 resources:
   - ./namespace.yaml
+  - ./media-storage/ks.yaml
   - ./apprise/ks.yaml
   - ./bazarr/ks.yaml
   - ./echo/ks.yaml
   - ./homepage/ks.yaml
   - ./mkdocs/ks.yaml
+  - ./radarr/ks.yaml
   - ./seerr/ks.yaml
+  - ./sonarr/ks.yaml
   - ./speedtest-tracker/ks.yaml
