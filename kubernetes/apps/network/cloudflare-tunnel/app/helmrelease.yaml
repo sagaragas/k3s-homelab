@@ -28,7 +28,7 @@ spec:
             envFrom:
               - secretRef:
                   name: cloudflare-tunnel-secret
-            args: ["tunnel", "run"]
+            args: ["tunnel", "--config", "/etc/cloudflared/config.yaml", "run"]
             probes:
               liveness: &probes
                 enabled: true
@@ -69,6 +69,7 @@ spec:
       config:
         data:
           config.yaml: |-
+            tunnel: 30286f86-9062-47bd-92f2-80d94cdb17b0
             ingress:
               - hostname: "request.ragas.sh"
                 originRequest:
