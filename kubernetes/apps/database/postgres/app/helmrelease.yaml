@@ -21,7 +21,7 @@ spec:
           app:
             image:
               repository: postgres
-              tag: "18"
+              tag: "15"
             env:
               POSTGRES_DB: speedtest-tracker
               POSTGRES_USER: tipi
