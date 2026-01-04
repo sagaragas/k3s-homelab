@@ -11,6 +11,10 @@
   suppressNotifications: [
     'prEditedNotification',
   ],
+  // Auto-merge directly to main without PRs for most updates
+  automerge: true,
+  automergeType: 'branch',
+  platformAutomerge: true,
   flux: {
     managerFilePatterns: [
       '/kubernetes/.+\\.ya?ml$/',
@@ -28,12 +32,21 @@
   },
   packageRules: [
     {
-      description: 'Auto-merge patch updates',
-      matchUpdateTypes: [
-        'patch',
-      ],
+      description: 'Auto-merge all patch and minor updates',
+      matchUpdateTypes: ['patch', 'minor'],
       automerge: true,
+      automergeType: 'branch',
+    },
+    {
+      description: 'Major updates need manual review (create PR)',
+      matchUpdateTypes: ['major'],
+      automerge: false,
       automergeType: 'pr',
+    },
+    {
+      description: 'Talos updates need manual review (cluster critical)',
+      matchPackageNames: ['/talos/', '/talhelper/'],
+      automerge: false,
     },
     {
       description: 'Group infrastructure updates',
@@ -43,13 +56,6 @@
         '/external-dns/',
         '/traefik/',
       ],
-    },
-    {
-      description: 'Limit Python to stable versions (no pre-release)',
-      matchPackageNames: [
-        'python',
-      ],
-      allowedVersions: '<3.13',
     },
   ],
 }
