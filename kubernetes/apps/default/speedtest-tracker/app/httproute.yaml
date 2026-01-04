@@ -8,7 +8,7 @@ spec:
     - name: envoy-internal
       namespace: network
   hostnames:
-    - "speedtest.ragas.cc"
+    - "speed.ragas.cc"
   rules:
     - matches:
         - path:
