@@ -118,7 +118,10 @@ spec:
                     showLabel: true
                     label: "Cluster"
                   nodes:
-                    show: false
+                    show: true
+                    cpu: true
+                    memory: true
+                    showLabel: true
 
         - Storage:
             - Volume-1:
