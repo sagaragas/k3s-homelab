@@ -79,14 +79,8 @@ spec:
                 memory: 512Mi
 
     defaultPodOptions:
-      affinity:
-        nodeAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 100
-              preference:
-                matchExpressions:
-                  - key: node-role.kubernetes.io/control-plane
-                    operator: DoesNotExist
+      nodeSelector:
+        kubernetes.io/hostname: talos-worker-4
       securityContext:
         runAsNonRoot: false
         runAsUser: 0
