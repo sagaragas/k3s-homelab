@@ -16,6 +16,8 @@ spec:
   values:
     controllers:
       seerr:
+        replicas: 2
+        strategy: RollingUpdate
         containers:
           app:
             image:
@@ -26,6 +28,14 @@ spec:
               PUID: "1000"
               PGID: "1000"
               UMASK: "002"
+              DB_TYPE: postgres
+              DB_HOST: postgres.database.svc.cluster.local
+              DB_PORT: "5432"
+              DB_USER: tipi
+              DB_NAME: seerr
+            envFrom:
+              - secretRef:
+                  name: seerr-postgres-secret
             probes:
               liveness: &probes
                 enabled: true
@@ -69,6 +79,11 @@ spec:
           tolerationSeconds: 30
       affinity:
         podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: seerr
+              topologyKey: kubernetes.io/hostname
           preferredDuringSchedulingIgnoredDuringExecution:
             - weight: 100
               podAffinityTerm:
@@ -94,8 +109,6 @@ spec:
       config:
         enabled: true
         type: persistentVolumeClaim
-        accessMode: ReadWriteOnce
-        size: 1Gi
-        storageClass: ceph-block
+        existingClaim: seerr-config-nfs
         globalMounts:
           - path: /app/config

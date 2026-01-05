@@ -4,3 +4,5 @@ kind: Kustomization
 resources:
   - helmrelease.yaml
   - httproute.yaml
+  - pv.yaml
+  - secret.sops.yaml
