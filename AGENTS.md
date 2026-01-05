@@ -47,12 +47,14 @@ All internal services use `*.ragas.cc` via bind9 DNS.
 | Name | IP | Role | Host | VMID |
 |------|-----|------|------|------|
 | talos-cp-1 | 172.16.1.50 | controlplane | pve1 | 500 |
-| talos-cp-2 | 172.16.1.51 | controlplane | pve1 | 501 |
-| talos-cp-3 | 172.16.1.52 | controlplane | pve2 | 502 |
-| talos-worker-1 | 172.16.1.53 | worker | pve2 | 510 |
-| talos-worker-2 | 172.16.1.54 | worker | pve4 | 511 |
-| talos-worker-3 | 172.16.1.55 | worker | pve4 | 512 |
-| talos-worker-4 | 172.16.1.56 | worker | pve3 | 513 |
+| talos-cp-2 | 172.16.1.51 | controlplane | pve2 | 501 |
+| talos-cp-3 | 172.16.1.52 | controlplane | pve4 | 502 |
+| talos-worker-1 | 172.16.1.53 | worker | pve1 | 510 |
+| talos-worker-2 | 172.16.1.54 | worker | pve2 | 511 |
+| talos-worker-3 | 172.16.1.55 | worker | pve3 | 512 |
+| talos-worker-4 | 172.16.1.56 | worker | pve4 | 513 |
+
+> **HA Distribution:** Each PVE host has max 1 control plane. Any single host failure maintains etcd quorum (2/3 CPs).
 
 ### K8s Network
 
@@ -175,24 +177,31 @@ Synology NAS with NFS shares:
 
 | Storage Type | Use Case | Notes |
 |--------------|----------|-------|
-| **Ceph RBD (ceph-block)** | All application data | Distributed, replicated, proper block storage |
-| **NFS (NAS)** | Backups, media files | Read-heavy, already on NAS at 172.16.1.250 |
+| **CephFS (ceph-filesystem)** | All application configs | Kernel mounter, RWX, instant failover |
+| **Ceph RBD (ceph-block)** | Databases only | PostgreSQL, Prometheus, Grafana |
+| **NFS (NAS)** | Media files, backups | Read-heavy, 172.16.1.250 |
 
-**IMPORTANT:** Never use NFS for SQLite databases - causes corruption due to locking issues.
+**IMPORTANT:**
+- CephFS uses kernel mounter (not FUSE) - 5x faster metadata ops
+- Talos 1.11+ has IMA disabled, kernel CephFS works properly
+- Never use NFS for SQLite - causes corruption
 
 ### Current PVCs
 
 | App | Storage Class | Size |
 |-----|---------------|------|
+| Sonarr | ceph-filesystem | 10Gi |
+| Radarr | ceph-filesystem | 10Gi |
+| Prowlarr | ceph-filesystem | 5Gi |
+| Seerr | ceph-filesystem | 5Gi |
+| Bazarr | ceph-filesystem | 5Gi |
+| Huntarr | ceph-filesystem | 2Gi |
+| Requestrr | ceph-filesystem | 1Gi |
+| Unpackerr | ceph-filesystem | 1Gi |
+| Speedtest | ceph-filesystem | 1Gi |
 | PostgreSQL | ceph-block | 10Gi |
-| Sonarr | ceph-block | 10Gi |
-| Radarr | ceph-block | 10Gi |
-| Prowlarr | ceph-block | 5Gi |
-| Seerr | ceph-block | 5Gi |
-| Huntarr | ceph-block | 2Gi |
-| Requestrr | ceph-block | 1Gi |
-| Unpackerr | ceph-block | 1Gi |
-| Bazarr | ceph-block | 5Gi |
+| Prometheus | ceph-block | 50Gi |
+| Grafana | ceph-block | 10Gi |
 | Media (NFS) | - | 10Ti |
 | Backups (NFS) | - | 500Gi |
 
