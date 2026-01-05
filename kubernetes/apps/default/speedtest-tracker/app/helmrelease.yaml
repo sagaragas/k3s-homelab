@@ -80,7 +80,7 @@ spec:
 
     defaultPodOptions:
       nodeSelector:
-        kubernetes.io/hostname: talos-worker-4
+        kubernetes.io/hostname: talos-worker-3
       securityContext:
         runAsNonRoot: false
         runAsUser: 0
