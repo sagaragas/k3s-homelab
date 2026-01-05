@@ -21,7 +21,7 @@ spec:
           app:
             image:
               repository: thomst08/requestrr
-              tag: v2.1.6
+              tag: v2.1.9
             env:
               TZ: America/Los_Angeles
             probes:
