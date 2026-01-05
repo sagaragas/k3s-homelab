@@ -45,10 +45,10 @@ spec:
                 protocol: TCP
             resources:
               requests:
-                cpu: 10m
-                memory: 128Mi
+                memory: 256Mi
               limits:
-                memory: 512Mi
+                cpu: "2"
+                memory: 1Gi
 
     defaultPodOptions:
       securityContext:
