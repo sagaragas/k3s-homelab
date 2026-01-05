@@ -14,6 +14,7 @@
 | **External DNS** | Cloudflare (ragas.cc public) |
 | **Secrets** | SOPS + age |
 | **Updates** | Renovate (auto-merge patch/minor to main) |
+| **Storage** | Ceph RBD (app data), NFS (backups/media only) |
 
 ## Domains
 
@@ -170,9 +171,30 @@ Synology NAS with NFS shares:
 4. Fix base_url if needed: `sed -i 's|base_url:.*|base_url: /|' config.yaml`
 5. Restart pod to apply
 
-### NFS Media Mount (Pending)
-K8s pods cannot mount NAS NFS until NAS is configured to allow worker IPs.
-Workaround: Apps can still connect to Sonarr/Radarr via API without direct media access.
+## Storage Strategy
+
+| Storage Type | Use Case | Notes |
+|--------------|----------|-------|
+| **Ceph RBD (ceph-block)** | All application data | Distributed, replicated, proper block storage |
+| **NFS (NAS)** | Backups, media files | Read-heavy, already on NAS at 172.16.1.250 |
+
+**IMPORTANT:** Never use NFS for SQLite databases - causes corruption due to locking issues.
+
+### Current PVCs
+
+| App | Storage Class | Size |
+|-----|---------------|------|
+| PostgreSQL | ceph-block | 1Gi |
+| Sonarr | ceph-block | 1Gi |
+| Radarr | ceph-block | 1Gi |
+| Prowlarr | ceph-block | 1Gi |
+| Seerr | ceph-block | 1Gi |
+| Huntarr | ceph-block | 500Mi |
+| Requestrr | ceph-block | 100Mi |
+| Unpackerr | ceph-block | 50Mi |
+| Bazarr | ceph-block | 1Gi |
+| Media (NFS) | - | 10Ti |
+| Backups (NFS) | - | 500Gi |
 
 ## Key Tools
 
