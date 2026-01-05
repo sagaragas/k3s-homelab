@@ -45,7 +45,6 @@ spec:
               readOnlyRootFilesystem: false
               capabilities:
                 add: ["CHOWN", "SETGID", "SETUID", "DAC_OVERRIDE", "FOWNER"]
-            resources: {}
 
     defaultPodOptions:
       securityContext:
