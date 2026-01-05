@@ -78,14 +78,12 @@ spec:
       config:
         enabled: true
         type: persistentVolumeClaim
-        accessMode: ReadWriteOnce
-        size: 1Gi
-        storageClass: ceph-block
-      # TODO: Add NFS media mount after configuring NAS to allow K8s workers
-      # media:
-      #   enabled: true
-      #   type: nfs
-      #   server: 172.16.1.250
-      #   path: /volume2/media
-      #   globalMounts:
-      #     - path: /media
+        existingClaim: bazarr-config
+        globalMounts:
+          - path: /config
+      media:
+        enabled: true
+        type: persistentVolumeClaim
+        existingClaim: media-nfs
+        globalMounts:
+          - path: /media

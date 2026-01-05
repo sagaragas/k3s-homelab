@@ -8,7 +8,7 @@ parameters:
   clusterID: eb53e78d-4b17-4e8c-8186-cd82025a8917
   fsName: cephfs
   pool: cephfs_data
-  mounter: fuse
+  mounter: kernel
   csi.storage.k8s.io/provisioner-secret-name: ceph-csi-cephfs-secret
   csi.storage.k8s.io/provisioner-secret-namespace: storage
   csi.storage.k8s.io/controller-expand-secret-name: ceph-csi-cephfs-secret

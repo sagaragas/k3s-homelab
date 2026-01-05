@@ -80,6 +80,6 @@ spec:
       config:
         enabled: true
         type: persistentVolumeClaim
-        existingClaim: huntarr-config-cephfs
+        existingClaim: huntarr-config
         globalMounts:
           - path: /config

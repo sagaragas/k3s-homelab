@@ -101,7 +101,7 @@ spec:
       config:
         enabled: true
         type: persistentVolumeClaim
-        existingClaim: sonarr-config-cephfs
+        existingClaim: sonarr-config
         globalMounts:
           - path: /config
       media:

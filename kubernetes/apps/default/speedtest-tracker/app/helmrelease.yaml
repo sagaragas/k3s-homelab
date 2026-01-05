@@ -97,6 +97,6 @@ spec:
       config:
         enabled: true
         type: persistentVolumeClaim
-        existingClaim: speedtest-tracker-config-cephfs
+        existingClaim: speedtest-tracker-config
         globalMounts:
           - path: /config

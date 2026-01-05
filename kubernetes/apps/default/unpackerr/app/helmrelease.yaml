@@ -55,7 +55,7 @@ spec:
       config:
         enabled: true
         type: persistentVolumeClaim
-        existingClaim: unpackerr-config-cephfs
+        existingClaim: unpackerr-config
         globalMounts:
           - path: /config
       media:
