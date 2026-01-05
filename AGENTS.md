@@ -184,17 +184,24 @@ Synology NAS with NFS shares:
 
 | App | Storage Class | Size |
 |-----|---------------|------|
-| PostgreSQL | ceph-block | 1Gi |
-| Sonarr | ceph-block | 1Gi |
-| Radarr | ceph-block | 1Gi |
-| Prowlarr | ceph-block | 1Gi |
-| Seerr | ceph-block | 1Gi |
-| Huntarr | ceph-block | 500Mi |
-| Requestrr | ceph-block | 100Mi |
-| Unpackerr | ceph-block | 50Mi |
-| Bazarr | ceph-block | 1Gi |
+| PostgreSQL | ceph-block | 10Gi |
+| Sonarr | ceph-block | 10Gi |
+| Radarr | ceph-block | 10Gi |
+| Prowlarr | ceph-block | 5Gi |
+| Seerr | ceph-block | 5Gi |
+| Huntarr | ceph-block | 2Gi |
+| Requestrr | ceph-block | 1Gi |
+| Unpackerr | ceph-block | 1Gi |
+| Bazarr | ceph-block | 5Gi |
 | Media (NFS) | - | 10Ti |
 | Backups (NFS) | - | 500Gi |
+
+### Resource Policy
+
+- **No CPU/memory limits** - apps scale as needed
+- **Generous PVC sizes** - storage is plentiful, don't underprovision
+- **Worker node preference** - apps prefer workers but can run on control planes
+- **Control planes not tainted** - allows full resource utilization on small clusters
 
 ## Key Tools
 
