@@ -16,7 +16,7 @@ spec:
   values:
     controllers:
       prowlarr:
-        replicas: 2
+        replicas: 1
         strategy: RollingUpdate
         containers:
           app:
@@ -87,6 +87,6 @@ spec:
       config:
         enabled: true
         type: persistentVolumeClaim
-        existingClaim: prowlarr-config-nfs
+        existingClaim: prowlarr-config
         globalMounts:
           - path: /config

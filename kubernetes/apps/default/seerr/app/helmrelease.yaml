@@ -16,7 +16,7 @@ spec:
   values:
     controllers:
       seerr:
-        replicas: 2
+        replicas: 1
         strategy: RollingUpdate
         containers:
           app:
@@ -109,6 +109,6 @@ spec:
       config:
         enabled: true
         type: persistentVolumeClaim
-        existingClaim: seerr-config-nfs
+        existingClaim: seerr-config
         globalMounts:
           - path: /app/config

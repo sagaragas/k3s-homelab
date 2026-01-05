@@ -53,7 +53,7 @@ spec:
       config:
         enabled: true
         type: persistentVolumeClaim
-        existingClaim: unpackerr-config-nfs
+        existingClaim: unpackerr-config
         globalMounts:
           - path: /config
       media:

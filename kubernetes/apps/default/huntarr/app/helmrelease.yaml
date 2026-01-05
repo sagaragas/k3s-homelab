@@ -72,6 +72,6 @@ spec:
       config:
         enabled: true
         type: persistentVolumeClaim
-        existingClaim: huntarr-config-nfs
+        existingClaim: huntarr-config
         globalMounts:
           - path: /config

@@ -77,6 +77,6 @@ spec:
       config:
         enabled: true
         type: persistentVolumeClaim
-        existingClaim: requestrr-config-nfs
+        existingClaim: requestrr-config
         globalMounts:
           - path: /root/config

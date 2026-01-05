@@ -16,7 +16,7 @@ spec:
   values:
     controllers:
       radarr:
-        replicas: 2
+        replicas: 1
         strategy: RollingUpdate
         containers:
           app:
@@ -100,7 +100,7 @@ spec:
       config:
         enabled: true
         type: persistentVolumeClaim
-        existingClaim: radarr-config-nfs
+        existingClaim: radarr-config
         globalMounts:
           - path: /config
       media:

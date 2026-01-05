@@ -16,7 +16,7 @@ spec:
   values:
     controllers:
       sonarr:
-        replicas: 2
+        replicas: 1
         strategy: RollingUpdate
         containers:
           app:
@@ -100,7 +100,7 @@ spec:
       config:
         enabled: true
         type: persistentVolumeClaim
-        existingClaim: sonarr-config-nfs
+        existingClaim: sonarr-config
         globalMounts:
           - path: /config
       media:
