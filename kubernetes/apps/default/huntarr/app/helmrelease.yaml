@@ -30,7 +30,15 @@ spec:
               readiness:
                 enabled: false
               startup:
-                enabled: false
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: 9705
+                  initialDelaySeconds: 5
+                  periodSeconds: 5
+                  failureThreshold: 60
+                  timeoutSeconds: 1
             ports:
               - name: http
                 containerPort: 9705
