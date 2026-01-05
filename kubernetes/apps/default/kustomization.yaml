@@ -13,8 +13,12 @@ resources:
   - ./bazarr/ks.yaml
   - ./echo/ks.yaml
   - ./homepage/ks.yaml
+  - ./huntarr/ks.yaml
   - ./mkdocs/ks.yaml
+  - ./prowlarr/ks.yaml
   - ./radarr/ks.yaml
+  - ./requestrr/ks.yaml
   - ./seerr/ks.yaml
   - ./sonarr/ks.yaml
   - ./speedtest-tracker/ks.yaml
+  - ./unpackerr/ks.yaml
