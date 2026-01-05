@@ -26,27 +26,15 @@ spec:
               TZ: America/Los_Angeles
             probes:
               liveness:
-                enabled: true
-                custom: true
-                spec:
-                  httpGet:
-                    path: /
-                    port: &port 9705
-                  initialDelaySeconds: 60
-                  periodSeconds: 30
-                  timeoutSeconds: 10
-                  failureThreshold: 5
+                enabled: false
               readiness:
-                enabled: true
-                custom: true
-                spec:
-                  httpGet:
-                    path: /
-                    port: *port
-                  initialDelaySeconds: 60
-                  periodSeconds: 30
-                  timeoutSeconds: 10
-                  failureThreshold: 5
+                enabled: false
+              startup:
+                enabled: false
+            ports:
+              - name: http
+                containerPort: 9705
+                protocol: TCP
             resources:
               requests:
                 cpu: 10m
@@ -75,7 +63,7 @@ spec:
         controller: huntarr
         ports:
           http:
-            port: *port
+            port: 9705
 
     persistence:
       config:
