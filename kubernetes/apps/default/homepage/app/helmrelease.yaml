@@ -220,12 +220,11 @@ spec:
                   key: "{{HOMEPAGE_VAR_RADARR_KEY}}"
             - Prowlarr:
                 icon: prowlarr.svg
-                href: http://172.16.1.31:9696
+                href: https://prowlarr.ragas.cc
                 description: Indexers
-                ping: 172.16.1.31
                 widget:
                   type: prowlarr
-                  url: http://172.16.1.31:9696
+                  url: http://prowlarr.default.svc.cluster.local:9696
                   key: "{{HOMEPAGE_VAR_PROWLARR_KEY}}"
         - Network:
             - OpnSense:
