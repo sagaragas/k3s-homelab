@@ -43,6 +43,11 @@ spec:
         policy: none
         purge: false
 
+    securityContext:
+      runAsUser: 0
+      runAsGroup: 0
+      fsGroup: 0
+
     tolerations:
       - key: "node.kubernetes.io/not-ready"
         operator: "Exists"
