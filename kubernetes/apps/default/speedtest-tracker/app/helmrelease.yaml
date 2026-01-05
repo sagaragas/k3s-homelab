@@ -97,8 +97,6 @@ spec:
       config:
         enabled: true
         type: persistentVolumeClaim
-        accessMode: ReadWriteOnce
-        size: 256Mi
-        storageClass: ceph-block
+        existingClaim: speedtest-tracker-config-cephfs
         globalMounts:
           - path: /config

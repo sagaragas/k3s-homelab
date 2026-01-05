@@ -88,6 +88,6 @@ spec:
       config:
         enabled: true
         type: persistentVolumeClaim
-        existingClaim: prowlarr-config
+        existingClaim: prowlarr-config-cephfs
         globalMounts:
           - path: /config

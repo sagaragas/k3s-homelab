@@ -101,7 +101,7 @@ spec:
       config:
         enabled: true
         type: persistentVolumeClaim
-        existingClaim: radarr-config
+        existingClaim: radarr-config-cephfs
         globalMounts:
           - path: /config
       media:

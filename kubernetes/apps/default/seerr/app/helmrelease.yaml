@@ -110,6 +110,6 @@ spec:
       config:
         enabled: true
         type: persistentVolumeClaim
-        existingClaim: seerr-config
+        existingClaim: seerr-config-cephfs
         globalMounts:
           - path: /app/config

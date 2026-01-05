@@ -79,6 +79,6 @@ spec:
       config:
         enabled: true
         type: persistentVolumeClaim
-        existingClaim: requestrr-config
+        existingClaim: requestrr-config-cephfs
         globalMounts:
           - path: /root/config
