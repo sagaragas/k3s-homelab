@@ -54,12 +54,7 @@ spec:
               readOnlyRootFilesystem: false
               capabilities:
                 add: ["CHOWN", "SETGID", "SETUID", "DAC_OVERRIDE", "FOWNER"]
-            resources:
-              requests:
-                cpu: 10m
-                memory: 256Mi
-              limits:
-                memory: 1Gi
+            resources: {}
 
     defaultPodOptions:
       securityContext:
@@ -78,6 +73,13 @@ spec:
           effect: "NoExecute"
           tolerationSeconds: 30
       affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                  - key: node-role.kubernetes.io/control-plane
+                    operator: DoesNotExist
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             - labelSelector:
