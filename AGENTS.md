@@ -23,7 +23,7 @@
 | `ragas.sh` | Public-facing services | Cloudflare |
 
 ### Public Services (ragas.sh) - DO NOT MIGRATE DOMAINS
-- `request.ragas.sh` → Overseerr (public requests)
+- `request.ragas.sh` → Seerr (public requests, on K8s)
 - `plex.ragas.sh` → Plex (public streaming)
 - `jelly.ragas.sh` → Jellyfin (public streaming)
 
@@ -66,27 +66,38 @@ All internal services use `*.ragas.cc` via bind9 DNS.
 
 ### On Kubernetes (ragas.cc)
 
-| Service | URL | Status |
-|---------|-----|--------|
-| Homepage | home.ragas.cc | ✅ Deployed |
-| Bazarr | bazarr.ragas.cc | ✅ Deployed |
-| Grafana | grafana.ragas.cc | ✅ Deployed |
-| Prometheus | prometheus.ragas.cc | ✅ Deployed |
-| MkDocs | docs.ragas.cc | ✅ Deployed |
-| Speedtest Tracker | speed.ragas.cc | ✅ Deployed |
-| Seerr | request.ragas.sh | ✅ Deployed (public via CF tunnel) |
-| Sonarr | sonarr.ragas.cc | ✅ Deployed |
-| Radarr | radarr.ragas.cc | ✅ Deployed |
-| PostgreSQL | postgres.database.svc | ✅ Deployed |
+| Service | URL | Status | Notes |
+|---------|-----|--------|-------|
+| Homepage | home.ragas.cc | ✅ Deployed | 2 replicas |
+| Bazarr | bazarr.ragas.cc | ✅ Deployed | |
+| Grafana | grafana.ragas.cc | ✅ Deployed | |
+| Prometheus | prometheus.ragas.cc | ✅ Deployed | |
+| MkDocs | docs.ragas.cc | ✅ Deployed | |
+| Speedtest Tracker | speed.ragas.cc | ✅ Deployed | |
+| Seerr | request.ragas.sh | ✅ Deployed | 2 replicas, PostgreSQL, public via CF tunnel |
+| Sonarr | sonarr.ragas.cc | ✅ Deployed | 2 replicas, PostgreSQL |
+| Radarr | radarr.ragas.cc | ✅ Deployed | 2 replicas, PostgreSQL |
+| Prowlarr | prowlarr.ragas.cc | ✅ Deployed | 2 replicas, PostgreSQL |
+| Requestrr | requestrr.ragas.cc | ✅ Deployed | Discord bot |
+| Huntarr | huntarr.ragas.cc | ✅ Deployed | Missing media hunter |
+| Unpackerr | (internal) | ✅ Deployed | Archive extraction |
+| PostgreSQL | postgres.database.svc | ✅ Deployed | Shared DB for arr apps |
 
-### On LXC: arr (172.16.1.31) - Docker
+### On LXC: arr (172.16.1.31) - SHUTDOWN
 
-| Service | URL | Port |
-|---------|-----|------|
-| Prowlarr | prowlarr.ragas.cc | 9696 |
-| Requestrr | requestrr.ragas.cc | 4545 |
-| Huntarr | huntarr.ragas.cc | 9705 |
-| Dockge | dockge.ragas.cc | 5001 |
+> **Status:** Shutdown on 2026-01-05. Backups at `/volume1/k8s-backup/lxc-backups/arr-lxc-final-20260105.tar.gz`
+> **Keep until:** 2026-02-05 (30 days monitoring period)
+
+| Service | Status |
+|---------|--------|
+| Sonarr | ✅ Migrated to K8s |
+| Radarr | ✅ Migrated to K8s |
+| Prowlarr | ✅ Migrated to K8s |
+| Seerr | ✅ Migrated to K8s |
+| Requestrr | ✅ Migrated to K8s |
+| Huntarr | ✅ Migrated to K8s |
+| Unpackerr | ✅ Migrated to K8s |
+| Dockge | ❌ Not migrated (not needed) |
 
 ### On LXC: torrent (172.16.1.32) - Docker
 
@@ -94,16 +105,19 @@ All internal services use `*.ragas.cc` via bind9 DNS.
 |---------|-----|------|-------|
 | qBittorrent | qbit.ragas.cc | 8080 | 2.5Gb NIC - keep on LXC |
 
-### On LXC: fun (172.16.1.7) - Runtipi
+### On LXC: fun (172.16.1.7) - SHUTDOWN
 
-| Service | URL | Status |
-|---------|-----|--------|
-| Homepage | ~~homepage.ragas.cc~~ | ✅ Migrated to K8s |
-| Bazarr | ~~bazarr.ragas.cc~~ | ✅ Migrated to K8s |
-| Speedtest | ~~speedtest.ragas.cc~~ | ✅ Migrated to K8s |
-| PostgreSQL | ~~(internal)~~ | ✅ Migrated to K8s |
-| Overseerr | overseerr.ragas.cc | 🔄 Pending migration |
-| NextGBA | nextgba.ragas.cc | 🔄 Pending migration |
+> **Status:** Shutdown on 2026-01-05. Backups at `/volume1/k8s-backup/lxc-backups/fun-lxc-final-20260105.tar.gz`
+> **Keep until:** 2026-02-05 (30 days monitoring period)
+
+| Service | Status |
+|---------|--------|
+| Homepage | ✅ Migrated to K8s |
+| Bazarr | ✅ Migrated to K8s |
+| Speedtest | ✅ Migrated to K8s |
+| PostgreSQL | ✅ Migrated to K8s |
+| Overseerr | ✅ Replaced by Seerr on K8s |
+| NextGBA | ❌ Not migrated (low priority) |
 
 ### On LXC: Media (GPU required - stay on LXC)
 
