@@ -63,10 +63,7 @@ spec:
         cpu: 500m
         memory: 512Mi
 
-    kubectl:
-      image:
-        repository: bitnami/kubectl
-        tag: "1.31"
+    upgradeCRDs: false
 
     schedules:
       daily-backup:
