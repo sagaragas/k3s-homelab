@@ -45,3 +45,18 @@ spec:
       replicas: 0
     backend:
       replicas: 0
+
+    gateway:
+      enabled: false
+
+    chunksCache:
+      enabled: false
+
+    resultsCache:
+      enabled: false
+
+    lokiCanary:
+      enabled: false
+
+    test:
+      enabled: false
