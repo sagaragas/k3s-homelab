@@ -9,4 +9,5 @@ resources:
   - helmrepository.yaml
   - helmrelease.yaml
   - httproutes.yaml
+  - loki-datasource.yaml
   - secret.sops.yaml

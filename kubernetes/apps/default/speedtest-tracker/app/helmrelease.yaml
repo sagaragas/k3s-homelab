@@ -79,8 +79,6 @@ spec:
                 memory: 512Mi
 
     defaultPodOptions:
-      nodeSelector:
-        kubernetes.io/hostname: talos-worker-3
       securityContext:
         runAsNonRoot: false
         runAsUser: 0
