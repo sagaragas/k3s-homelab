@@ -51,8 +51,8 @@ jobs:
             -strict \
             -ignore-missing-schemas \
             -skip Secret,SopsSecret \
-            -kubernetes-version 1.31.0 \
-            -summary || true
+            -kubernetes-version 1.34.0 \
+            -summary
 
   flux-local:
     name: Flux Local
@@ -75,4 +75,4 @@ jobs:
       - name: Validate Flux resources
         run: |
           echo "Validating Flux Kustomizations..."
-          flux-local test --path kubernetes/flux --enable-helm || true
+          flux-local test --path kubernetes/flux --enable-helm

@@ -28,7 +28,7 @@ xargs -0 kubeconform \
     -strict \
     -ignore-missing-schemas \
     -skip Secret,SopsSecret \
-    -kubernetes-version 1.31.0 \
+    -kubernetes-version 1.34.0 \
     -summary || {
     echo "FAILED: Schema validation errors found"
     exit 1
