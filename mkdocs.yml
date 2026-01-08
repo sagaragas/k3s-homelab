@@ -69,8 +69,11 @@ nav:
   - Services:
       - Homepage: services/homepage.md
       - Monitoring: services/monitoring.md
+      - Logging: services/logging.md
+      - Backups: services/backups.md
       - Cert Manager: services/cert-manager.md
       - DNS & Ingress: services/networking.md
+      - Cloudflare Tunnel: services/cloudflare-tunnel.md
   - Guides:
       - Deploy a Service: guides/deploy-service.md
       - Image Automation: guides/image-automation.md
