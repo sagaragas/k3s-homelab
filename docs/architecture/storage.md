@@ -20,8 +20,8 @@ The cluster uses Ceph CSI to connect Kubernetes directly to the Proxmox Ceph clu
 │         └────────────────┼────────────────┘                         │
 │                          │                                          │
 │                 ┌────────┴────────┐                                 │
-│                 │  ceph-csi-rbd   │                                 │
-│                 │   (CSI Driver)  │                                 │
+│                 │     Ceph CSI    │                                 │
+│                 │  (RBD + CephFS) │                                 │
 │                 └────────┬────────┘                                 │
 └──────────────────────────┼──────────────────────────────────────────┘
                            │

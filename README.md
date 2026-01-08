@@ -72,7 +72,7 @@ The cluster runs on a 4-node Proxmox VE hypervisor cluster with Ceph distributed
 
 ### Kubernetes Cluster
 
-4 Talos Linux VMs form the Kubernetes cluster:
+7 Talos Linux VMs (3 control plane + 4 workers) form the Kubernetes cluster:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -96,11 +96,16 @@ The cluster runs on a 4-node Proxmox VE hypervisor cluster with Ceph distributed
 │                                                                          │
 │  ┌──────────────────────────────────────────────────────────────────┐   │
 │  │                       Worker Nodes                                │   │
-│  │  ┌─────────────────┐                                             │   │
-│  │  │ talos-worker-1  │                                             │   │
-│  │  │  172.16.1.53    │                                             │   │
-│  │  │   8c / 16GB     │                                             │   │
-│  │  └─────────────────┘                                             │   │
+│  │  ┌─────────────────┐  ┌─────────────────┐                         │   │
+│  │  │ talos-worker-1  │  │ talos-worker-2  │                         │   │
+│  │  │  172.16.1.53    │  │  172.16.1.54    │                         │   │
+│  │  │   8c / 16GB     │  │   8c / 16GB     │                         │   │
+│  │  └─────────────────┘  └─────────────────┘                         │   │
+│  │  ┌─────────────────┐  ┌─────────────────┐                         │   │
+│  │  │ talos-worker-3  │  │ talos-worker-4  │                         │   │
+│  │  │  172.16.1.55    │  │  172.16.1.56    │                         │   │
+│  │  │   8c / 16GB     │  │   8c / 16GB     │                         │   │
+│  │  └─────────────────┘  └─────────────────┘                         │   │
 │  └──────────────────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
@@ -144,13 +149,15 @@ Cilium provides advanced networking with eBPF:
 
 ### Storage
 
-Currently using local storage with plans for Ceph CSI:
+Storage is provided by Proxmox Ceph (via Ceph CSI) plus NFS for backups/media:
 
 | Type | Provider | Use Case |
 |------|----------|----------|
 | etcd | Local NVMe | Kubernetes state |
 | Ephemeral | EmptyDir | Temporary data |
-| Persistent | Ceph (planned) | Application data |
+| Persistent (RWO) | Ceph RBD (`ceph-block`) | Databases / metrics |
+| Persistent (RWX) | CephFS (`ceph-filesystem`) | App config / shared storage |
+| Backups / Media | NFS (NAS) | Large, read-heavy or backup data |
 
 ---
 
@@ -187,16 +194,15 @@ All cluster state is managed through Flux GitOps:
 - **Kustomize Controller** - Applies Kustomizations
 - **Helm Controller** - Manages HelmReleases
 - **Notification Controller** - Sends alerts to Discord
-- **Image Reflector** - Scans container registries
-- **Image Automation** - Updates image tags automatically
+- **(Optional) Image Automation** - Manifests exist but are currently disabled; updates handled via Renovate/Dependabot
 
 ### Branch Protection
 
-The `main` branch is protected with strict rules:
+GitHub branch protection is currently **not enabled** for `main`. The preferred workflow is still PRs + CI (with auto-merge used for many bot PRs).
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                        Branch Protection                                 │
+│                     PR + CI Workflow (recommended)                        │
 │                                                                          │
 │   ┌─────────────┐                                                        │
 │   │  Developer  │                                                        │
@@ -224,15 +230,13 @@ The `main` branch is protected with strict rules:
 │                                    │                         │           │
 │                                    ▼                         ▼           │
 │                             ┌─────────────┐          ┌─────────────┐     │
-│                             │  Auto-merge │          │   Blocked   │     │
-│                             │  to main    │          │   (Fix CI)  │     │
+│                             │ Merge /     │          │   Blocked   │     │
+│                             │ auto-merge  │          │   (Fix CI)  │     │
 │                             └─────────────┘          └─────────────┘     │
 │                                                                          │
-│   Protected Rules:                                                       │
-│   ✓ Required status checks (YAML Lint, Kubeconform, Flux Local)         │
-│   ✓ Enforce for administrators                                          │
-│   ✗ Force pushes blocked                                                │
-│   ✗ Branch deletion blocked                                             │
+│   Notes:                                                                │
+│   • No GitHub branch protection rules are enabled for `main`             │
+│   • CI runs on push/PR and should stay green                             │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -250,47 +254,31 @@ Every PR runs through comprehensive CI:
 
 ### Image Automation
 
-Container images are automatically updated via Flux:
+Dependency and image tag updates are handled via Renovate/Dependabot. (Optional) Flux Image Automation manifests exist but are currently disabled.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                      Image Automation Pipeline                           │
+│                     Update Automation Pipeline                           │
 │                                                                          │
-│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐                  │
-│  │  Container  │    │   Image     │    │   Image     │                  │
-│  │  Registry   │───▶│  Reflector  │───▶│   Policy    │                  │
-│  │(Docker,GHCR)│    │ (scan tags) │    │  (semver)   │                  │
-│  └─────────────┘    └─────────────┘    └──────┬──────┘                  │
-│                                               │                          │
-│                                               │ new version detected     │
-│                                               ▼                          │
-│                                        ┌─────────────┐                   │
-│                                        │   Image     │                   │
-│                                        │  Automation │                   │
-│                                        └──────┬──────┘                   │
-│                                               │                          │
-│                                               │ push to branch           │
-│                                               ▼                          │
-│   ┌─────────────────────────────────────────────────────────────────┐   │
-│   │                    flux-image-updates branch                     │   │
-│   └───────────────────────────────┬─────────────────────────────────┘   │
-│                                   │                                      │
-│                                   │ GitHub Action                        │
-│                                   ▼                                      │
-│   ┌─────────────────────────────────────────────────────────────────┐   │
-│   │                    Create PR to main                             │   │
-│   └───────────────────────────────┬─────────────────────────────────┘   │
-│                                   │                                      │
-│                                   │ CI passes                            │
-│                                   ▼                                      │
-│   ┌─────────────────────────────────────────────────────────────────┐   │
-│   │                    Auto-merge & Deploy                           │   │
-│   └─────────────────────────────────────────────────────────────────┘   │
+│  ┌─────────────┐     ┌──────────────┐     ┌──────────────┐              │
+│  │ Registries  │────▶│ Renovate /   │────▶│ PR to main   │              │
+│  │ / Charts    │     │ Dependabot   │     │ (or direct)  │              │
+│  └─────────────┘     └──────────────┘     └──────┬───────┘              │
+│                                                  │                      │
+│                                             CI passes                   │
+│                                                  │                      │
+│                                                  ▼                      │
+│                                           ┌─────────────┐               │
+│                                           │ Merge /     │               │
+│                                           │ auto-merge  │               │
+│                                           └──────┬──────┘               │
+│                                                  │                      │
+│                                                  ▼                      │
+│                                           ┌─────────────┐               │
+│                                           │  Flux GitOps │────▶ Cluster │
+│                                           └─────────────┘               │
 │                                                                          │
-│   Tracked Images:                                                        │
-│   ├── ghcr.io/gethomepage/homepage  (>=0.9.0)                           │
-│   ├── squidfunk/mkdocs-material     (9.x)                               │
-│   └── grafana/grafana               (>=11.0.0)                          │
+│   Note: Flux Image Automation manifests exist but are currently disabled. │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -334,9 +322,9 @@ Container images are automatically updated via Flux:
 │  └─────────────────────────────────────────────────────────────────┘    │
 │                                                                          │
 │  ┌─────────────────────────────────────────────────────────────────┐    │
-│  │ Layer 5: Git Security (Branch Protection)                        │    │
-│  │  • Required CI checks                                            │    │
-│  │  • No direct pushes                                              │    │
+│  │ Layer 5: GitHub CI / PR Workflow                                 │    │
+│  │  • CI validation on push/PR                                      │    │
+│  │  • Optional PR reviews                                           │    │
 │  │  • Secret scanning                                               │    │
 │  │  • Signed commits (optional)                                     │    │
 │  └─────────────────────────────────────────────────────────────────┘    │
