@@ -32,13 +32,18 @@ This document describes the continuous integration and deployment pipeline for t
 
 | Component | Purpose | Trigger |
 |-----------|---------|---------|
-| **Validate** | YAML/K8s validation | Every push/PR |
-| **Droid Review** | AI code review | PR opened |
-| **Droid CI Fix** | Auto-fix failures | CI failure on branch |
-| **Auto-Merge** | Merge dependency PRs | CI passes |
-| **Renovate** | Dependency updates | Daily scan |
-| **Flux Image Automation** | Container updates | New image tags |
-| **Release Drafter** | Release notes | PR merged |
+| **Validate** | YAML/K8s/Flux validation | Push/PR to `main` |
+| **Flux Diff** | Comment diffs for Flux resources (non-blocking) | PRs touching `kubernetes/**` |
+| **Droid Auto Review** | AI code review | PR opened / ready for review |
+| **Droid CI Fix** | Auto-fix validation failures | Validate failure (non-`main` branches) |
+| **Renovate** | Dependency + image tag updates | Scheduled scans |
+| **Dependabot** | GitHub Actions updates | Weekly |
+| **Auto-Merge** | Auto-merge Dependabot PRs | CI passes |
+| **Security Scan** | Trivy config scan + gitleaks | Weekly / manual |
+| **Release Drafter** | Draft release notes | Push/PR events |
+| **Labeler** | Auto-label PRs | PR opened/sync |
+| **Discord Notifications** | Push/PR notifications | Push/PR events |
+| **Issue Summary** | AI summary comment | Issue opened |
 
 ## GitHub Actions Workflows
 
@@ -70,6 +75,16 @@ Automatically merges Dependabot PRs after CI passes.
 | Dependabot PR + minor/patch | Auto-merge with squash |
 | GitHub Actions update | Auto-merge immediately |
 
+!!! note
+    Renovate is configured to auto-merge most updates directly to `main` without PRs. This workflow is specifically for Dependabot PRs (GitHub Actions updates).
+
+### Flux Diff (`flux-diff.yaml`)
+
+Adds a PR comment showing the `flux-local` diff for `HelmRelease` and `Kustomization` resources.
+
+- Trigger: PRs to `main` that touch `kubernetes/**`
+- Behavior: Non-blocking (informational only)
+
 ### Release Drafter (`release-drafter.yaml`)
 
 Automatically generates release notes from merged PRs.
@@ -95,15 +110,22 @@ Automatically labels PRs based on changed files.
 
 AI-powered code review using Factory's Droid.
 
-- Triggers on PR open/sync
+- Triggers when a PR is opened or marked ready-for-review
 - Reviews Kubernetes/Flux manifests
 - Posts inline comments for issues
 - Focuses on: YAML errors, security issues, misconfigurations
 
 ```yaml
 # Requires FACTORY_API_KEY secret
-droid exec --auto high -f prompt.txt
+uses: Factory-AI/droid-action@v1
+with:
+  factory_api_key: ${{ secrets.FACTORY_API_KEY }}
+  automatic_review: true
 ```
+
+### Droid Tag (`droid.yaml`)
+
+Runs Droid when `@droid` is mentioned in an issue/PR/comment.
 
 ### Droid CI Fix (`droid-fix.yaml`)
 
@@ -139,15 +161,25 @@ Configured in `.github/renovate.json5` for automated dependency updates.
   "flux": { "fileMatch": ["kubernetes/.+\\.ya?ml$"] },
   "helm-values": { "fileMatch": ["kubernetes/.+\\.ya?ml$"] },
   "automerge": true,
-  "automergeType": "squash"
+  "automergeType": "branch"
 }
 ```
 
 ### Auto-merge Rules
 
-- **Patch/minor updates**: Auto-merge after CI passes
-- **Major updates**: Require manual review
+- **Patch/minor updates**: Auto-merge directly to `main`
+- **Major updates**: PR required (manual review)
 - **Security updates**: Prioritized and auto-merged
+
+## Dependabot
+
+Dependabot is used for GitHub Actions updates (see `.github/dependabot.yaml`). These PRs are auto-merged via `auto-merge.yaml`.
+
+## Flux Image Automation
+
+Flux Image Automation resources exist in the repo, but are currently disabled (Renovate handles image updates instead).
+
+If re-enabled, Flux pushes commits to the `flux-image-updates` branch and the `flux-image-pr.yaml` workflow creates a PR to `main`.
 
 ## Pre-commit Hooks
 
@@ -205,7 +237,7 @@ kubectl -n flux-system get receiver github-webhook -o jsonpath='{.status.webhook
 ### Trivy (via `security.yaml`)
 
 - Scans Kubernetes manifests for misconfigurations
-- Runs on PRs and weekly schedule
+- Runs on a weekly schedule (and manual trigger)
 - Reports findings to GitHub Security tab
 
 ### Gitleaks
@@ -234,6 +266,8 @@ Events sent:
 - Kustomization reconciliation (success/failure)
 - HelmRelease updates
 - Deployment errors
+
+GitHub also sends Discord notifications for pushes to `main` (Kubernetes changes) and PR open/merge events via `discord-notify.yaml`.
 
 ## Best Practices
 
@@ -265,12 +299,9 @@ Recommended settings for `main` branch:
 
 Before pushing:
 ```bash
-# Run pre-commit hooks
+# Run repo validators
+./tests/run_all.sh
+
+# Optional: run pre-commit hooks
 pre-commit run --all-files
-
-# Test Flux locally
-flux-local test --path kubernetes/flux
-
-# Diff changes
-flux-local diff ks -p kubernetes/flux
 ```

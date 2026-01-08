@@ -69,10 +69,7 @@ Homepage supports widgets for many services:
 
 | Service | Widget Type |
 |---------|-------------|
-| Plex | plex |
-| Sonarr | sonarr |
-| Radarr | radarr |
-| qBittorrent | qbittorrent |
+| Grafana | grafana |
 | Proxmox | proxmox |
 | AdGuard | adguard |
 | Portainer | portainer |
@@ -80,14 +77,13 @@ Homepage supports widgets for many services:
 ### Widget Example
 
 ```yaml
-- Media:
-    - Plex:
-        icon: plex
-        href: http://172.16.1.33:32400
+- Monitoring:
+    - Grafana:
+        icon: grafana
+        href: https://grafana.ragas.cc
         widget:
-          type: plex
-          url: http://172.16.1.33:32400
-          key: YOUR_PLEX_TOKEN
+          type: grafana
+          url: http://grafana.monitoring.svc.cluster.local
 ```
 
 ## Kubernetes Widget

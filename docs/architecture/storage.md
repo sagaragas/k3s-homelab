@@ -2,7 +2,10 @@
 
 ## Overview
 
-The cluster uses Ceph CSI to connect Kubernetes directly to the Proxmox Ceph cluster, providing persistent block storage for stateful workloads.
+The cluster uses Ceph CSI to connect Kubernetes directly to the Proxmox Ceph cluster:
+
+- **RBD** (`ceph-block`) for block volumes (RWO)
+- **CephFS** (`ceph-filesystem`) for shared filesystem volumes (RWX)
 
 ## Architecture
 
@@ -42,6 +45,7 @@ The cluster uses Ceph CSI to connect Kubernetes directly to the Proxmox Ceph clu
 | Storage Class | Backend | Access Mode | Default |
 |---------------|---------|-------------|---------|
 | `ceph-block` | Ceph RBD | RWO | Yes |
+| `ceph-filesystem` | CephFS | RWX | No |
 
 ## Ceph Cluster Details
 
@@ -65,6 +69,8 @@ The cluster uses Ceph CSI to connect Kubernetes directly to the Proxmox Ceph clu
 
 ## Current PVCs
 
+The largest stateful PVCs live in `monitoring` (Prometheus/Grafana/Alertmanager) on `ceph-block`. Many application config PVCs use `ceph-filesystem`.
+
 | Namespace | PVC | Size | Workload |
 |-----------|-----|------|----------|
 | monitoring | prometheus-db | 50Gi | Metrics storage (7d retention) |
@@ -86,7 +92,7 @@ spec:
   resources:
     requests:
       storage: 10Gi
-  # storageClassName: ceph-rbd  # Default
+  # storageClassName: ceph-block  # Default
 ```
 
 ### Shared Storage (RWX)
@@ -99,7 +105,7 @@ metadata:
 spec:
   accessModes:
     - ReadWriteMany
-  storageClassName: cephfs
+  storageClassName: ceph-filesystem
   resources:
     requests:
       storage: 100Gi
@@ -119,9 +125,9 @@ volumes:
 
 ## Backup Strategy
 
-### Velero (Planned)
+### Velero (Deployed)
 
-Velero will back up:
+Velero backs up:
 - Kubernetes resources (YAML)
 - Persistent Volumes (snapshots)
 
@@ -139,9 +145,9 @@ talosctl -n 172.16.1.50 etcd snapshot db.snapshot
 
 | Workload | Storage Class | Access Mode |
 |----------|---------------|-------------|
-| Databases | ceph-rbd | RWO |
-| Prometheus | ceph-rbd | RWO |
-| Shared configs | cephfs | RWX |
+| Databases | ceph-block | RWO |
+| Prometheus | ceph-block | RWO |
+| Shared configs | ceph-filesystem | RWX |
 | Media files | NFS | RWX |
 | Temporary | emptyDir | - |
 
