@@ -23,17 +23,14 @@ Flux Image Automation:
 4. **Commits** and pushes changes
 5. **Deploys** via normal GitOps flow
 
-```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│ Image Registry  │────►│ Image Reflector │────►│  Image Policy   │
-│  (Docker Hub,   │     │   Controller    │     │   (semver)      │
-│   GHCR, etc.)   │     └─────────────────┘     └────────┬────────┘
-└─────────────────┘                                      │
-                                                         ▼
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│    Cluster      │◄────│   Flux GitOps   │◄────│ Image Update    │
-│   Deployment    │     │                 │     │  Automation     │
-└─────────────────┘     └─────────────────┘     └─────────────────┘
+```mermaid
+flowchart LR
+  reg["Image Registry<br>(Docker Hub, GHCR, etc.)"] --> refl["Image Reflector<br>Controller"]
+  refl --> policy["Image Policy<br>(semver)"]
+  policy --> update["Image Update<br>Automation"]
+  update --> git["Git"]
+  git --> flux["Flux GitOps"]
+  flux --> deploy["Cluster Deployment"]
 ```
 
 ## Components

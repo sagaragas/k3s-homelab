@@ -16,36 +16,15 @@ Grafana admin credentials are managed via a Kubernetes Secret (referenced by the
 
 ## Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                         Monitoring Stack                         │
-│                                                                  │
-│  ┌───────────────────────────────────────────────────────────┐  │
-│  │                    ServiceMonitors                        │  │
-│  │                                                           │  │
-│  │  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐     │  │
-│  │  │ Cilium  │  │ CoreDNS │  │  etcd   │  │ Kubelet │     │  │
-│  │  └─────────┘  └─────────┘  └─────────┘  └─────────┘     │  │
-│  │                                                           │  │
-│  │  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐     │  │
-│  │  │  Node   │  │ API     │  │Controller│  │ Custom  │     │  │
-│  │  │Exporter │  │ Server  │  │ Manager │  │  Apps   │     │  │
-│  │  └─────────┘  └─────────┘  └─────────┘  └─────────┘     │  │
-│  └──────────────┬────────────────────────────────────────────┘  │
-│                 │ (scrape targets)                                │
-│                 ▼                                                 │
-│          ┌──────────────┐                                         │
-│          │  Prometheus  │──────────┐                              │
-│          │   Metrics    │          │ (alerts)                     │
-│          └──────────────┘          ▼                              │
-│                 ▲           ┌──────────────┐                      │
-│        (queries)│           │ Alertmanager │                      │
-│                 │           │    Alerts    │                      │
-│          ┌──────┴───────┐   └──────────────┘                      │
-│          │   Grafana    │                                         │
-│          │ Dashboards   │                                         │
-│          └──────────────┘                                         │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+  subgraph "Monitoring Stack"
+    direction TB
+    sm["ServiceMonitors / scrape targets"] --> prom["Prometheus<br>metrics"]
+    prom --> graf["Grafana<br>dashboards"]
+    graf -->|"query"| prom
+    prom -->|"alerts"| am["Alertmanager<br>alerts"]
+  end
 ```
 
 ## Pre-built Dashboards

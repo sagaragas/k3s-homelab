@@ -90,23 +90,14 @@ spec:
 
 ### Split DNS Setup
 
-```
-                Public DNS
-                     │
-        ┌────────────┴────────────┐
-        │                         │
-   ragas.sh queries          ragas.cc queries
-        │                         │
-        ▼                         ▼
-   Cloudflare DNS          AdGuard / bind9
-                            (forwards ragas.cc)
-                                  │
-                           172.16.1.60
-                                  │
-                    ┌─────────────┴─────────────┐
-                    │                           │
-              Gateway API              External Services
-              HTTPRoutes               (manual records)
+```mermaid
+flowchart TB
+  q["Client DNS query"] --> split["Split DNS"]
+  split -->|"ragas.sh"| cf["Cloudflare DNS"]
+  split -->|"ragas.cc"| adg["AdGuard / bind9"]
+  adg --> k8sgw["k8s-gateway<br>172.16.1.60"]
+  k8sgw --> gwapi["Gateway API<br>HTTPRoutes"]
+  k8sgw --> ext["External services<br>(manual records)"]
 ```
 
 ### DNS Resolution Flow

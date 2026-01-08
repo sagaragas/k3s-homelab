@@ -13,17 +13,11 @@ Cert-manager automates TLS certificate management using Let's Encrypt with Cloud
 
 ## Architecture
 
-```
-┌─────────────────┐     ┌──────────────┐     ┌─────────────┐
-│  Certificate    │────▶│ Cert-Manager │────▶│  Cloudflare │
-│  Request        │     │  Controller  │     │  DNS API    │
-└─────────────────┘     └──────────────┘     └─────────────┘
-                               │
-                               ▼
-                        ┌──────────────┐
-                        │ Let's Encrypt│
-                        │    ACME      │
-                        └──────────────┘
+```mermaid
+flowchart LR
+  req["Certificate request"] --> cm["cert-manager<br>controller"]
+  cm -->|"DNS-01"| cf["Cloudflare<br>DNS API"]
+  cm -->|"ACME"| le["Let's Encrypt"]
 ```
 
 ## Cluster Issuers

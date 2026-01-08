@@ -4,28 +4,19 @@ This document describes the continuous integration and deployment pipeline for t
 
 ## Overview
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                         Git Push / PR                                │
-└───────────────────────────┬─────────────────────────────────────────┘
-                            │
-        ┌───────────────────┼───────────────────┐
-        ▼                   ▼                   ▼
-┌───────────────┐   ┌───────────────┐   ┌───────────────┐
-│   Validate    │   │ Droid Review  │   │  Auto-Merge   │
-│   Workflow    │   │  (AI Review)  │   │   Workflow    │
-└───────┬───────┘   └───────────────┘   └───────────────┘
-        │
-┌───────┴───────┐
-│   YAML Lint   │
-│  Kubeconform  │◄──── On Failure ────► Droid CI Fix
-│  Flux Local   │                       (Auto-repairs)
-└───────┬───────┘
-        │
-        ▼
-┌───────────────┐
-│  Flux GitOps  │──────► Cluster ──────► Discord
-└───────────────┘                        Notifications
+```mermaid
+flowchart TB
+  push["Git Push / PR"]
+
+  push --> validate["Validate workflow"]
+  push --> review["Droid Review<br>(AI review)"]
+  push --> automerge["Auto-merge workflow"]
+
+  validate --> checks["YAML lint<br>Kubeconform<br>Flux local"]
+  checks -->|"pass"| flux["Flux GitOps"]
+  checks -->|"fail"| droidfix["Droid CI Fix<br>(auto-repairs)"]
+  flux --> cluster["Cluster"]
+  cluster --> discord["Discord notifications"]
 ```
 
 ## Automation Stack
