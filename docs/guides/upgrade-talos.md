@@ -29,29 +29,16 @@ talosctl -n 172.16.1.50 version
 curl -s https://api.github.com/repos/siderolabs/talos/releases/latest | grep tag_name
 ```
 
-## Update Configuration
+## Record the target version (recommended)
 
-### 1. Update talconfig.yaml
+Update the pinned version in `talos/talenv.yaml`:
 
 ```yaml
-# talconfig.yaml
-talosVersion: v1.11.6  # Update to new version
-kubernetesVersion: v1.34.2
+# talos/talenv.yaml
+talosVersion: v1.11.6
 ```
 
-### 2. Regenerate Configs
-
-```bash
-talhelper genconfig
-```
-
-### 3. Commit Changes
-
-```bash
-git add -A
-git commit -m "chore: upgrade Talos to v1.11.6"
-git push
-```
+Commit the change once the upgrade is complete (or as part of the same maintenance window).
 
 ## Upgrade Process
 
@@ -99,7 +86,7 @@ talosctl -n 172.16.1.52 upgrade \
 VERSION="v1.11.6"
 IMAGE="ghcr.io/siderolabs/installer:$VERSION"
 
-WORKERS="172.16.1.53"
+WORKERS="172.16.1.53 172.16.1.54 172.16.1.55 172.16.1.56"
 CONTROL_PLANES="172.16.1.50 172.16.1.51 172.16.1.52"
 
 echo "Upgrading workers..."
@@ -129,7 +116,7 @@ talosctl -n 172.16.1.50 version
 kubectl get nodes
 
 # Verify Talos version on all nodes
-talosctl -n 172.16.1.50,51,52,53 version
+talosctl -n 172.16.1.50,172.16.1.51,172.16.1.52,172.16.1.53,172.16.1.54,172.16.1.55,172.16.1.56 version
 
 # Check cluster health
 talosctl -n 172.16.1.50 health
@@ -183,7 +170,7 @@ talosctl -n 172.16.1.50 logs etcd
 Ensure all nodes run the same Talos version:
 
 ```bash
-talosctl -n 172.16.1.50,51,52,53 version --short
+talosctl -n 172.16.1.50,172.16.1.51,172.16.1.52,172.16.1.53,172.16.1.54,172.16.1.55,172.16.1.56 version --short
 ```
 
 ## Upgrade Schedule

@@ -1,10 +1,21 @@
 # Flux Image Automation
 
-This guide explains how container images are automatically updated in the cluster.
+This guide explains Flux Image Automation and how it is (optionally) used in this repo.
 
-## Overview
+## Status in this repo
 
-Flux Image Automation automatically:
+Flux Image Automation resources are currently **disabled**. Image updates are handled via PRs (Renovate/Dependabot).
+
+The manifests live under `kubernetes/apps/flux-system/image-automation/`, but they are not applied because this line is commented out:
+
+```yaml
+# kubernetes/apps/flux-system/kustomization.yaml
+# - ./image-automation/ks.yaml
+```
+
+## How it works (when enabled)
+
+Flux Image Automation:
 
 1. **Scans** container registries for new tags
 2. **Evaluates** tags against version policies
@@ -45,48 +56,23 @@ Commits image updates back to Git.
 kubectl get deployment -n flux-system image-automation-controller
 ```
 
-## Configuration
+## Repo configuration (when enabled)
 
 ### ImageRepository
 
 Defines which container registry to scan.
 
-```yaml
-apiVersion: image.toolkit.fluxcd.io/v1beta2
-kind: ImageRepository
-metadata:
-  name: homepage
-  namespace: flux-system
-spec:
-  image: ghcr.io/gethomepage/homepage
-  interval: 6h
-  exclusionList:
-    - "^.*-dev$"  # Exclude dev tags
-```
-
-**Current repositories:**
-
-| Name | Image | Scan Interval |
-|------|-------|---------------|
-| homepage | `ghcr.io/gethomepage/homepage` | 6h |
-| mkdocs-material | `squidfunk/mkdocs-material` | 6h |
-| grafana | `grafana/grafana` | 6h |
-
-Check status:
-```bash
-kubectl get imagerepository -n flux-system
-```
+See: `kubernetes/apps/flux-system/image-automation/app/image-repositories.yaml`
 
 ### ImagePolicy
 
 Defines version selection rules.
 
 ```yaml
-apiVersion: image.toolkit.fluxcd.io/v1beta2
+apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImagePolicy
 metadata:
   name: homepage
-  namespace: flux-system
 spec:
   imageRepositoryRef:
     name: homepage
@@ -104,58 +90,43 @@ spec:
 | `numerical` | `asc` or `desc` | Numeric tags |
 | `alphabetical` | `asc` or `desc` | Alphabetic tags |
 
-**Current policies:**
-
-| Image | Policy | Latest Tag |
-|-------|--------|------------|
-| homepage | `>=0.9.0` | v1.7.0 |
-| mkdocs-material | `9.x` | 9.7.0 |
-| grafana | `>=11.0.0` | 12.3.0 |
-
-Check status:
-```bash
-kubectl get imagepolicy -n flux-system
-```
+See: `kubernetes/apps/flux-system/image-automation/app/image-policies.yaml`
 
 ### ImageUpdateAutomation
 
 Configures how updates are committed.
 
 ```yaml
-apiVersion: image.toolkit.fluxcd.io/v1beta2
+apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImageUpdateAutomation
 metadata:
   name: flux-system
-  namespace: flux-system
 spec:
-  interval: 30m
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
   git:
-    checkout:
-      ref:
-        branch: main
-    commit:
-      author:
-        name: flux-image-automation
-        email: flux@ragas.cc
-      messageTemplate: |
-        chore(container): update images
-        
-        Automated image update
     push:
-      branch: main
-  update:
-    path: ./kubernetes
-    strategy: Setters
+      branch: flux-image-updates
 ```
+
+See: `kubernetes/apps/flux-system/image-automation/app/image-update-automation.yaml`
 
 Check status:
 ```bash
 kubectl get imageupdateautomation -n flux-system
 kubectl describe imageupdateautomation flux-system -n flux-system
 ```
+
+## Enabling it (optional)
+
+1. Uncomment the image automation kustomization:
+   ```yaml
+   # kubernetes/apps/flux-system/kustomization.yaml
+   - ./image-automation/ks.yaml
+   ```
+2. Commit and push.
+3. Confirm resources exist:
+   ```bash
+   kubectl get imagerepositories,imagepolicies,imageupdateautomations -n flux-system
+   ```
 
 ## Adding a New Image
 
@@ -164,7 +135,7 @@ kubectl describe imageupdateautomation flux-system -n flux-system
 ```yaml
 # kubernetes/apps/flux-system/image-automation/app/image-repositories.yaml
 ---
-apiVersion: image.toolkit.fluxcd.io/v1beta2
+apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImageRepository
 metadata:
   name: my-app
@@ -178,7 +149,7 @@ spec:
 ```yaml
 # kubernetes/apps/flux-system/image-automation/app/image-policies.yaml
 ---
-apiVersion: image.toolkit.fluxcd.io/v1beta2
+apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImagePolicy
 metadata:
   name: my-app

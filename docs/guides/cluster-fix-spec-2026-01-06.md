@@ -16,7 +16,7 @@
 
 ### Phase 1 — Remove broken NFS config PV/PVC resources
 
-- Stop applying the `*-config-nfs` PV/PVC manifests from the arr apps.
+- Stop applying the legacy `*-config-nfs` PV/PVC manifests.
 - Let Flux prune the unused NFS objects (PVCs/PVs).
 
 ### Phase 2 — GitOps-manage CephFS config PVCs

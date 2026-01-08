@@ -1,15 +1,12 @@
 # Upgrade Kubernetes
 
-This guide covers upgrading Kubernetes on your Talos cluster.
+This guide covers upgrading Kubernetes on this Talos cluster.
 
 ## Overview
 
-With Talos, Kubernetes upgrades are managed through the Talos configuration. The process:
+This cluster is managed manually (no talhelper-generated configs; per-node machine configs are not stored in Git). Kubernetes upgrades are performed with `talosctl upgrade-k8s`.
 
-1. Update `kubernetesVersion` in talconfig.yaml
-2. Regenerate machine configs
-3. Apply configs to each node
-4. Nodes upgrade Kubernetes components automatically
+The desired Kubernetes version is tracked in `talos/talenv.yaml` (Renovate may open PRs for this), but the upgrade itself is an operator-run maintenance action.
 
 ## Version Compatibility
 
@@ -40,100 +37,34 @@ pluto detect-files -d kubernetes/
 pluto detect-helm -A
 ```
 
-## Update Configuration
+## Record the target version (recommended)
 
-### 1. Update talconfig.yaml
+Update the pinned version in `talos/talenv.yaml`:
 
 ```yaml
-# talconfig.yaml
-talosVersion: v1.11.5
-kubernetesVersion: v1.35.0  # Update this
+# talos/talenv.yaml
+kubernetesVersion: v1.34.3
 ```
 
-### 2. Regenerate Configs
-
-```bash
-talhelper genconfig
-```
-
-### 3. Commit Changes
-
-```bash
-git add -A
-git commit -m "chore: upgrade Kubernetes to v1.35.0"
-git push
-```
+Commit the change once the upgrade is complete (or as part of the same maintenance window).
 
 ## Upgrade Process
 
-### Apply to Control Plane Nodes
+Run the upgrade from a workstation with `talosctl` configured.
 
-Upgrade control plane nodes one at a time:
-
-```bash
-# First control plane
-talosctl -n 172.16.1.50 apply-config \
-  --file talos/clusterconfig/kubernetes-talos-cp-1.yaml
-
-# Wait for API server to be ready
-kubectl get nodes
-talosctl -n 172.16.1.50 health
-
-# Second control plane
-talosctl -n 172.16.1.51 apply-config \
-  --file talos/clusterconfig/kubernetes-talos-cp-2.yaml
-
-# Wait and verify
-talosctl -n 172.16.1.51 health
-
-# Third control plane
-talosctl -n 172.16.1.52 apply-config \
-  --file talos/clusterconfig/kubernetes-talos-cp-3.yaml
-```
-
-### Apply to Worker Nodes
+### Dry run
 
 ```bash
-talosctl -n 172.16.1.53 apply-config \
-  --file talos/clusterconfig/kubernetes-talos-worker-1.yaml
+talosctl -n 172.16.1.50 upgrade-k8s --to v1.34.3 --dry-run
 ```
 
-## Automated Upgrade Script
+### Upgrade
 
 ```bash
-#!/bin/bash
-CONFIG_DIR="talos/clusterconfig"
-
-CONTROL_PLANES=(
-  "172.16.1.50:kubernetes-talos-cp-1.yaml"
-  "172.16.1.51:kubernetes-talos-cp-2.yaml"
-  "172.16.1.52:kubernetes-talos-cp-3.yaml"
-)
-
-WORKERS=(
-  "172.16.1.53:kubernetes-talos-worker-1.yaml"
-)
-
-echo "Upgrading control planes..."
-for entry in "${CONTROL_PLANES[@]}"; do
-  IFS=':' read -r node config <<< "$entry"
-  echo "Applying config to $node"
-  talosctl -n $node apply-config --file $CONFIG_DIR/$config
-  sleep 30
-  talosctl -n $node health --wait-timeout 5m
-done
-
-echo "Upgrading workers..."
-for entry in "${WORKERS[@]}"; do
-  IFS=':' read -r node config <<< "$entry"
-  echo "Applying config to $node"
-  talosctl -n $node apply-config --file $CONFIG_DIR/$config
-  sleep 30
-done
-
-echo "Upgrade complete!"
-kubectl version
+talosctl -n 172.16.1.50 upgrade-k8s --to v1.34.3
 ```
+
+> You only need to target one control plane node; Talos will coordinate the Kubernetes control plane upgrade.
 
 ## Post-Upgrade Verification
 
@@ -210,23 +141,12 @@ Kubernetes supports n-2 minor version skew. If you skip versions:
 
 ```bash
 # Upgrade incrementally
-# v1.32 → v1.33 → v1.34 → v1.35
+# v1.32 → v1.33 → v1.34
 ```
 
 ## Rollback
 
-To rollback Kubernetes version:
-
-1. Update `kubernetesVersion` in talconfig.yaml to previous version
-2. Regenerate and apply configs
-3. Or restore from etcd backup
-
-```bash
-# Quick rollback via config
-vim talconfig.yaml  # Change version back
-talhelper genconfig
-talosctl -n <node> apply-config --file <config>
-```
+Downgrades are not recommended. If you need to recover, prefer restoring from a known-good etcd snapshot.
 
 ## Upgrade Schedule
 
