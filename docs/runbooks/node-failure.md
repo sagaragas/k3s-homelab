@@ -133,7 +133,8 @@ talosctl apply-config --nodes <new-ip> --file <config.yaml>
 3. Verify cluster health:
    ```bash
    talosctl -n 172.16.1.50 health
-   kubectl get cs  # component status
+   kubectl get pods -n kube-system
+   kubectl get --raw='/readyz?verbose' | head -50
    ```
 
 ## Prevention

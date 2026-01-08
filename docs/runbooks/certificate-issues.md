@@ -58,8 +58,8 @@ kubectl describe clusterissuer letsencrypt-production
 ### Scenario 1: DNS Challenge Failing
 
 ```bash
-# Check Cloudflare API token
-kubectl get secret -n cert-manager cloudflare-api-token -o yaml
+# Check Cloudflare API token secret used by the ClusterIssuer
+kubectl get secret -n cert-manager cert-manager-secret -o yaml
 
 # Verify token has correct permissions:
 # - Zone:DNS:Edit
@@ -85,14 +85,11 @@ kubectl logs -n cert-manager -l app=cert-manager | grep -i "rate limit"
 ### Scenario 3: Certificate Expired
 
 ```bash
-# Delete and recreate certificate
-kubectl delete certificate <name> -n <namespace>
+# Force renewal by deleting the secret
+kubectl delete secret <cert-secret-name> -n <namespace>
 
-# cert-manager will recreate automatically
-# Or trigger reconciliation
-kubectl annotate certificate <name> -n <namespace> \
-  cert-manager.io/issuer-kind- \
-  cert-manager.io/issuer-kind=ClusterIssuer
+# Watch re-issuance
+kubectl get certificate <name> -n <namespace> -w
 ```
 
 ### Scenario 4: Secret Missing
@@ -144,7 +141,7 @@ spec:
       - dns01:
           cloudflare:
             apiTokenSecretRef:
-              name: cloudflare-api-token
+              name: cert-manager-secret
               key: api-token
 ```
 
