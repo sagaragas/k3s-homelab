@@ -59,9 +59,22 @@ kubectl logs -n kube-system -l k8s-app=kube-dns
 kubectl run -it --rm debug --image=alpine -- nslookup kubernetes.default
 ```
 
+If the issue is *service DNS inside the cluster*, CoreDNS is the first place to look.
+
 **Fix**: Restart CoreDNS
 ```bash
 kubectl rollout restart deployment coredns -n kube-system
+```
+
+If the issue is *`*.ragas.cc` resolution from the LAN*, check `k8s-gateway`:
+
+```bash
+# k8s-gateway is the LAN DNS entrypoint for *.ragas.cc
+kubectl get svc -n network k8s-gateway
+kubectl get endpoints -n network k8s-gateway
+
+# Confirm the HTTPRoute exists and is accepted
+kubectl get httproute -A
 ```
 
 ### 2. Pod-to-Pod Communication Failing
@@ -100,9 +113,9 @@ kubectl describe svc <service-name>
 ### 4. LoadBalancer IP Not Assigned
 
 ```bash
-# Check Cilium L2 announcements
-kubectl get ciliumbgppeeringpolicy
+# Check Cilium LB IPAM + L2 announcement policies
 kubectl get ciliumloadbalancerippool
+kubectl get ciliuml2announcementpolicy
 
 # Check service
 kubectl describe svc <service-name>
@@ -126,17 +139,17 @@ kubectl logs -n network -l app.kubernetes.io/name=envoy
 
 **Fix**: Verify gateway is listening and route is attached
 
-### 6. External DNS Not Updating
+### 6. Public DNS / Cloudflare issues
+
+This cluster does not use external-dns to manage Cloudflare records (the controller is disabled).
+
+If a public hostname (e.g. `ragas.sh`) is unreachable, check:
 
 ```bash
-# Check external-dns logs
-kubectl logs -n network -l app.kubernetes.io/name=external-dns
-
-# Verify Cloudflare API token
-kubectl get secret -n network cloudflare-api-token
+# Cloudflare tunnel
+kubectl get pods -n network -l app.kubernetes.io/name=cloudflare-tunnel
+kubectl logs -n network -l app.kubernetes.io/name=cloudflare-tunnel --tail=200
 ```
-
-**Fix**: Check API token permissions and DNS zone settings
 
 ## Network Policy Debugging
 
