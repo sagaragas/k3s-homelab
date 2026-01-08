@@ -6,34 +6,24 @@ This document covers the networking stack: Envoy Gateway, k8s-gateway, and Ciliu
 
 | Component | Purpose | IP/Port |
 |-----------|---------|---------|
-| Envoy Gateway | HTTP/HTTPS ingress | 172.16.1.61 (internal) |
-| k8s-gateway | Split-horizon DNS | 172.16.1.60:53 |
+| Envoy Gateway (internal) | HTTP/HTTPS ingress for `*.ragas.cc` | 172.16.1.61 |
+| Envoy Gateway (external) | Gateway behind Cloudflare tunnel for `*.ragas.sh` | 172.16.1.62 |
+| Cloudflare Tunnel | Public ingress (Cloudflare → cluster) | in-cluster |
+| k8s-gateway | Split-horizon DNS for `ragas.cc` (HTTPRoutes/Services) | 172.16.1.60:53 |
 | Cilium | LoadBalancer + CNI | L2 announcements |
 
 ## Traffic Flow
 
+### Internal (`ragas.cc`)
+
 ```
-┌──────────┐    DNS     ┌─────────────┐
-│  Client  │───────────▶│  AdGuard    │
-└──────────┘            │  (rewrite)  │
-     │                  └──────┬──────┘
-     │                         │
-     │ *.ragas.cc             ▼
-     │                  ┌─────────────┐
-     │                  │ k8s-gateway │ (optional)
-     │                  │ 172.16.1.60 │
-     │                  └──────┬──────┘
-     │                         │ 172.16.1.61
-     ▼                         ▼
-┌─────────────────────────────────────┐
-│         Envoy Gateway               │
-│         172.16.1.61                 │
-└──────────────────┬──────────────────┘
-                   │ HTTPRoute
-                   ▼
-            ┌──────────────┐
-            │   Service    │
-            └──────────────┘
+Client → AdGuard → (optional) k8s-gateway (172.16.1.60) → envoy-internal (172.16.1.61) → Service
+```
+
+### External (`ragas.sh`)
+
+```
+Internet → Cloudflare → Cloudflare Tunnel → envoy-external → Service
 ```
 
 ## Envoy Gateway
@@ -45,7 +35,7 @@ Two gateways are configured:
 | Gateway | IP | Purpose |
 |---------|-----|---------|
 | envoy-internal | 172.16.1.61 | Local network access |
-| envoy-external | 172.16.1.62 | External/Cloudflare (disabled) |
+| envoy-external | 172.16.1.62 | Public services via Cloudflare tunnel (`ragas.sh`) |
 
 ### Creating an HTTPRoute
 
@@ -69,11 +59,10 @@ spec:
 
 ### TLS Configuration
 
-TLS is handled by a wildcard certificate:
+TLS is handled by cert-manager Certificates:
 
-- **Secret**: `ragas-cc-production-tls` in `network` namespace
-- **Covers**: `*.ragas.cc` and `ragas.cc`
-- **Issuer**: Let's Encrypt via cert-manager
+- `ragas-cc-production-tls` (network): `ragas.cc` + `*.ragas.cc`
+- `ragas-sh-production-tls` (network): `ragas.sh` + `*.ragas.sh`
 
 ## k8s-gateway (Split DNS)
 
@@ -81,9 +70,9 @@ k8s-gateway provides DNS responses for cluster services, enabling split-horizon 
 
 ### How It Works
 
-1. AdGuard/router forwards `*.ragas.cc` queries to k8s-gateway (172.16.1.60)
-2. k8s-gateway looks up HTTPRoutes and returns the gateway IP
-3. Client connects to the gateway IP
+1. (Optional) AdGuard/router forwards `ragas.cc` queries to k8s-gateway (172.16.1.60)
+2. k8s-gateway watches `HTTPRoute` and `Service` resources and returns the appropriate LoadBalancer IP
+3. Client connects to the returned IP (typically `envoy-internal`)
 
 ### Configuration
 
@@ -147,22 +136,13 @@ kubectl exec -n kube-system ds/cilium -- cilium service list
 
 ### AdGuard Home
 
-Add DNS rewrite:
-```
-*.ragas.cc → 172.16.1.61
-```
+Recommended (dynamic): conditional forwarding to k8s-gateway:
 
-Or use conditional forwarding:
 ```
 [/ragas.cc/]172.16.1.60
 ```
 
-### Technitium DNS
-
-Create zone `ragas.cc` with:
-```
-*.ragas.cc  A  172.16.1.61
-```
+Alternative (static): wildcard `*.ragas.cc` → `172.16.1.61` in your LAN DNS server.
 
 ## Troubleshooting
 

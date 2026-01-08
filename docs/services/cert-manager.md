@@ -6,7 +6,7 @@ Cert-manager automates TLS certificate management using Let's Encrypt with Cloud
 
 | Component | Value |
 |-----------|-------|
-| Version | v1.19.1 |
+| Version | v1.19.2 |
 | Namespace | cert-manager |
 | Challenge Type | DNS-01 (Cloudflare) |
 | Issuer | Let's Encrypt Production |
