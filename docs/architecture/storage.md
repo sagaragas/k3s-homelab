@@ -9,35 +9,25 @@ The cluster uses Ceph CSI to connect Kubernetes directly to the Proxmox Ceph clu
 
 ## Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                    Kubernetes Cluster                                │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐                 │
-│  │ Prometheus  │  │   Grafana   │  │ Alertmanager│                 │
-│  │   (50Gi)    │  │   (10Gi)    │  │    (5Gi)    │                 │
-│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘                 │
-│         │                │                │                         │
-│         └────────────────┼────────────────┘                         │
-│                          │                                          │
-│                 ┌────────┴────────┐                                 │
-│                 │     Ceph CSI    │                                 │
-│                 │  (RBD + CephFS) │                                 │
-│                 └────────┬────────┘                                 │
-└──────────────────────────┼──────────────────────────────────────────┘
-                           │
-┌──────────────────────────┼──────────────────────────────────────────┐
-│                          ▼                                          │
-│  ┌───────────────────────────────────────────────────────────────┐  │
-│  │                    Proxmox Ceph Cluster                        │  │
-│  │  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐          │  │
-│  │  │  pve1   │  │  pve2   │  │  pve3   │  │  pve4   │          │  │
-│  │  │ MON+OSD │  │ MON+OSD │  │ MON+OSD │  │ MON+OSD │          │  │
-│  │  └─────────┘  └─────────┘  └─────────┘  └─────────┘          │  │
-│  │                                                               │  │
-│  │  Pool: kubernetes (2x replication, 32 PGs)                   │  │
-│  │  FSID: eb53e78d-4b17-4e8c-8186-cd82025a8917                  │  │
-│  └───────────────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+  subgraph "Kubernetes Cluster"
+    direction LR
+    prom["Prometheus<br>(50Gi)"] --> csi["Ceph CSI<br>(RBD + CephFS)"]
+    graf["Grafana<br>(10Gi)"] --> csi
+    am["Alertmanager<br>(5Gi)"] --> csi
+  end
+
+  subgraph "Proxmox Ceph Cluster"
+    direction TB
+    pves["pve1 / pve2 / pve3 / pve4<br>MON + OSD"]
+    pool["Pool: kubernetes<br>Replication: 2x<br>PGs: 32"]
+    fsid["FSID: eb53e78d-4b17-4e8c-8186-cd82025a8917"]
+    pves --> pool
+    pves --> fsid
+  end
+
+  csi --> pves
 ```
 
 ## Storage Classes

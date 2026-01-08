@@ -52,100 +52,77 @@ This repository contains the complete Infrastructure as Code for a production-gr
 
 The cluster runs on a 4-node Proxmox VE hypervisor cluster with Ceph distributed storage:
 
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                         Physical Infrastructure                          │
-├─────────────────┬─────────────────┬─────────────────┬───────────────────┤
-│      pve1       │      pve2       │      pve3       │       pve4        │
-│  Ryzen 9 6900HX │  Ryzen 9 6900HX │   Intel N150    │  Intel i5-12500T  │
-│      28GB       │      28GB       │      16GB       │       64GB        │
-│   Compute+Ceph  │   Compute+Ceph  │  Download+Ceph  │    Media+GPU      │
-└────────┬────────┴────────┬────────┴────────┬────────┴─────────┬─────────┘
-         │                 │                 │                  │
-         └─────────────────┴────────┬────────┴──────────────────┘
-                                    │
-                          ┌─────────┴─────────┐
-                          │   Ceph Storage    │
-                          │   (Distributed)   │
-                          └───────────────────┘
+```mermaid
+flowchart TB
+  subgraph "Physical Infrastructure"
+    direction LR
+    pve1["pve1<br>Ryzen 9 6900HX<br>28GB<br>Compute+Ceph"]
+    pve2["pve2<br>Ryzen 9 6900HX<br>28GB<br>Compute+Ceph"]
+    pve3["pve3<br>Intel N150<br>16GB<br>Download+Ceph"]
+    pve4["pve4<br>Intel i5-12500T<br>64GB<br>Media+GPU"]
+  end
+
+  ceph["Ceph Storage<br>(Distributed)"]
+
+  pve1 --- ceph
+  pve2 --- ceph
+  pve3 --- ceph
+  pve4 --- ceph
 ```
 
 ### Kubernetes Cluster
 
 7 Talos Linux VMs (3 control plane + 4 workers) form the Kubernetes cluster:
 
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                        Talos Kubernetes Cluster                          │
-│                                                                          │
-│  ┌──────────────────────────────────────────────────────────────────┐   │
-│  │                    Control Plane (HA)                             │   │
-│  │  ┌────────────┐  ┌────────────┐  ┌────────────┐                  │   │
-│  │  │ talos-cp-1 │  │ talos-cp-2 │  │ talos-cp-3 │                  │   │
-│  │  │ 172.16.1.50│  │ 172.16.1.51│  │ 172.16.1.52│                  │   │
-│  │  │  4c / 8GB  │  │  4c / 8GB  │  │  4c / 8GB  │                  │   │
-│  │  └─────┬──────┘  └──────┬─────┘  └──────┬─────┘                  │   │
-│  │        │                │               │                         │   │
-│  │        └────────────────┼───────────────┘                         │   │
-│  │                         │                                         │   │
-│  │              ┌──────────┴──────────┐                              │   │
-│  │              │   Cluster VIP       │                              │   │
-│  │              │   172.16.1.49:6443  │                              │   │
-│  │              └─────────────────────┘                              │   │
-│  └──────────────────────────────────────────────────────────────────┘   │
-│                                                                          │
-│  ┌──────────────────────────────────────────────────────────────────┐   │
-│  │                       Worker Nodes                                │   │
-│  │  ┌─────────────────┐  ┌─────────────────┐                         │   │
-│  │  │ talos-worker-1  │  │ talos-worker-2  │                         │   │
-│  │  │  172.16.1.53    │  │  172.16.1.54    │                         │   │
-│  │  │   8c / 16GB     │  │   8c / 16GB     │                         │   │
-│  │  └─────────────────┘  └─────────────────┘                         │   │
-│  │  ┌─────────────────┐  ┌─────────────────┐                         │   │
-│  │  │ talos-worker-3  │  │ talos-worker-4  │                         │   │
-│  │  │  172.16.1.55    │  │  172.16.1.56    │                         │   │
-│  │  │   8c / 16GB     │  │   8c / 16GB     │                         │   │
-│  │  └─────────────────┘  └─────────────────┘                         │   │
-│  └──────────────────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+  subgraph "Talos Kubernetes Cluster"
+    direction TB
+
+    subgraph "Control Plane (HA)"
+      direction LR
+      cp1["talos-cp-1<br>172.16.1.50<br>4c / 8GB"]
+      cp2["talos-cp-2<br>172.16.1.51<br>4c / 8GB"]
+      cp3["talos-cp-3<br>172.16.1.52<br>4c / 8GB"]
+    end
+
+    vip["Cluster VIP<br>172.16.1.49:6443"]
+    cp1 --> vip
+    cp2 --> vip
+    cp3 --> vip
+
+    subgraph "Worker Nodes"
+      direction LR
+      w1["talos-worker-1<br>172.16.1.53<br>8c / 16GB"]
+      w2["talos-worker-2<br>172.16.1.54<br>8c / 16GB"]
+      w3["talos-worker-3<br>172.16.1.55<br>8c / 16GB"]
+      w4["talos-worker-4<br>172.16.1.56<br>8c / 16GB"]
+    end
+  end
 ```
 
 ### Networking
 
 Cilium provides advanced networking with eBPF:
 
+```mermaid
+flowchart TB
+  subgraph "Ingress / LoadBalancers"
+    direction LR
+    t["External / LAN Traffic"] --> l2["Cilium L2 Announcer"] --> envoy["Envoy Gateway<br>(Gateway API)"] --> apps["Apps (Pods)"]
+  end
+
+  subgraph "DNS (ragas.cc)"
+    direction LR
+    q["Client DNS Query<br>*.ragas.cc"] --> adguard["AdGuard<br>172.16.1.11"] --> k8sgw["k8s-gateway<br>172.16.1.60"] --> coredns["CoreDNS<br>(Cluster)"]
+  end
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                           Network Architecture                           │
-│                                                                          │
-│  External Traffic                                                        │
-│        │                                                                 │
-│        ▼                                                                 │
-│  ┌─────────────┐     ┌─────────────┐     ┌─────────────┐                │
-│  │   Cilium    │     │   Envoy     │     │    Apps     │                │
-│  │     L2      │────▶│   Gateway   │────▶│  (Pods)     │                │
-│  │ Announcer   │     │  (Ingress)  │     │             │                │
-│  └─────────────┘     └─────────────┘     └─────────────┘                │
-│                                                                          │
-│  LoadBalancer IPs:                                                       │
-│  ├── 172.16.1.60  k8s-gateway (DNS)                                     │
-│  ├── 172.16.1.61  envoy-internal (HTTPS)                                │
-│  └── 172.16.1.62  envoy-external (HTTPS)                                │
-│                                                                          │
-│  ┌─────────────────────────────────────────────────────────────────┐    │
-│  │                      DNS Architecture                            │    │
-│  │                                                                  │    │
-│  │   Client DNS Query (*.ragas.cc)                                  │    │
-│  │          │                                                       │    │
-│  │          ▼                                                       │    │
-│  │   ┌─────────────┐    ┌─────────────┐    ┌─────────────┐         │    │
-│  │   │  AdGuard    │───▶│ k8s-gateway │───▶│   CoreDNS   │         │    │
-│  │   │  (Router)   │    │ (Split DNS) │    │  (Cluster)  │         │    │
-│  │   └─────────────┘    └─────────────┘    └─────────────┘         │    │
-│  │                                                                  │    │
-│  └─────────────────────────────────────────────────────────────────┘    │
-└─────────────────────────────────────────────────────────────────────────┘
-```
+
+**LoadBalancer IPs:**
+
+- `172.16.1.60` k8s-gateway (DNS)
+- `172.16.1.61` envoy-internal (HTTPS)
+- `172.16.1.62` envoy-external (HTTPS)
 
 ### Storage
 
@@ -167,26 +144,12 @@ Storage is provided by Proxmox Ceph (via Ceph CSI) plus NFS for backups/media:
 
 All cluster state is managed through Flux GitOps:
 
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                          GitOps Flow                                     │
-│                                                                          │
-│   Developer                                                              │
-│       │                                                                  │
-│       │ git push                                                         │
-│       ▼                                                                  │
-│   ┌─────────┐    webhook    ┌─────────────┐    reconcile   ┌─────────┐  │
-│   │ GitHub  │──────────────▶│    Flux     │───────────────▶│ Cluster │  │
-│   │  Repo   │               │  Operator   │                │  State  │  │
-│   └─────────┘               └─────────────┘                └─────────┘  │
-│                                    │                                     │
-│                                    │ notifies                            │
-│                                    ▼                                     │
-│                             ┌─────────────┐                              │
-│                             │   Discord   │                              │
-│                             │   Webhook   │                              │
-│                             └─────────────┘                              │
-└─────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+  dev["Developer"] -->|"git push"| github["GitHub Repo"]
+  github -->|"reconcile"| flux["Flux Operator"]
+  flux -->|"apply"| cluster["Cluster State"]
+  flux -->|"notify"| discord["Discord Webhook"]
 ```
 
 **Components:**
@@ -200,44 +163,13 @@ All cluster state is managed through Flux GitOps:
 
 GitHub branch protection is currently **not enabled** for `main`. The preferred workflow is still PRs + CI (with auto-merge used for many bot PRs).
 
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                     PR + CI Workflow (recommended)                        │
-│                                                                          │
-│   ┌─────────────┐                                                        │
-│   │  Developer  │                                                        │
-│   └──────┬──────┘                                                        │
-│          │                                                               │
-│          │ Push to feature branch                                        │
-│          ▼                                                               │
-│   ┌─────────────┐     ┌─────────────┐     ┌─────────────┐               │
-│   │   Feature   │────▶│  Create PR  │────▶│   CI Runs   │               │
-│   │   Branch    │     │   to main   │     │             │               │
-│   └─────────────┘     └─────────────┘     └──────┬──────┘               │
-│                                                  │                       │
-│                              ┌───────────────────┼───────────────────┐   │
-│                              │                   │                   │   │
-│                              ▼                   ▼                   ▼   │
-│                       ┌───────────┐       ┌───────────┐       ┌─────────┐│
-│                       │ YAML Lint │       │Kubeconform│       │Flux Local││
-│                       └─────┬─────┘       └─────┬─────┘       └────┬────┘│
-│                             │                   │                  │     │
-│                             └───────────────────┼──────────────────┘     │
-│                                                 │                        │
-│                                    ┌────────────┴────────────┐           │
-│                                    │                         │           │
-│                                 PASS                       FAIL          │
-│                                    │                         │           │
-│                                    ▼                         ▼           │
-│                             ┌─────────────┐          ┌─────────────┐     │
-│                             │ Merge /     │          │   Blocked   │     │
-│                             │ auto-merge  │          │   (Fix CI)  │     │
-│                             └─────────────┘          └─────────────┘     │
-│                                                                          │
-│   Notes:                                                                │
-│   • No GitHub branch protection rules are enabled for `main`             │
-│   • CI runs on push/PR and should stay green                             │
-└─────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+  dev["Developer"] -->|"push"| branch["Feature branch"]
+  branch --> pr["Pull request → main"]
+  pr --> ci["CI (validate)"]
+  ci -->|"PASS"| merge["Merge / auto-merge"]
+  ci -->|"FAIL"| fix["Blocked (fix CI)"]
 ```
 
 ### Automated Testing
@@ -256,30 +188,14 @@ Every PR runs through comprehensive CI:
 
 Dependency and image tag updates are handled via Renovate/Dependabot. (Optional) Flux Image Automation manifests exist but are currently disabled.
 
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                     Update Automation Pipeline                           │
-│                                                                          │
-│  ┌─────────────┐     ┌──────────────┐     ┌──────────────┐              │
-│  │ Registries  │────▶│ Renovate /   │────▶│ PR to main   │              │
-│  │ / Charts    │     │ Dependabot   │     │ (or direct)  │              │
-│  └─────────────┘     └──────────────┘     └──────┬───────┘              │
-│                                                  │                      │
-│                                             CI passes                   │
-│                                                  │                      │
-│                                                  ▼                      │
-│                                           ┌─────────────┐               │
-│                                           │ Merge /     │               │
-│                                           │ auto-merge  │               │
-│                                           └──────┬──────┘               │
-│                                                  │                      │
-│                                                  ▼                      │
-│                                           ┌─────────────┐               │
-│                                           │  Flux GitOps │────▶ Cluster │
-│                                           └─────────────┘               │
-│                                                                          │
-│   Note: Flux Image Automation manifests exist but are currently disabled. │
-└─────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+  registries["Registries / Charts"] --> bots["Renovate / Dependabot"]
+  bots --> pr["PR to main (or direct)"]
+  pr --> ci["CI (validate)"]
+  ci -->|"PASS"| merge["Merge / auto-merge"]
+  merge --> flux["Flux GitOps"]
+  flux --> cluster["Cluster"]
 ```
 
 ---
@@ -288,47 +204,15 @@ Dependency and image tag updates are handled via Renovate/Dependabot. (Optional)
 
 ### Layers of Security
 
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                         Security Architecture                            │
-│                                                                          │
-│  ┌─────────────────────────────────────────────────────────────────┐    │
-│  │ Layer 1: OS Security (Talos Linux)                               │    │
-│  │  • Immutable filesystem                                          │    │
-│  │  • No SSH, no shell                                              │    │
-│  │  • API-only management                                           │    │
-│  │  • Minimal attack surface                                        │    │
-│  └─────────────────────────────────────────────────────────────────┘    │
-│                                                                          │
-│  ┌─────────────────────────────────────────────────────────────────┐    │
-│  │ Layer 2: Network Security (Cilium)                               │    │
-│  │  • eBPF-based network policies                                   │    │
-│  │  • Encrypted pod-to-pod traffic (WireGuard)                      │    │
-│  │  • L7 visibility and filtering                                   │    │
-│  └─────────────────────────────────────────────────────────────────┘    │
-│                                                                          │
-│  ┌─────────────────────────────────────────────────────────────────┐    │
-│  │ Layer 3: Secret Management (SOPS + Age)                          │    │
-│  │  • All secrets encrypted at rest in Git                          │    │
-│  │  • Decrypted only in-cluster by Flux                             │    │
-│  │  • Age key stored securely                                       │    │
-│  └─────────────────────────────────────────────────────────────────┘    │
-│                                                                          │
-│  ┌─────────────────────────────────────────────────────────────────┐    │
-│  │ Layer 4: TLS Everywhere (cert-manager)                           │    │
-│  │  • Let's Encrypt certificates                                    │    │
-│  │  • Automatic renewal                                             │    │
-│  │  • Wildcard cert for *.ragas.cc                                  │    │
-│  └─────────────────────────────────────────────────────────────────┘    │
-│                                                                          │
-│  ┌─────────────────────────────────────────────────────────────────┐    │
-│  │ Layer 5: GitHub CI / PR Workflow                                 │    │
-│  │  • CI validation on push/PR                                      │    │
-│  │  • Optional PR reviews                                           │    │
-│  │  • Secret scanning                                               │    │
-│  │  • Signed commits (optional)                                     │    │
-│  └─────────────────────────────────────────────────────────────────┘    │
-└─────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+  os["Layer 1: OS Security (Talos Linux)<br>- Immutable filesystem<br>- No SSH / shell<br>- API-only management<br>- Minimal attack surface"]
+  net["Layer 2: Network Security (Cilium)<br>- eBPF-based network policies<br>- Encrypted pod-to-pod traffic (optional)<br>- L7 visibility / filtering"]
+  secrets["Layer 3: Secret Management (SOPS + age)<br>- Encrypted at rest in Git<br>- Decrypted in-cluster by Flux<br>- Age key stored securely"]
+  tls["Layer 4: TLS Everywhere (cert-manager)<br>- Let's Encrypt certificates<br>- Automatic renewal<br>- Wildcard certs"]
+  git["Layer 5: GitHub CI / PR Workflow<br>- CI validation on push/PR<br>- Secret scanning<br>- Signed commits (optional)"]
+
+  os --> net --> secrets --> tls --> git
 ```
 
 ---

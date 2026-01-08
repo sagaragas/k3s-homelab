@@ -17,53 +17,68 @@ The Ragas Homelab runs a production-grade Kubernetes cluster using Talos Linux, 
 
 ## Cluster Architecture
 
+```mermaid
+flowchart TB
+  internet["Internet"] --> cf["Cloudflare (public)<br>ragas.sh"]
+
+  subgraph "Home Network (172.16.1.0/24)"
+    direction TB
+    router["Router<br>172.16.1.1"]
+    adguard["AdGuard Home<br>172.16.1.11"]
+    bind9["bind9<br>172.16.1.10"]
+    nas["NAS<br>172.16.1.250"]
+
+    subgraph "Proxmox Cluster"
+      direction LR
+      pve1["pve1<br>172.16.1.2"]
+      pve2["pve2<br>172.16.1.3"]
+      pve3["pve3<br>172.16.1.4"]
+      pve4["pve4<br>172.16.1.5"]
+    end
+
+    subgraph "Kubernetes Cluster (Talos)"
+      direction TB
+      vip["API VIP<br>172.16.1.49:6443"]
+
+      subgraph "Control Plane (HA)"
+        direction LR
+        cp1["talos-cp-1<br>172.16.1.50"]
+        cp2["talos-cp-2<br>172.16.1.51"]
+        cp3["talos-cp-3<br>172.16.1.52"]
+      end
+
+      subgraph "Worker Nodes"
+        direction LR
+        w1["talos-worker-1<br>172.16.1.53"]
+        w2["talos-worker-2<br>172.16.1.54"]
+        w3["talos-worker-3<br>172.16.1.55"]
+        w4["talos-worker-4<br>172.16.1.56"]
+      end
+    end
+
+    pve1 --> cp1
+    pve2 --> cp2
+    pve4 --> cp3
+    pve1 --> w1
+    pve2 --> w2
+    pve3 --> w3
+    pve4 --> w4
+
+    adguard -->|"split DNS"| k8sgw["k8s-gateway<br>172.16.1.60"]
+    k8sgw --> envoyInt["envoy-internal<br>172.16.1.61"]
+  end
+
+  cf -->|"Cloudflare Tunnel"| envoyExt["envoy-external<br>172.16.1.62"]
+  envoyInt --> internal["Internal services<br>(ragas.cc)"]
+  envoyExt --> public["Public services<br>(ragas.sh)"]
 ```
-                    ┌─────────────────────────────────────────┐
-                    │              Internet                    │
-                    └─────────────────┬───────────────────────┘
-                                      │
-                    ┌─────────────────▼───────────────────────┐
-                    │         Cloudflare (public)             │
-                    │         ragas.sh                        │
-                    └─────────────────┬───────────────────────┘
-                                      │ (Cloudflare Tunnel)
-┌─────────────────────────────────────▼─────────────────────────────────────────┐
-│                            Home Network (172.16.1.0/24)                        │
-│                                                                                │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐       │
-│  │   Router     │  │   AdGuard    │  │    bind9     │  │    NAS       │       │
-│  │ 172.16.1.1   │  │ 172.16.1.11  │  │ 172.16.1.10  │  │ 172.16.1.250 │       │
-│  └──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘       │
-│                                                                                │
-│  ┌────────────────────────────────────────────────────────────────────────┐   │
-│  │                    Kubernetes Cluster (Talos)                           │   │
-│  │                         VIP: 172.16.1.49                                │   │
-│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐    │   │
-│  │  │ talos-cp-1  │  │ talos-cp-2  │  │ talos-cp-3  │  │ workers     │    │   │
-│  │  │ .50 (pve1)  │  │ .51 (pve2)  │  │ .52 (pve4)  │  │ .53-.56     │    │   │
-│  │  │ Control     │  │ Control     │  │ Control     │  │ Worker      │    │   │
-│  │  │ Plane       │  │ Plane       │  │ Plane       │  │             │    │   │
-│  │  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘    │   │
-│  │                                                                         │   │
-│  │  Load Balancer IPs (Cilium):                                           │   │
-│  │  - 172.16.1.49: Kubernetes API (VIP)                                   │   │
-│  │  - 172.16.1.60: k8s-gateway (internal DNS)                             │   │
-│  │  - 172.16.1.61: envoy-internal (internal ingress)                      │   │
-│  │  - 172.16.1.62: envoy-external (external ingress)                      │   │
-│  └────────────────────────────────────────────────────────────────────────┘   │
-│                                                                                │
-│  ┌────────────────────────────────────────────────────────────────────────┐   │
-│  │                         Proxmox Cluster                                 │   │
-│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐    │   │
-│  │  │    pve1     │  │    pve2     │  │    pve3     │  │    pve4     │    │   │
-│  │  │ 172.16.1.2  │  │ 172.16.1.3  │  │ 172.16.1.4  │  │ 172.16.1.5  │    │   │
-│  │  │ Ryzen 9    │  │ Ryzen 9     │  │ Intel N150  │  │ i5-12500T   │    │   │
-│  │  │ 28GB RAM   │  │ 28GB RAM    │  │ 16GB RAM    │  │ 64GB RAM    │    │   │
-│  │  │ Ceph OSD   │  │ Ceph OSD    │  │ Ceph OSD    │  │ GPU (770)   │    │   │
-│  │  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘    │   │
-│  └────────────────────────────────────────────────────────────────────────┘   │
-└───────────────────────────────────────────────────────────────────────────────┘
-```
+
+**LoadBalancer IPs (Cilium):**
+
+- `172.16.1.49` Kubernetes API (VIP)
+- `172.16.1.60` k8s-gateway (internal DNS)
+- `172.16.1.61` envoy-internal (internal ingress)
+- `172.16.1.62` envoy-external (external ingress)
 
 ## High Availability
 
