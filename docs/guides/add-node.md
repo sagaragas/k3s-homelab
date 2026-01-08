@@ -23,50 +23,27 @@ In Proxmox, create a new VM:
 | Network | VLAN 1 (172.16.1.0/24) |
 | ISO | talos-v1.11.5-amd64.iso |
 
-### 2. Update Nodes Configuration
+### 2. Copy machine config from an existing worker
 
-Edit `nodes.yaml`:
-
-```yaml
-nodes:
-  # ... existing nodes ...
-  
-  - hostname: talos-worker-2
-    ipAddress: 172.16.1.54
-    controlPlane: false
-    installDiskSelector:
-      size: ">= 100GB"
-    networkInterfaces:
-      - interface: eth0
-        dhcp: false
-        addresses:
-          - 172.16.1.54/24
-        routes:
-          - network: 0.0.0.0/0
-            gateway: 172.16.1.1
-```
-
-### 3. Generate Machine Config
+This cluster is managed manually (not via talhelper-generated configs). The simplest pattern is to copy the machine config from an existing worker and edit it for the new node.
 
 ```bash
-# Regenerate configs
-task talos:generate
+# Export an existing worker machine config
+talosctl -n 172.16.1.53 get machineconfig -o jsonpath='{.spec}' > /tmp/new-worker.yaml
 
-# Or manually with talhelper
-talhelper genconfig
+# Edit /tmp/new-worker.yaml: hostname, IP, MAC address
+# (use your editor of choice)
 ```
 
-### 4. Apply Configuration
+### 3. Apply configuration to the new node
+
+Boot the new VM from the Talos ISO (maintenance mode), then apply the config using the node's current (DHCP) IP:
 
 ```bash
-# Apply config to new node
-talosctl apply-config \
-  --nodes 172.16.1.54 \
-  --file talos/clusterconfig/kubernetes-talos-worker-2.yaml \
-  --insecure
+talosctl apply-config --insecure --nodes <new-node-ip> --file /tmp/new-worker.yaml
 ```
 
-### 5. Verify Node Joined
+### 4. Verify Node Joined
 
 ```bash
 # Wait for node to appear
@@ -88,29 +65,18 @@ Same as worker, but with:
 | RAM | 8GB |
 | Disk | 100GB |
 
-### 2. Update Nodes Configuration
-
-Edit `nodes.yaml`:
-
-```yaml
-nodes:
-  # ... existing nodes ...
-  
-  - hostname: talos-cp-4
-    ipAddress: 172.16.1.55
-    controlPlane: true
-    installDiskSelector:
-      size: ">= 100GB"
-```
-
-### 3. Generate and Apply
+### 2. Copy machine config from an existing control plane
 
 ```bash
-task talos:generate
-talosctl apply-config \
-  --nodes 172.16.1.55 \
-  --file talos/clusterconfig/kubernetes-talos-cp-4.yaml \
-  --insecure
+talosctl -n 172.16.1.50 get machineconfig -o jsonpath='{.spec}' > /tmp/new-controlplane.yaml
+
+# Edit /tmp/new-controlplane.yaml: hostname, IP, MAC address
+```
+
+### 3. Apply configuration to the new control plane
+
+```bash
+talosctl apply-config --insecure --nodes <new-node-ip> --file /tmp/new-controlplane.yaml
 ```
 
 ### 4. Verify Etcd Membership
@@ -120,7 +86,7 @@ talosctl apply-config \
 talosctl -n 172.16.1.50 etcd members
 
 # Verify all control planes healthy
-talosctl -n 172.16.1.50,172.16.1.51,172.16.1.52,172.16.1.55 health
+talosctl -n 172.16.1.50,172.16.1.51,172.16.1.52,<new-cp-ip> health
 ```
 
 ## Post-Addition Steps
@@ -146,8 +112,8 @@ Add new node to any relevant DNS records or monitoring configurations.
 
 ```bash
 # Add labels for scheduling
-kubectl label node talos-worker-2 node-role.kubernetes.io/worker=true
-kubectl label node talos-worker-2 topology.kubernetes.io/zone=rack-1
+kubectl label node <node-name> node-role.kubernetes.io/worker=true
+kubectl label node <node-name> topology.kubernetes.io/zone=rack-1
 ```
 
 ## Removing a Node
@@ -156,27 +122,27 @@ kubectl label node talos-worker-2 topology.kubernetes.io/zone=rack-1
 
 ```bash
 # Drain the node
-kubectl drain talos-worker-2 --ignore-daemonsets --delete-emptydir-data
+kubectl drain <node-name> --ignore-daemonsets --delete-emptydir-data
 
 # Delete from Kubernetes
-kubectl delete node talos-worker-2
+kubectl delete node <node-name>
 
 # Reset Talos (optional)
-talosctl -n 172.16.1.54 reset --graceful=false
+talosctl -n <node-ip> reset --graceful=false
 ```
 
 ### Control Plane Node
 
 ```bash
 # Remove from etcd first
-talosctl -n 172.16.1.50 etcd remove-member talos-cp-4
+talosctl -n 172.16.1.50 etcd remove-member <cp-node-name>
 
 # Then drain and delete
-kubectl drain talos-cp-4 --ignore-daemonsets --delete-emptydir-data
-kubectl delete node talos-cp-4
+kubectl drain <cp-node-name> --ignore-daemonsets --delete-emptydir-data
+kubectl delete node <cp-node-name>
 
 # Reset
-talosctl -n 172.16.1.55 reset --graceful=false
+talosctl -n <node-ip> reset --graceful=false
 ```
 
 ## Troubleshooting

@@ -193,7 +193,7 @@ kubectl get httproute -A
 
 ## Step 9: Verify Access
 
-1. Ensure DNS is configured (AdGuard should forward to k8s_gateway)
+1. Ensure DNS is configured (AdGuard should forward `ragas.cc` to `k8s-gateway` at `172.16.1.60`)
 2. Access https://my-app.ragas.cc
 3. Check certificate status:
    ```bash
@@ -237,7 +237,7 @@ kubectl describe certificate -n network
 1. **Use HelmRelease** for complex apps with many config options
 2. **Pin versions** - never use `latest` in production
 3. **Add health checks** to your deployments
-4. **Use resource limits** to prevent resource exhaustion
+4. **Set resource requests**; add limits only when needed
 5. **Enable PodDisruptionBudgets** for HA apps
 6. **Use SOPS** for secrets, never commit plain secrets
 
