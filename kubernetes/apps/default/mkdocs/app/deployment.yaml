@@ -27,10 +27,16 @@ spec:
           ports:
             - containerPort: 8000
           command:
-            - mkdocs
-            - serve
-            - --dev-addr=0.0.0.0:8000
-          workingDir: /docs
+            - /bin/sh
+            - -ec
+            - |
+              while [ ! -f /git/repo/mkdocs.yml ]; do
+                echo "Waiting for git-sync to populate repo..."
+                sleep 2
+              done
+              cd /git/repo
+              mkdocs serve --dev-addr=0.0.0.0:8000 --watch /git/root
+          workingDir: /git/repo
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false
@@ -53,8 +59,8 @@ spec:
             timeoutSeconds: 3
             failureThreshold: 3
           volumeMounts:
-            - name: docs
-              mountPath: /docs
+            - name: git
+              mountPath: /git
           resources:
             requests:
               cpu: 50m
@@ -62,27 +68,46 @@ spec:
             limits:
               cpu: 200m
               memory: 256Mi
-      initContainers:
-        - name: git-clone
-          image: alpine/git:v2.49.1
+        - name: git-sync
+          image: registry.k8s.io/git-sync/git-sync:v4.5.1
+          args:
+            - --repo=https://github.com/sagaragas/k3s-homelab.git
+            - --ref=main
+            - --root=/git/root
+            - --link=/git/repo
+            - --period=60s
+            - --depth=1
+            - --max-failures=-1
+            - --touch-file=/git/root/refresh
+            - --http-bind=0.0.0.0:2020
+          ports:
+            - name: http
+              containerPort: 2020
           securityContext:
             allowPrivilegeEscalation: false
-            runAsNonRoot: true
-            runAsUser: 1000
+            readOnlyRootFilesystem: false
             capabilities:
               drop: ["ALL"]
-          command:
-            - /bin/sh
-            - -c
-            - |
-              git clone --depth 1 https://github.com/sagaragas/k3s-homelab.git /tmp/repo
-              cp -r /tmp/repo/docs/* /docs/
-              cp /tmp/repo/mkdocs.yml /docs/ 2>/dev/null || echo "No mkdocs.yml, using default"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 2
+            periodSeconds: 5
+            timeoutSeconds: 1
+            failureThreshold: 12
           volumeMounts:
-            - name: docs
-              mountPath: /docs
+            - name: git
+              mountPath: /git
+          resources:
+            requests:
+              cpu: 5m
+              memory: 32Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
       volumes:
-        - name: docs
+        - name: git
           emptyDir: {}
 ---
 apiVersion: v1
