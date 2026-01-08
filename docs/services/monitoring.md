@@ -10,11 +10,9 @@ The cluster uses kube-prometheus-stack for comprehensive monitoring.
 | Grafana | https://grafana.ragas.cc | Visualization & dashboards |
 | Alertmanager | https://alertmanager.ragas.cc | Alert routing & notification |
 
-## Default Credentials
+## Access
 
-| Service | Username | Password |
-|---------|----------|----------|
-| Grafana | admin | admin (change immediately!) |
+Grafana admin credentials are managed via a Kubernetes Secret (referenced by the `kube-prometheus-stack` HelmRelease) and are **not** the chart defaults.
 
 ## Architecture
 
@@ -112,10 +110,10 @@ spec:
 
 ```bash
 # Current alerts in Prometheus
-curl -s http://prometheus.ragas.cc/api/v1/alerts | jq
+curl -s https://prometheus.ragas.cc/api/v1/alerts | jq
 
 # Alertmanager status
-curl -s http://alertmanager.ragas.cc/api/v2/alerts | jq
+curl -s https://alertmanager.ragas.cc/api/v2/alerts | jq
 ```
 
 ### Custom AlertRule
@@ -146,15 +144,15 @@ spec:
 
 | Component | Storage | Size |
 |-----------|---------|------|
-| Prometheus | PVC | 20Gi |
-| Alertmanager | PVC | 1Gi |
-| Grafana | PVC | 5Gi |
+| Prometheus | PVC (`ceph-block`) | 50Gi |
+| Alertmanager | PVC (`ceph-block`) | 5Gi |
+| Grafana | PVC (`ceph-block`) | 10Gi |
 
 ## Retention
 
 Default retention settings:
 - **Time**: 7 days
-- **Size**: 10GB
+- **Size**: 45GB
 
 Adjust in HelmRelease:
 ```yaml
@@ -169,7 +167,7 @@ prometheus:
 ### Prometheus not scraping
 ```bash
 # Check targets
-curl http://prometheus.ragas.cc/api/v1/targets | jq '.data.activeTargets[] | select(.health != "up")'
+curl https://prometheus.ragas.cc/api/v1/targets | jq '.data.activeTargets[] | select(.health != "up")'
 
 # Check ServiceMonitor
 kubectl get servicemonitor -A
@@ -188,7 +186,7 @@ kubectl get secret -n monitoring kube-prometheus-stack-grafana -o jsonpath='{.da
 kubectl top pod -n monitoring -l app.kubernetes.io/name=prometheus
 
 # Check cardinality
-curl http://prometheus.ragas.cc/api/v1/status/tsdb | jq
+curl https://prometheus.ragas.cc/api/v1/status/tsdb | jq
 ```
 
 ## Files
