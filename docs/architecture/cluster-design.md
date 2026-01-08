@@ -47,7 +47,7 @@ The Ragas Homelab runs a production-grade Kubernetes cluster using Talos Linux, 
 │  │                                                                         │   │
 │  │  Load Balancer IPs (Cilium):                                           │   │
 │  │  - 172.16.1.49: Kubernetes API (VIP)                                   │   │
-│  │  - 172.16.1.60: k8s_gateway (internal DNS)                             │   │
+│  │  - 172.16.1.60: k8s-gateway (internal DNS)                             │   │
 │  │  - 172.16.1.61: envoy-internal (internal ingress)                      │   │
 │  │  - 172.16.1.62: envoy-external (external ingress)                      │   │
 │  └────────────────────────────────────────────────────────────────────────┘   │
