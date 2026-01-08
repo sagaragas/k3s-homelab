@@ -23,15 +23,15 @@ The Ragas Homelab runs a production-grade Kubernetes cluster using Talos Linux, 
                     └─────────────────┬───────────────────────┘
                                       │
                     ┌─────────────────▼───────────────────────┐
-                    │         Cloudflare (DNS/CDN)            │
-                    │         ragas.cc                         │
+                    │         Cloudflare (public)             │
+                    │         ragas.sh                        │
                     └─────────────────┬───────────────────────┘
-                                      │ (Optional tunnel)
+                                      │ (Cloudflare Tunnel)
 ┌─────────────────────────────────────▼─────────────────────────────────────────┐
 │                            Home Network (172.16.1.0/24)                        │
 │                                                                                │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐       │
-│  │   Router     │  │   AdGuard    │  │  Technitium  │  │    NAS       │       │
+│  │   Router     │  │   AdGuard    │  │    bind9     │  │    NAS       │       │
 │  │ 172.16.1.1   │  │ 172.16.1.11  │  │ 172.16.1.10  │  │ 172.16.1.250 │       │
 │  └──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘       │
 │                                                                                │
@@ -39,8 +39,8 @@ The Ragas Homelab runs a production-grade Kubernetes cluster using Talos Linux, 
 │  │                    Kubernetes Cluster (Talos)                           │   │
 │  │                         VIP: 172.16.1.49                                │   │
 │  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐    │   │
-│  │  │ talos-cp-1  │  │ talos-cp-2  │  │ talos-cp-3  │  │talos-worker │    │   │
-│  │  │ .50 (pve1)  │  │ .51 (pve1)  │  │ .52 (pve2)  │  │ .53 (pve2)  │    │   │
+│  │  │ talos-cp-1  │  │ talos-cp-2  │  │ talos-cp-3  │  │ workers     │    │   │
+│  │  │ .50 (pve1)  │  │ .51 (pve2)  │  │ .52 (pve4)  │  │ .53-.56     │    │   │
 │  │  │ Control     │  │ Control     │  │ Control     │  │ Worker      │    │   │
 │  │  │ Plane       │  │ Plane       │  │ Plane       │  │             │    │   │
 │  │  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘    │   │
@@ -68,44 +68,44 @@ The Ragas Homelab runs a production-grade Kubernetes cluster using Talos Linux, 
 ## High Availability
 
 ### Control Plane HA
-- 3 control plane nodes across 2 physical hosts
+- 3 control plane nodes across 3 physical hosts (pve1, pve2, pve4)
 - etcd runs on all control plane nodes
 - Virtual IP (172.16.1.49) for API server access
 - Any control plane node can be lost without cluster impact
 
 ### Worker Availability
-- Currently 1 worker node
+- Currently 4 worker nodes
 - All control plane nodes can also run workloads
 - Can scale by adding more workers
 
 ## Resource Allocation
 
-### Control Plane Nodes (each)
-- **CPU**: 4 cores
-- **Memory**: 8GB
-- **Disk**: 100GB (vm-storage/Ceph RBD)
-- **Network**: 1Gbps
-
-### Worker Nodes (each)
-- **CPU**: 8 cores
-- **Memory**: 16GB
-- **Disk**: 200GB (vm-storage/Ceph RBD)
-- **Network**: 1Gbps
+VM sizing is managed in Proxmox and may change over time. The stable source-of-truth in this repo is node identity (hostname/IP) and cluster topology.
 
 ## Talos Configuration
 
-### Machine Config Structure
+!!! note
+    This cluster was bootstrapped manually (not with talhelper). The `talos/` folder is primarily documentation plus reusable patch snippets.
+
+### Talos config files in this repo
+
 ```
 talos/
-├── talconfig.yaml          # Talhelper configuration
 ├── talenv.yaml             # Version pinning
-├── talsecret.sops.yaml     # Encrypted secrets
-├── clusterconfig/          # Generated configs (gitignored)
-│   ├── talosconfig         # Admin config
-│   └── kubernetes-*.yaml   # Per-node configs
+├── talconfig.yaml          # Documentation-only example (not applied directly)
 └── patches/
     ├── controller/         # Control plane patches
     └── global/             # All-node patches
+```
+
+### Adding nodes (high level)
+
+Copy the machine config from an existing node, edit hostname/IP/MAC, and apply to the new node in maintenance mode:
+
+```bash
+talosctl -n <existing-node-ip> get machineconfig -o jsonpath='{.spec}' > /tmp/new-node.yaml
+# edit /tmp/new-node.yaml
+talosctl apply-config --insecure --nodes <new-node-ip> --file /tmp/new-node.yaml
 ```
 
 ### Key Talos Features Used

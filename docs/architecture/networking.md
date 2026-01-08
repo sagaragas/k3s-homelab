@@ -19,7 +19,7 @@ The cluster uses Cilium as the CNI with Gateway API for ingress, providing moder
 |----|---------|-------------|
 | 172.16.1.1 | Router | Default gateway |
 | 172.16.1.2-5 | Proxmox | pve1-pve4 |
-| 172.16.1.10 | Technitium DNS | Secondary DNS |
+| 172.16.1.10 | bind9 | Internal DNS (authoritative for `ragas.cc`) |
 | 172.16.1.11 | AdGuard Home | Primary DNS |
 
 ### Kubernetes IPs
@@ -27,8 +27,8 @@ The cluster uses Cilium as the CNI with Gateway API for ingress, providing moder
 |----|---------|-------------|
 | 172.16.1.49 | Kubernetes VIP | API server (HA) |
 | 172.16.1.50-52 | Control Plane | talos-cp-1/2/3 |
-| 172.16.1.53 | Worker | talos-worker-1 |
-| 172.16.1.60 | k8s_gateway | Internal DNS resolution |
+| 172.16.1.53-56 | Workers | talos-worker-1..4 |
+| 172.16.1.60 | k8s-gateway | Internal DNS resolution |
 | 172.16.1.61 | envoy-internal | Internal ingress gateway |
 | 172.16.1.62 | envoy-external | External ingress gateway |
 
@@ -61,7 +61,7 @@ l2announcements:
 **External Gateway** (`envoy-external`)
 - IP: 172.16.1.62
 - Purpose: Public services via Cloudflare tunnel
-- TLS: Cloudflare-issued certificates
+- TLS: Let's Encrypt (via cert-manager + Cloudflare DNS-01)
 
 ### HTTPRoute Example
 ```yaml
@@ -91,15 +91,15 @@ spec:
 ### Split DNS Setup
 
 ```
-                Internet DNS
+                Public DNS
                      │
         ┌────────────┴────────────┐
         │                         │
-   External queries          ragas.cc queries
+   ragas.sh queries          ragas.cc queries
         │                         │
         ▼                         ▼
-   Cloudflare DNS          Internal DNS
-   (public IPs)            (k8s_gateway)
+   Cloudflare DNS          AdGuard / bind9
+                            (forwards ragas.cc)
                                   │
                            172.16.1.60
                                   │
@@ -111,15 +111,16 @@ spec:
 
 ### DNS Resolution Flow
 1. Client queries AdGuard (172.16.1.11)
-2. AdGuard forwards `*.ragas.cc` to k8s_gateway (172.16.1.60)
-3. k8s_gateway returns appropriate gateway IP
+2. AdGuard forwards `ragas.cc` queries to k8s-gateway (172.16.1.60)
+3. k8s-gateway returns the appropriate gateway IP based on `HTTPRoute`s
 4. Client connects to envoy-internal (172.16.1.61)
 5. Envoy routes to backend pod
 
 ### AdGuard Configuration
-Add DNS rewrite:
+Forward `ragas.cc` queries to `k8s-gateway` (172.16.1.60) so DNS answers are driven by `HTTPRoute` and `Service` resources:
+
 ```
-*.ragas.cc → 172.16.1.60
+[/ragas.cc/]172.16.1.60
 ```
 
 ## Network Policies
