@@ -161,7 +161,7 @@ flowchart LR
 
 ### Branch Protection
 
-GitHub branch protection is currently **not enabled** for `main`. The preferred workflow is still PRs + CI (with auto-merge used for many bot PRs).
+GitHub branch protection is enabled for `main`: changes merge via PRs, and the Validate checks must pass.
 
 ```mermaid
 flowchart LR
@@ -191,7 +191,7 @@ Dependency and image tag updates are handled via Renovate/Dependabot. (Optional)
 ```mermaid
 flowchart LR
   registries["Registries / Charts"] --> bots["Renovate / Dependabot"]
-  bots --> pr["PR to main (or direct)"]
+  bots --> pr["PR to main"]
   pr --> ci["CI (validate)"]
   ci -->|"PASS"| merge["Merge / auto-merge"]
   merge --> flux["Flux GitOps"]

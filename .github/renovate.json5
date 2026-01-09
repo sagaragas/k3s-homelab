@@ -11,9 +11,9 @@
   suppressNotifications: [
     'prEditedNotification',
   ],
-  // Auto-merge directly to main without PRs for most updates
+  // Auto-merge via PRs for most updates (required for protected branches)
   automerge: true,
-  automergeType: 'branch',
+  automergeType: 'pr',
   platformAutomerge: true,
   flux: {
     managerFilePatterns: [
@@ -35,7 +35,7 @@
       description: 'Auto-merge all patch and minor updates',
       matchUpdateTypes: ['patch', 'minor'],
       automerge: true,
-      automergeType: 'branch',
+      automergeType: 'pr',
     },
     {
       description: 'Major updates need manual review (create PR)',
