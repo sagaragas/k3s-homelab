@@ -22,4 +22,3 @@ resources:
   - ./sonarr/ks.yaml
   - ./speedtest-tracker/ks.yaml
   - ./unpackerr/ks.yaml
-  - ./mediamanager/ks.yaml
