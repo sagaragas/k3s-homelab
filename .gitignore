@@ -20,6 +20,10 @@ talosconfig
 .DS_Store
 Thumbs.db
 
-# Agentic docs (local only, not for public repo)
-.factory/
+# Factory AI - commit skills/droids, ignore ephemeral data
+.factory/context/
+.factory/artifacts/
+.factory/logs/
+.factory/sessions/
+.factory/.cache/
 talosconfig.backup
