@@ -86,11 +86,41 @@ All internal services use `*.ragas.cc` via bind9 DNS.
 | Unpackerr | (internal) | ✅ Deployed | Archive extraction |
 | PostgreSQL | postgres.database.svc | ✅ Deployed | Shared DB for arr apps |
 
+### On LXC: arr (172.16.1.31) - SHUTDOWN
+
+> **Status:** Shutdown on 2026-01-05. Backups at `/volume1/k8s-backup/lxc-backups/arr-lxc-final-20260105.tar.gz`
+> **Keep until:** 2026-02-05 (30 days monitoring period)
+
+| Service | Status |
+|---------|--------|
+| Sonarr | ✅ Migrated to K8s |
+| Radarr | ✅ Migrated to K8s |
+| Prowlarr | ✅ Migrated to K8s |
+| Seerr | ✅ Migrated to K8s |
+| Requestrr | ✅ Migrated to K8s |
+| Huntarr | ✅ Migrated to K8s |
+| Unpackerr | ✅ Migrated to K8s |
+| Dockge | ❌ Not migrated (not needed) |
+
 ### On LXC: torrent (172.16.1.32) - Docker
 
 | Service | URL | Port | Notes |
 |---------|-----|------|-------|
 | qBittorrent | qbit.ragas.cc | 8080 | 2.5Gb NIC - keep on LXC |
+
+### On LXC: fun (172.16.1.7) - SHUTDOWN
+
+> **Status:** Shutdown on 2026-01-05. Backups at `/volume1/k8s-backup/lxc-backups/fun-lxc-final-20260105.tar.gz`
+> **Keep until:** 2026-02-05 (30 days monitoring period)
+
+| Service | Status |
+|---------|--------|
+| Homepage | ✅ Migrated to K8s |
+| Bazarr | ✅ Migrated to K8s |
+| Speedtest | ✅ Migrated to K8s |
+| PostgreSQL | ✅ Migrated to K8s |
+| Overseerr | ✅ Replaced by Seerr on K8s |
+| NextGBA | ❌ Not migrated (low priority) |
 
 ### On LXC: Media (GPU required - stay on LXC)
 
@@ -114,7 +144,7 @@ All internal services use `*.ragas.cc` via bind9 DNS.
 Synology NAS with NFS shares:
 - `/volume2/media` - Media files (movies, TV, music)
 
-**NFS Access:** K8s workers (172.16.1.53-56) and LXC containers can mount NFS shares.
+**NFS Access:** Currently only LXC containers can mount. K8s workers (172.16.1.50-53) need to be added to NAS allowed hosts.
 
 ## Decision Rules: K8s vs LXC
 
@@ -127,6 +157,21 @@ Synology NAS with NFS shares:
 | Stateless web app? | K8s |
 | Arr stack app? | K8s (preferred) or LXC |
 | Public-facing (ragas.sh)? | Keep existing setup |
+
+## Migration Notes
+
+### Domain Changes
+- **Old internal domain:** `*.ragas.sh` (some services)
+- **New internal domain:** `*.ragas.cc`
+- When migrating, update `base_url` configs from `/app.ragas.sh/` to `/`
+- Update DNS in bind9 (`/etc/bind/db.ragas.cc` on 172.16.1.10)
+
+### Config Migration Pattern
+1. Backup config from source: `tar -czf /tmp/app-config.tar.gz -C /path/to/config .`
+2. Copy to K8s pod: `kubectl cp /tmp/app-config.tar.gz namespace/pod:/tmp/`
+3. Extract in pod: `kubectl exec pod -- tar -xzf /tmp/app-config.tar.gz -C /config`
+4. Fix base_url if needed: `sed -i 's|base_url:.*|base_url: /|' config.yaml`
+5. Restart pod to apply
 
 ## Storage Strategy
 
