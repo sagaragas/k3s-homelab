@@ -18,6 +18,21 @@ spec:
       mediamanager:
         replicas: 1
         strategy: RollingUpdate
+        initContainers:
+          init-config:
+            image:
+              repository: busybox
+              tag: latest
+            command:
+              - sh
+              - -c
+              - |
+                if [ ! -f /app/config/config.toml ]; then
+                  cp /config-template/config.toml /app/config/config.toml
+                  echo "Config copied from template"
+                else
+                  echo "Config already exists, skipping"
+                fi
         containers:
           app:
             image:
@@ -87,14 +102,16 @@ spec:
         existingClaim: mediamanager-config
         globalMounts:
           - path: /app/config
-      config-file:
+            subPath: config
+      config-template:
         enabled: true
         type: configMap
         name: mediamanager-config
-        globalMounts:
-          - path: /app/config/config.toml
-            subPath: config.toml
-            readOnly: true
+        advancedMounts:
+          mediamanager:
+            init-config:
+              - path: /config-template
+                readOnly: true
       data:
         enabled: true
         type: persistentVolumeClaim
