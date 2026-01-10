@@ -102,7 +102,6 @@ spec:
         existingClaim: mediamanager-config
         globalMounts:
           - path: /app/config
-            subPath: config
       config-template:
         enabled: true
         type: configMap
@@ -112,13 +111,6 @@ spec:
             init-config:
               - path: /config-template
                 readOnly: true
-      data:
-        enabled: true
-        type: persistentVolumeClaim
-        existingClaim: mediamanager-config
-        globalMounts:
-          - path: /data/images
-            subPath: images
       media:
         enabled: true
         type: persistentVolumeClaim

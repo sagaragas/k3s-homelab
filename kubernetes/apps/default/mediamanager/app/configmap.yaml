@@ -9,7 +9,7 @@ data:
     [misc]
     frontend_url = "https://media.ragas.cc"
     cors_urls = ["https://media.ragas.cc"]
-    image_directory = "/data/images"
+    image_directory = "/app/config/images"
     tv_directory = "/media/tv"
     movie_directory = "/media/movies"
     torrent_directory = "/media/downloads"
