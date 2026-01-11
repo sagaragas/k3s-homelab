@@ -17,6 +17,8 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: media-nfs
+  labels:
+    velero.io/exclude-from-backup: "true"
 spec:
   accessModes:
     - ReadWriteMany
