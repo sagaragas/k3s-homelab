@@ -5,4 +5,5 @@ resources:
   - helmrepository.yaml
   - helmrelease.yaml
   - httproute.yaml
+  - backendtrafficpolicy.yaml
   - secret.sops.yaml
