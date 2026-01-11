@@ -264,6 +264,9 @@ spec:
                   url: http://172.16.1.32:8080
                   username: "{{HOMEPAGE_VAR_QBIT_USER}}"
                   password: "{{HOMEPAGE_VAR_QBIT_PASS}}"
+                  fields:
+                    - download
+                    - upload
             - Speedtest:
                 icon: si-speedtest
                 href: https://speed.ragas.cc
