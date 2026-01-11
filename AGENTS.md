@@ -24,7 +24,7 @@
 | `ragas.sh` | Public-facing services | Cloudflare |
 
 ### Public Services (ragas.sh) - DO NOT MIGRATE DOMAINS
-- `request.ragas.sh` → Seerr (public requests, on K8s)
+- `request.ragas.sh` → Overseerr (public requests, on K8s via CF tunnel)
 - `plex.ragas.sh` → Plex (public streaming)
 - `jelly.ragas.sh` → Jellyfin (public streaming)
 
@@ -77,12 +77,14 @@ All internal services use `*.ragas.cc` via bind9 DNS.
 | Prometheus | prometheus.ragas.cc | ✅ Deployed | |
 | MkDocs | docs.ragas.cc | ✅ Deployed | |
 | Speedtest Tracker | speed.ragas.cc | ✅ Deployed | |
-| Seerr | request.ragas.sh | ✅ Deployed | 2 replicas, PostgreSQL, public via CF tunnel |
+| Overseerr | request.ragas.sh | ✅ Deployed | Public via CF tunnel, SQLite |
+| Seerr | seerr.ragas.cc | ✅ Deployed | Internal testing, PostgreSQL |
 | Sonarr | sonarr.ragas.cc | ✅ Deployed | 2 replicas, PostgreSQL |
 | Radarr | radarr.ragas.cc | ✅ Deployed | 2 replicas, PostgreSQL |
 | Prowlarr | prowlarr.ragas.cc | ✅ Deployed | 2 replicas, PostgreSQL |
 | Requestrr | requestrr.ragas.cc | ✅ Deployed | Discord bot |
 | Huntarr | huntarr.ragas.cc | ✅ Deployed | Missing media hunter |
+| Agregarr | agg.ragas.cc | ✅ Deployed | Plex collections manager |
 | Unpackerr | (internal) | ✅ Deployed | Archive extraction |
 | PostgreSQL | postgres.database.svc | ✅ Deployed | Shared DB for arr apps |
 
@@ -162,7 +164,7 @@ Synology NAS with NFS shares:
 
 ### Resource Policy
 
-- **No CPU/memory limits** - apps scale as needed
+- **Resource requests/limits configured** - all apps have memory requests and limits for stability
 - **Generous PVC sizes** - storage is plentiful, don't underprovision
 - **Worker node preference** - apps prefer workers but can run on control planes
 - **Control planes not tainted** - allows full resource utilization on small clusters
