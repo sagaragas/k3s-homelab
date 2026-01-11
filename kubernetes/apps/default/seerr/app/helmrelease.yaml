@@ -21,10 +21,13 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/seerr-team/seerr
-              tag: develop
+              repository: ghcr.io/hotio/seerr
+              tag: nightly
             env:
               TZ: America/Los_Angeles
+              PUID: "1000"
+              PGID: "1000"
+              UMASK: "002"
               DB_TYPE: postgres
               DB_HOST: postgres.database.svc.cluster.local
               DB_PORT: "5432"
