@@ -21,19 +21,13 @@ spec:
         containers:
           app:
             image:
-              repository: sctx/overseerr
+              repository: lscr.io/linuxserver/overseerr
               tag: latest
             env:
               TZ: America/Los_Angeles
+              PUID: "1000"
+              PGID: "1000"
               LOG_LEVEL: info
-              DB_TYPE: postgres
-              DB_HOST: postgres.database.svc.cluster.local
-              DB_PORT: "5432"
-              DB_USER: tipi
-              DB_NAME: overseerr
-            envFrom:
-              - secretRef:
-                  name: overseerr-postgres-secret
             probes:
               liveness: &probes
                 enabled: true
