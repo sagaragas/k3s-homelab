@@ -85,4 +85,4 @@ spec:
         type: persistentVolumeClaim
         existingClaim: overseerr-config
         globalMounts:
-          - path: /app/config
+          - path: /config
