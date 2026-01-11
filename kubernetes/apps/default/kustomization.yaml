@@ -19,6 +19,7 @@ resources:
   - ./radarr/ks.yaml
   - ./requestrr/ks.yaml
   - ./seerr/ks.yaml
+  - ./overseerr/ks.yaml
   - ./sonarr/ks.yaml
   - ./speedtest-tracker/ks.yaml
   - ./unpackerr/ks.yaml
