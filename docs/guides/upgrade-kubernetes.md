@@ -4,16 +4,11 @@ This guide covers upgrading Kubernetes on this Talos cluster.
 
 ## Overview
 
-This cluster is managed manually (no talhelper-generated configs; per-node machine configs are not stored in Git). Kubernetes upgrades are performed with `talosctl upgrade-k8s`.
+This cluster uses `talhelper` (see `task talos:*`). Kubernetes upgrades can be performed with `task talos:upgrade-k8s` (recommended) or directly with `talosctl upgrade-k8s`.
 
 The desired Kubernetes version is tracked in `talos/talenv.yaml` (Renovate may open PRs for this), but the upgrade itself is an operator-run maintenance action.
 
 ## Version Compatibility
-
-| Talos Version | Supported Kubernetes |
-|---------------|---------------------|
-| v1.11.x | v1.31.x - v1.34.x |
-| v1.10.x | v1.30.x - v1.33.x |
 
 Check compatibility: [Talos Support Matrix](https://www.talos.dev/latest/introduction/support-matrix/)
 
@@ -51,6 +46,13 @@ Commit the change once the upgrade is complete (or as part of the same maintenan
 ## Upgrade Process
 
 Run the upgrade from a workstation with `talosctl` configured.
+
+### Recommended (Taskfile)
+
+```bash
+# Uses talos/talenv.yaml:kubernetesVersion
+task talos:upgrade-k8s
+```
 
 ### Dry run
 

@@ -37,7 +37,7 @@ Safely upgrade Talos Linux, Kubernetes, and cluster components.
 
 ## Talos Upgrade Process
 
-1. **Update talconfig.yaml** with new Talos version
+1. **Update Talos version pin** in `talos/talenv.yaml`
 2. **Generate new configs:**
    ```bash
    task talos:generate-config
@@ -57,7 +57,7 @@ Safely upgrade Talos Linux, Kubernetes, and cluster components.
 
 ## Kubernetes Upgrade Process
 
-1. **Update Kubernetes version in talconfig.yaml**
+1. **Update Kubernetes version pin** in `talos/talenv.yaml`
 2. **Regenerate configs:**
    ```bash
    task talos:generate-config

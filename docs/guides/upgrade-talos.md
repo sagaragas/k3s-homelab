@@ -4,7 +4,7 @@ This guide covers upgrading Talos Linux on your cluster nodes.
 
 ## Overview
 
-Talos upgrades are performed node-by-node using `talosctl upgrade`. The process:
+Talos upgrades are performed node-by-node. This cluster uses `talhelper` (see `task talos:*`), but you can also upgrade directly with `talosctl upgrade`. The process:
 
 1. Downloads new Talos image
 2. Writes to disk
@@ -35,7 +35,7 @@ Update the pinned version in `talos/talenv.yaml`:
 
 ```yaml
 # talos/talenv.yaml
-talosVersion: v1.11.6
+talosVersion: v1.12.1
 ```
 
 Commit the change once the upgrade is complete (or as part of the same maintenance window).
@@ -48,8 +48,11 @@ Always upgrade workers before control plane nodes.
 
 ```bash
 # Upgrade worker node
+task talos:upgrade-node IP=172.16.1.53
+
+# Or directly with talosctl:
 talosctl -n 172.16.1.53 upgrade \
-  --image ghcr.io/siderolabs/installer:v1.11.6
+  --image ghcr.io/siderolabs/installer:v1.12.1
 
 # Wait for node to come back
 kubectl get nodes -w
@@ -62,28 +65,28 @@ Upgrade control plane nodes one at a time:
 ```bash
 # Upgrade first control plane
 talosctl -n 172.16.1.50 upgrade \
-  --image ghcr.io/siderolabs/installer:v1.11.6
+  --image ghcr.io/siderolabs/installer:v1.12.1
 
 # Wait for it to rejoin
 talosctl -n 172.16.1.50 health
 
 # Upgrade second control plane
 talosctl -n 172.16.1.51 upgrade \
-  --image ghcr.io/siderolabs/installer:v1.11.6
+  --image ghcr.io/siderolabs/installer:v1.12.1
 
 # Wait and verify
 talosctl -n 172.16.1.51 health
 
 # Upgrade third control plane
 talosctl -n 172.16.1.52 upgrade \
-  --image ghcr.io/siderolabs/installer:v1.11.6
+  --image ghcr.io/siderolabs/installer:v1.12.1
 ```
 
 ## Automated Upgrade Script
 
 ```bash
 #!/bin/bash
-VERSION="v1.11.6"
+VERSION="v1.12.1"
 IMAGE="ghcr.io/siderolabs/installer:$VERSION"
 
 WORKERS="172.16.1.53 172.16.1.54 172.16.1.55 172.16.1.56"

@@ -14,7 +14,7 @@ Welcome to the comprehensive documentation for the Ragas Homelab Kubernetes clus
 
 ## Architecture Overview
 
-- **Platform**: Talos Linux v1.11.5
+- **Platform**: Talos Linux v1.12.1
 - **Kubernetes**: v1.34.2
 - **GitOps**: Flux v2
 - **CNI**: Cilium (eBPF, DSR mode)

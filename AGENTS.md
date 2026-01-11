@@ -176,13 +176,18 @@ Synology NAS with NFS shares:
 | `flux` | GitOps CLI |
 | `task` | Task runner |
 | `sops` | Encrypt/decrypt secrets |
-| `talhelper` | Generate Talos configs (NOT USED - see below) |
+| `talhelper` | Generate/apply/upgrade Talos configs (`task talos:*`) |
 
 ## Adding New Talos Nodes
 
-**IMPORTANT:** This cluster was NOT created with talhelper. The `talsecret.sops.yaml` was removed because it contained incorrect secrets.
+Preferred: add the node to `talos/talconfig.yaml`, then generate/apply configs via Taskfile (generated machine configs land in `talos/clusterconfig/` and are gitignored).
 
-To add a new worker node:
+```bash
+task talos:generate-config
+task talos:apply-node IP=<new-node-ip> MODE=auto
+```
+
+Fallback (quick/manual): copy the machine config from an existing worker node, edit it, and apply in maintenance mode.
 
 ```bash
 # 1. Get config template from existing worker

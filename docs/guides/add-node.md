@@ -21,11 +21,13 @@ In Proxmox, create a new VM:
 | RAM | 8GB+ |
 | Disk | 100GB+ |
 | Network | VLAN 1 (172.16.1.0/24) |
-| ISO | talos-v1.11.5-amd64.iso |
+| ISO | talos-v1.12.1-amd64.iso |
 
 ### 2. Copy machine config from an existing worker
 
-This cluster is managed manually (not via talhelper-generated configs). The simplest pattern is to copy the machine config from an existing worker and edit it for the new node.
+This cluster is managed with `talhelper` (see `task talos:*`). Generated node configs live in `talos/clusterconfig/` and are not meant to be committed.
+
+If you just need to add a node quickly, you can also copy the live machine config from an existing node and edit it.
 
 ```bash
 # Export an existing worker machine config

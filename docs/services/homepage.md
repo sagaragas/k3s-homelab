@@ -146,6 +146,12 @@ kubectl logs -n default -l app.kubernetes.io/name=homepage
 2. Verify API keys/tokens are correct
 3. Check widget type matches the service
 
+### Page refresh loop (repeated reloads)
+
+If Homepage is running multiple replicas and the pods report different `HOMEPAGE_BUILDTIME`, the frontend may see a changing `/api/hash` and trigger reloads.
+
+This repo mitigates that with cookie-based sticky sessions via Envoy Gateway `BackendTrafficPolicy` (`EG_HOME_STICKY`): `kubernetes/apps/default/homepage/app/backendtrafficpolicy.yaml`.
+
 ### RBAC Issues
 Homepage needs cluster-wide read access for Kubernetes widgets:
 ```bash
@@ -156,5 +162,6 @@ kubectl get clusterrolebinding homepage
 ## Files
 
 - HelmRelease: `kubernetes/apps/default/homepage/app/helmrelease.yaml`
+- BackendTrafficPolicy: `kubernetes/apps/default/homepage/app/backendtrafficpolicy.yaml`
 - HTTPRoute: `kubernetes/apps/default/homepage/app/httproute.yaml`
 - Kustomization: `kubernetes/apps/default/homepage/ks.yaml`

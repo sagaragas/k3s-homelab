@@ -100,22 +100,30 @@ VM sizing is managed in Proxmox and may change over time. The stable source-of-t
 ## Talos Configuration
 
 !!! note
-    This cluster was bootstrapped manually (not with talhelper). The `talos/` folder is primarily documentation plus reusable patch snippets.
+    Talos configuration is managed with `talhelper` (see `task talos:*`). Source-of-truth is `talos/talconfig.yaml` + `talos/talenv.yaml`; generated machine configs are written to `talos/clusterconfig/` (gitignored).
 
 ### Talos config files in this repo
 
 ```
 talos/
 ├── talenv.yaml             # Version pinning
-├── talconfig.yaml          # Documentation-only example (not applied directly)
-└── patches/
-    ├── controller/         # Control plane patches
-    └── global/             # All-node patches
+├── talconfig.yaml          # Cluster definition (talhelper)
+├── patches/
+│   ├── controller/         # Control plane patches
+│   └── global/             # All-node patches
+└── clusterconfig/          # Generated machine configs (gitignored)
 ```
 
 ### Adding nodes (high level)
 
-Copy the machine config from an existing node, edit hostname/IP/MAC, and apply to the new node in maintenance mode:
+Preferred: update `talos/talconfig.yaml` with the new node definition, then:
+
+```bash
+task talos:generate-config
+task talos:apply-node IP=<new-node-ip> MODE=auto
+```
+
+Fallback: copy the machine config from an existing node, edit hostname/IP/MAC, and apply to the new node in maintenance mode:
 
 ```bash
 talosctl -n <existing-node-ip> get machineconfig -o jsonpath='{.spec}' > /tmp/new-node.yaml

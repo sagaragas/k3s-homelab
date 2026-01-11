@@ -56,15 +56,16 @@ talosctl -n 172.16.1.50 bootstrap --recover-from=./db.snapshot
 
 ## Talos Configuration Backup
 
-This cluster is managed manually (not via talhelper-generated machine configs). The repo tracks version pins and reusable patch snippets, but per-node machine configs are not stored in Git.
+Talos configuration is managed with `talhelper` (see `task talos:*`). The repo tracks version pins and cluster definition; per-node machine configs are generated into `talos/clusterconfig/` (gitignored).
 
 ### Critical Files
 
 ```
 talos/
 ├── talenv.yaml             # Version pinning
-├── talconfig.yaml          # Documentation-only example
-└── patches/                # Reusable patch snippets
+├── talconfig.yaml          # Cluster definition (talhelper)
+├── patches/                # Reusable patch snippets
+└── clusterconfig/          # Generated machine configs (gitignored)
 ```
 
 ### Export machine configs (optional)

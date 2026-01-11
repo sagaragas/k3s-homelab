@@ -4,7 +4,7 @@
 
 ### Production-grade Kubernetes on Proxmox with Talos Linux & GitOps
 
-[![Talos](https://img.shields.io/badge/Talos-v1.11.5-orange?style=for-the-badge&logo=talos)](https://www.talos.dev/)
+[![Talos](https://img.shields.io/badge/Talos-v1.12.1-orange?style=for-the-badge&logo=talos)](https://www.talos.dev/)
 [![Kubernetes](https://img.shields.io/badge/Kubernetes-v1.34.2-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)](https://kubernetes.io/)
 [![Flux](https://img.shields.io/badge/Flux-v0.36.0-5468FF?style=for-the-badge&logo=flux&logoColor=white)](https://fluxcd.io/)
 
@@ -233,12 +233,12 @@ flowchart TB
 
 | Component | Version | Purpose |
 |-----------|---------|---------|
-| Cilium | 1.18.4 | CNI, LoadBalancer, Network Policies |
+| Cilium | 1.18.5 | CNI, LoadBalancer, Network Policies |
 | CoreDNS | 1.45.0 | Cluster DNS |
-| cert-manager | 1.19.1 | TLS certificate management |
+| cert-manager | 1.19.2 | TLS certificate management |
 | Envoy Gateway | 1.6.1 | Gateway API ingress |
 | Flux | 0.36.0 | GitOps operator |
-| kube-prometheus-stack | 72.6.2 | Full monitoring stack |
+| kube-prometheus-stack | 80.13.3 | Full monitoring stack |
 
 ---
 
@@ -286,10 +286,11 @@ k3s-homelab/
 │   │   └── sops/            # SOPS decryption
 │   └── flux/                # Flux bootstrap
 │       └── cluster/
-├── talos/                   # Talos machine configs
+├── talos/                   # Talos config (talhelper)
+│   ├── talenv.yaml          # Version pinning (Talos/Kubernetes)
 │   ├── talconfig.yaml       # Cluster definition
-│   ├── talsecret.sops.yaml  # Encrypted secrets
-│   └── clusterconfig/       # Generated configs
+│   ├── patches/             # Node/cluster patches
+│   └── clusterconfig/       # Generated configs (local)
 ├── docs/                    # MkDocs documentation
 │   ├── architecture/
 │   ├── services/
