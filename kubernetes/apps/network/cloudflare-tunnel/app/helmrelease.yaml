@@ -89,7 +89,7 @@ spec:
             tunnel: 30286f86-9062-47bd-92f2-80d94cdb17b0
             ingress:
               - hostname: "request.ragas.sh"
-                service: http://seerr.default.svc.cluster.local:5055
+                service: http://overseerr.default.svc.cluster.local:5055
               - hostname: "*.ragas.sh"
                 service: http://envoy-external.{{ .Release.Namespace }}.svc.cluster.local:80
               - service: http_status:404
