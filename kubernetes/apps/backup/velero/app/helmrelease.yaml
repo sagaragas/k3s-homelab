@@ -77,6 +77,8 @@ spec:
             - default
             - database
             - monitoring
+          excludedResources:
+            - persistentvolumeclaims/media-nfs
           snapshotVolumes: true
           storageLocation: default
           volumeSnapshotLocations:
