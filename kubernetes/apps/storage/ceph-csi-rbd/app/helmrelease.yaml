@@ -24,22 +24,50 @@ spec:
 
     provisioner:
       replicaCount: 2
-      resources:
-        requests:
-          cpu: 10m
-          memory: 64Mi
-        limits:
-          cpu: 200m
-          memory: 256Mi
+      provisioner:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 128Mi
+          limits:
+            memory: 512Mi
+      attacher:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
+          limits:
+            memory: 256Mi
+      resizer:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
+          limits:
+            memory: 256Mi
+      snapshotter:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
+          limits:
+            memory: 256Mi
 
     nodeplugin:
-      resources:
-        requests:
-          cpu: 10m
-          memory: 64Mi
-        limits:
-          cpu: 200m
-          memory: 256Mi
+      plugin:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
+          limits:
+            memory: 256Mi
+      registrar:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 32Mi
+          limits:
+            memory: 128Mi
 
     storageClass:
       create: false

@@ -11,6 +11,12 @@ spec:
   interval: 1h
   values:
     fullnameOverride: k8s-gateway
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        memory: 128Mi
     domain: "${SECRET_DOMAIN}"
     ttl: 1
     service:

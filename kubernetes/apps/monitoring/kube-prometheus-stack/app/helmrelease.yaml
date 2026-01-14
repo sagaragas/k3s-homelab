@@ -27,6 +27,12 @@ spec:
       ingress:
         enabled: false
       alertmanagerSpec:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
+          limits:
+            memory: 256Mi
         storage:
           volumeClaimTemplate:
             spec:
@@ -40,6 +46,12 @@ spec:
       enabled: true
       defaultDashboardsEnabled: true
       defaultDashboardsTimezone: America/Los_Angeles
+      resources:
+        requests:
+          cpu: 50m
+          memory: 256Mi
+        limits:
+          memory: 512Mi
       deploymentStrategy:
         type: Recreate
       admin:
@@ -64,6 +76,12 @@ spec:
       ingress:
         enabled: false
       prometheusSpec:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 512Mi
+          limits:
+            memory: 2Gi
         retention: 7d
         retentionSize: 45GB
         storageSpec:
@@ -112,5 +130,27 @@ spec:
     nodeExporter:
       enabled: true
 
+    prometheus-node-exporter:
+      resources:
+        requests:
+          cpu: 10m
+          memory: 32Mi
+        limits:
+          memory: 128Mi
+
+    kube-state-metrics:
+      resources:
+        requests:
+          cpu: 10m
+          memory: 64Mi
+        limits:
+          memory: 256Mi
+
     prometheusOperator:
       enabled: true
+      resources:
+        requests:
+          cpu: 10m
+          memory: 64Mi
+        limits:
+          memory: 256Mi

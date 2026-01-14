@@ -14,6 +14,12 @@ spec:
         name: grafana
         namespace: monitoring
   values:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+      limits:
+        memory: 256Mi
     config:
       clients:
         - url: http://loki.monitoring.svc.cluster.local:3100/loki/api/v1/push

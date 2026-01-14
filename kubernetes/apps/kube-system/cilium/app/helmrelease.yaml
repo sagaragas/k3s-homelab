@@ -36,8 +36,28 @@ spec:
       enabled: true
       relay:
         enabled: true
+        resources:
+          requests:
+            cpu: 10m
+            memory: 32Mi
+          limits:
+            memory: 128Mi
       ui:
         enabled: true
+        frontend:
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
+        backend:
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
     ipam:
       mode: kubernetes
     ipv4NativeRoutingCIDR: "10.42.0.0/16"
