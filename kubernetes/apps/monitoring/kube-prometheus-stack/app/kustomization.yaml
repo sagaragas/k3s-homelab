@@ -6,7 +6,7 @@ components:
   - ../../../../components/sops
 
 resources:
-  - helmrepository.yaml
+  - ocirepository.yaml
   - helmrelease.yaml
   - httproutes.yaml
   - loki-datasource.yaml
