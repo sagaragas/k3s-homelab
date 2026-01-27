@@ -26,6 +26,9 @@ spec:
               POSTGRES_DB: speedtest-tracker
               POSTGRES_USER: tipi
               PGDATA: /var/lib/postgresql/data/pgdata
+            args:
+              - -c
+              - max_connections=200
             envFrom:
               - secretRef:
                   name: postgres-secret
