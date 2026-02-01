@@ -95,7 +95,7 @@ spec:
     semver:
       range: ">=1.0.0"
 ---
-# Unpackerr - follow latest release tag
+# Unpackerr - follow latest release tag (hotio uses release-X.X.X format)
 apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImagePolicy
 metadata:
@@ -103,6 +103,9 @@ metadata:
 spec:
   imageRepositoryRef:
     name: unpackerr
+  filterTags:
+    pattern: "^release-(?P<version>[0-9]+\\.[0-9]+\\.[0-9]+)$"
+    extract: "$version"
   policy:
     semver:
       range: ">=0.1.0"
