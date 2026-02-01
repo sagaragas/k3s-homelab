@@ -22,7 +22,7 @@ spec:
           app:
             image:
               repository: ghcr.io/linuxserver/prowlarr
-              tag: 1.31.2 # {"$imagepolicy": "flux-system:prowlarr:tag"}
+              tag: 1.37.0 # {"$imagepolicy": "flux-system:prowlarr:tag"}
             env:
               TZ: America/Los_Angeles
               PUID: "1000"
