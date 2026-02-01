@@ -21,7 +21,7 @@ spec:
           app:
             image:
               repository: docker.io/agregarr/agregarr
-              tag: 0.7.0 # {"$imagepolicy": "flux-system:agregarr:tag"}
+              tag: v2.3.0 # {"$imagepolicy": "flux-system:agregarr:tag"}
             env:
               TZ: America/Los_Angeles
             probes:
