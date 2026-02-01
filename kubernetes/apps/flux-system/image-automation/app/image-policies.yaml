@@ -34,3 +34,123 @@ spec:
   policy:
     semver:
       range: ">=11.0.0"
+---
+# Sonarr - follow semver 4.x
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImagePolicy
+metadata:
+  name: sonarr
+spec:
+  imageRepositoryRef:
+    name: sonarr
+  policy:
+    semver:
+      range: ">=4.0.0"
+---
+# Radarr - follow semver 5.x
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImagePolicy
+metadata:
+  name: radarr
+spec:
+  imageRepositoryRef:
+    name: radarr
+  policy:
+    semver:
+      range: ">=5.0.0"
+---
+# Prowlarr - follow semver 1.x
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImagePolicy
+metadata:
+  name: prowlarr
+spec:
+  imageRepositoryRef:
+    name: prowlarr
+  policy:
+    semver:
+      range: ">=1.0.0"
+---
+# Bazarr - follow semver 1.x
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImagePolicy
+metadata:
+  name: bazarr
+spec:
+  imageRepositoryRef:
+    name: bazarr
+  policy:
+    semver:
+      range: ">=1.0.0"
+---
+# Overseerr - follow semver 1.x
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImagePolicy
+metadata:
+  name: overseerr
+spec:
+  imageRepositoryRef:
+    name: overseerr
+  policy:
+    semver:
+      range: ">=1.0.0"
+---
+# Unpackerr - follow latest release tag
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImagePolicy
+metadata:
+  name: unpackerr
+spec:
+  imageRepositoryRef:
+    name: unpackerr
+  policy:
+    semver:
+      range: ">=0.1.0"
+---
+# Speedtest Tracker - follow semver
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImagePolicy
+metadata:
+  name: speedtest-tracker
+spec:
+  imageRepositoryRef:
+    name: speedtest-tracker
+  policy:
+    semver:
+      range: ">=0.1.0"
+---
+# Apprise - follow semver
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImagePolicy
+metadata:
+  name: apprise
+spec:
+  imageRepositoryRef:
+    name: apprise
+  policy:
+    semver:
+      range: ">=0.1.0"
+---
+# Huntarr - follow semver
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImagePolicy
+metadata:
+  name: huntarr
+spec:
+  imageRepositoryRef:
+    name: huntarr
+  policy:
+    semver:
+      range: ">=0.1.0"
+---
+# Agregarr - follow semver
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImagePolicy
+metadata:
+  name: agregarr
+spec:
+  imageRepositoryRef:
+    name: agregarr
+  policy:
+    semver:
+      range: ">=0.1.0"

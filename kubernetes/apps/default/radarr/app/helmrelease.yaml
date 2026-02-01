@@ -22,7 +22,7 @@ spec:
           app:
             image:
               repository: ghcr.io/linuxserver/radarr
-              tag: latest
+              tag: 5.22.1 # {"$imagepolicy": "flux-system:radarr:tag"}
             env:
               TZ: America/Los_Angeles
               PUID: "1000"

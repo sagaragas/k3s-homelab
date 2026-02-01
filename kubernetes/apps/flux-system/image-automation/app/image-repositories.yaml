@@ -29,3 +29,109 @@ spec:
   interval: 6h
   exclusionList:
     - "^.*-.*$"  # Exclude pre-release versions
+---
+# Sonarr
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: sonarr
+spec:
+  image: ghcr.io/linuxserver/sonarr
+  interval: 6h
+  exclusionList:
+    - "^develop.*$"
+    - "^nightly.*$"
+---
+# Radarr
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: radarr
+spec:
+  image: ghcr.io/linuxserver/radarr
+  interval: 6h
+  exclusionList:
+    - "^develop.*$"
+    - "^nightly.*$"
+---
+# Prowlarr
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: prowlarr
+spec:
+  image: ghcr.io/linuxserver/prowlarr
+  interval: 6h
+  exclusionList:
+    - "^develop.*$"
+    - "^nightly.*$"
+---
+# Bazarr
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: bazarr
+spec:
+  image: ghcr.io/linuxserver/bazarr
+  interval: 6h
+  exclusionList:
+    - "^develop.*$"
+    - "^nightly.*$"
+---
+# Overseerr
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: overseerr
+spec:
+  image: ghcr.io/linuxserver/overseerr
+  interval: 6h
+  exclusionList:
+    - "^develop.*$"
+---
+# Unpackerr
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: unpackerr
+spec:
+  image: ghcr.io/hotio/unpackerr
+  interval: 6h
+  exclusionList:
+    - "^nightly.*$"
+---
+# Speedtest Tracker
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: speedtest-tracker
+spec:
+  image: ghcr.io/linuxserver/speedtest-tracker
+  interval: 6h
+---
+# Apprise
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: apprise
+spec:
+  image: ghcr.io/linuxserver/apprise-api
+  interval: 6h
+---
+# Huntarr
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: huntarr
+spec:
+  image: docker.io/huntarr/huntarr
+  interval: 6h
+---
+# Agregarr
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: agregarr
+spec:
+  image: docker.io/agregarr/agregarr
+  interval: 6h
