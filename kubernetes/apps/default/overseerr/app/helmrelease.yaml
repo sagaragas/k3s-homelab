@@ -22,7 +22,7 @@ spec:
           app:
             image:
               repository: ghcr.io/linuxserver/overseerr
-              tag: 1.33.2 # {"$imagepolicy": "flux-system:overseerr:tag"}
+              tag: 1.34.0 # {"$imagepolicy": "flux-system:overseerr:tag"}
             env:
               TZ: America/Los_Angeles
               PUID: "1000"
