@@ -11,5 +11,4 @@ resources:
   - ./flux-instance/ks.yaml
   - ./flux-operator/ks.yaml
   - ./notifications/ks.yaml
-  # Disabled - Renovate handles image updates instead
-  # - ./image-automation/ks.yaml
+  - ./image-automation/ks.yaml
