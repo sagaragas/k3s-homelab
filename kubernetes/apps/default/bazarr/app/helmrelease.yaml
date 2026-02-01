@@ -20,7 +20,7 @@ spec:
           app:
             image:
               repository: ghcr.io/linuxserver/bazarr
-              tag: 1.5.2 # {"$imagepolicy": "flux-system:bazarr:tag"}
+              tag: 1.5.5 # {"$imagepolicy": "flux-system:bazarr:tag"}
             env:
               TZ: America/Los_Angeles
               BAZARR__PORT: &port 6767
