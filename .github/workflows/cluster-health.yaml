@@ -1,0 +1,104 @@
+name: Cluster Health Report
+
+on:
+  schedule:
+    - cron: '0 8 * * 1'  # Monday 8am UTC
+  workflow_dispatch:
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Configure kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
+
+      - name: Cluster Health Report
+        id: health
+        run: |
+          echo "## Cluster Health Report" >> $GITHUB_STEP_SUMMARY
+          echo "Generated: $(date -u)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "### Nodes" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          kubectl get nodes -o wide >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "### Unhealthy Pods" >> $GITHUB_STEP_SUMMARY
+          UNHEALTHY=$(kubectl get pods -A --field-selector=status.phase!=Running,status.phase!=Succeeded 2>/dev/null | grep -v "^NAMESPACE" || echo "None")
+          if [ "$UNHEALTHY" = "None" ] || [ -z "$UNHEALTHY" ]; then
+            echo "All pods healthy! ✅" >> $GITHUB_STEP_SUMMARY
+          else
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "$UNHEALTHY" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "### Flux Status" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          kubectl get ks -A 2>/dev/null | head -30 >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "### HelmRelease Status" >> $GITHUB_STEP_SUMMARY
+          FAILED_HR=$(kubectl get hr -A 2>/dev/null | grep -v "True" | grep -v "READY" || echo "")
+          if [ -z "$FAILED_HR" ]; then
+            echo "All HelmReleases healthy! ✅" >> $GITHUB_STEP_SUMMARY
+          else
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "$FAILED_HR" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "### Storage" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          kubectl get pvc -A 2>/dev/null | head -30 >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+          echo "### Image Versions" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          kubectl get deploy -n default -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.template.spec.containers[0].image}{"\n"}{end}' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Check for issues
+        run: |
+          ISSUES=0
+          
+          # Check for non-ready nodes
+          NOT_READY=$(kubectl get nodes | grep -v "Ready" | grep -v "NAME" || true)
+          if [ -n "$NOT_READY" ]; then
+            echo "::warning::Some nodes are not ready"
+            ISSUES=$((ISSUES+1))
+          fi
+          
+          # Check for failed HelmReleases
+          FAILED=$(kubectl get hr -A 2>/dev/null | grep -E "False|Unknown" | grep -v "READY" || true)
+          if [ -n "$FAILED" ]; then
+            echo "::warning::Some HelmReleases are not ready"
+            ISSUES=$((ISSUES+1))
+          fi
+          
+          # Check for unhealthy pods
+          UNHEALTHY=$(kubectl get pods -A --field-selector=status.phase=Failed 2>/dev/null | grep -v "NAMESPACE" || true)
+          if [ -n "$UNHEALTHY" ]; then
+            echo "::warning::Some pods are in failed state"
+            ISSUES=$((ISSUES+1))
+          fi
+          
+          if [ $ISSUES -gt 0 ]; then
+            echo "Found $ISSUES potential issues"
+            exit 0  # Don't fail the workflow, just report
+          else
+            echo "Cluster is healthy!"
+          fi

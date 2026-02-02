@@ -38,7 +38,25 @@
       automergeType: 'pr',
     },
     {
-      description: 'Major updates need manual review (create PR)',
+      description: 'Auto-merge major updates for arr stack apps (safe)',
+      matchPackageNames: [
+        '/sonarr/',
+        '/radarr/',
+        '/prowlarr/',
+        '/overseerr/',
+        '/huntarr/',
+        '/agregarr/',
+        '/unpackerr/',
+        '/speedtest-tracker/',
+        '/apprise/',
+        '/homepage/',
+      ],
+      matchUpdateTypes: ['major'],
+      automerge: true,
+      automergeType: 'pr',
+    },
+    {
+      description: 'Major updates for other packages need manual review',
       matchUpdateTypes: ['major'],
       automerge: false,
       automergeType: 'pr',
@@ -46,6 +64,11 @@
     {
       description: 'Talos updates need manual review (cluster critical)',
       matchPackageNames: ['/talos/', '/talhelper/'],
+      automerge: false,
+    },
+    {
+      description: 'Cilium updates need manual review (CNI critical)',
+      matchPackageNames: ['/cilium/'],
       automerge: false,
     },
     {
@@ -60,7 +83,18 @@
       matchPackageNames: [
         '/cert-manager/',
         '/external-dns/',
-        '/traefik/',
+        '/envoy/',
+      ],
+    },
+    {
+      description: 'Group monitoring stack updates',
+      groupName: 'monitoring',
+      matchPackageNames: [
+        '/prometheus/',
+        '/grafana/',
+        '/alertmanager/',
+        '/loki/',
+        '/promtail/',
       ],
     },
   ],
