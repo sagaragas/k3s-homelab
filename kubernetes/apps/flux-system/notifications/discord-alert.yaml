@@ -1,18 +1,24 @@
 ---
+# Alert for errors - immediate notification
 apiVersion: notification.toolkit.fluxcd.io/v1beta3
 kind: Alert
 metadata:
-  name: discord
+  name: discord-errors
   namespace: flux-system
 spec:
   providerRef:
     name: discord
-  # Only notify on errors, not every reconciliation
   eventSeverity: error
   eventSources:
     - kind: Kustomization
       name: "*"
     - kind: HelmRelease
+      name: "*"
+    - kind: GitRepository
+      name: "*"
+    - kind: ImageRepository
+      name: "*"
+    - kind: ImagePolicy
       name: "*"
   exclusionList:
     - "error.*lookup.*no such host"
@@ -20,4 +26,49 @@ spec:
     - "waiting.*to be available"
     - "dependency.*is not ready"
     - "retrying in"
-  summary: "Homelab Kubernetes"
+  summary: "🔴 Cluster Error"
+---
+# Alert for successful deployments
+apiVersion: notification.toolkit.fluxcd.io/v1beta3
+kind: Alert
+metadata:
+  name: discord-deployments
+  namespace: flux-system
+spec:
+  providerRef:
+    name: discord
+  eventSeverity: info
+  eventSources:
+    - kind: Kustomization
+      name: "*"
+    - kind: HelmRelease
+      name: "*"
+  inclusionList:
+    - ".*upgrade.*succeeded.*"
+    - ".*install.*succeeded.*"
+    - ".*Applied revision.*"
+  exclusionList:
+    - ".*flux-system.*"
+    - ".*cert-manager.*"
+    - ".*kube-system.*"
+  summary: "✅ Deployment"
+---
+# Alert for image updates
+apiVersion: notification.toolkit.fluxcd.io/v1beta3
+kind: Alert
+metadata:
+  name: discord-images
+  namespace: flux-system
+spec:
+  providerRef:
+    name: discord
+  eventSeverity: info
+  eventSources:
+    - kind: ImagePolicy
+      name: "*"
+    - kind: ImageUpdateAutomation
+      name: "*"
+  inclusionList:
+    - ".*Latest image tag.*"
+    - ".*committed and pushed.*"
+  summary: "📦 Image Update"

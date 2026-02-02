@@ -71,15 +71,19 @@ jobs:
           kubectl get deploy -n default -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.template.spec.containers[0].image}{"\n"}{end}' >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
-      - name: Check for issues
+      - name: Check for issues and notify Discord
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
           ISSUES=0
+          ISSUE_LIST=""
           
           # Check for non-ready nodes
           NOT_READY=$(kubectl get nodes | grep -v "Ready" | grep -v "NAME" || true)
           if [ -n "$NOT_READY" ]; then
             echo "::warning::Some nodes are not ready"
             ISSUES=$((ISSUES+1))
+            ISSUE_LIST="$ISSUE_LIST\n- Nodes not ready"
           fi
           
           # Check for failed HelmReleases
@@ -87,6 +91,7 @@ jobs:
           if [ -n "$FAILED" ]; then
             echo "::warning::Some HelmReleases are not ready"
             ISSUES=$((ISSUES+1))
+            ISSUE_LIST="$ISSUE_LIST\n- HelmReleases failing"
           fi
           
           # Check for unhealthy pods
@@ -94,11 +99,44 @@ jobs:
           if [ -n "$UNHEALTHY" ]; then
             echo "::warning::Some pods are in failed state"
             ISSUES=$((ISSUES+1))
+            ISSUE_LIST="$ISSUE_LIST\n- Pods in failed state"
           fi
+          
+          # Count resources
+          NODE_COUNT=$(kubectl get nodes --no-headers | wc -l)
+          POD_COUNT=$(kubectl get pods -A --no-headers | wc -l)
+          HR_COUNT=$(kubectl get hr -A --no-headers 2>/dev/null | wc -l)
+          
+          # Send Discord notification
+          if [ $ISSUES -gt 0 ]; then
+            COLOR=15158332  # Red
+            TITLE="⚠️ Weekly Health Report - Issues Found"
+            DESC="Found **$ISSUES** potential issues:$ISSUE_LIST"
+          else
+            COLOR=3066993  # Green
+            TITLE="✅ Weekly Health Report - All Healthy"
+            DESC="Cluster is operating normally"
+          fi
+          
+          curl -s -H "Content-Type: application/json" \
+            -d "{
+              \"embeds\": [{
+                \"title\": \"$TITLE\",
+                \"description\": \"$DESC\",
+                \"color\": $COLOR,
+                \"fields\": [
+                  {\"name\": \"Nodes\", \"value\": \"$NODE_COUNT\", \"inline\": true},
+                  {\"name\": \"Pods\", \"value\": \"$POD_COUNT\", \"inline\": true},
+                  {\"name\": \"HelmReleases\", \"value\": \"$HR_COUNT\", \"inline\": true}
+                ],
+                \"footer\": {\"text\": \"View full report in GitHub Actions\"},
+                \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"
+              }]
+            }" \
+            "$DISCORD_WEBHOOK"
           
           if [ $ISSUES -gt 0 ]; then
             echo "Found $ISSUES potential issues"
-            exit 0  # Don't fail the workflow, just report
           else
             echo "Cluster is healthy!"
           fi
