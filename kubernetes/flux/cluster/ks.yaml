@@ -34,6 +34,7 @@ spec:
                 metadata:
                   name: _
                 spec:
+                  historyMax: 3
                   install:
                     crds: CreateReplace
                     strategy:
@@ -52,6 +53,16 @@ spec:
               target:
                 group: helm.toolkit.fluxcd.io
                 kind: HelmRelease
+            - patch: |-
+                apiVersion: apps/v1
+                kind: Deployment
+                metadata:
+                  name: _
+                spec:
+                  revisionHistoryLimit: 3
+              target:
+                group: apps
+                kind: Deployment
       target:
         group: kustomize.toolkit.fluxcd.io
         kind: Kustomization
