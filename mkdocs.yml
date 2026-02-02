@@ -71,6 +71,7 @@ nav:
       - Security: architecture/security.md
       - CI/CD Pipeline: architecture/ci-cd.md
   - Services:
+      - Media Stack: services/media-stack.md
       - Homepage: services/homepage.md
       - Monitoring: services/monitoring.md
       - Logging: services/logging.md

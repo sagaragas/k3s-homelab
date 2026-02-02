@@ -1,17 +1,32 @@
 # Flux Image Automation
 
-This guide explains Flux Image Automation and how it is (optionally) used in this repo.
+This guide explains Flux Image Automation and how it is used in this repo.
 
 ## Status in this repo
 
-Flux Image Automation resources are currently **disabled**. Image updates are handled via PRs (Renovate/Dependabot).
+Flux Image Automation is **enabled** and works alongside Renovate:
 
-The manifests live under `kubernetes/apps/flux-system/image-automation/`, but they are not applied because this line is commented out:
+- **Flux Image Automation**: Scans registries, detects latest tags, can auto-commit updates
+- **Renovate**: Creates PRs for version updates, auto-merges minor/patch
 
-```yaml
-# kubernetes/apps/flux-system/kustomization.yaml
-# - ./image-automation/ks.yaml
-```
+The manifests live under `kubernetes/apps/flux-system/image-automation/`.
+
+### Currently Tracked Images
+
+| App | Registry | Policy |
+|-----|----------|--------|
+| sonarr | ghcr.io/linuxserver/sonarr | semver >=4.0.0 |
+| radarr | ghcr.io/linuxserver/radarr | semver >=5.0.0 |
+| prowlarr | ghcr.io/linuxserver/prowlarr | semver >=1.0.0 |
+| overseerr | ghcr.io/linuxserver/overseerr | semver >=1.0.0 (version-vX.X.X format) |
+| huntarr | docker.io/huntarr/huntarr | semver >=0.1.0 |
+| agregarr | docker.io/agregarr/agregarr | semver >=0.1.0 |
+| unpackerr | ghcr.io/hotio/unpackerr | semver >=0.1.0 (release-X.X.X format) |
+| speedtest-tracker | ghcr.io/linuxserver/speedtest-tracker | semver >=0.1.0 |
+| apprise | ghcr.io/linuxserver/apprise-api | semver >=0.1.0 |
+| homepage | ghcr.io/gethomepage/homepage | semver >=0.9.0 |
+| grafana | grafana/grafana | semver >=11.0.0 |
+| mkdocs-material | squidfunk/mkdocs-material | semver 9.x |
 
 ## How it works (when enabled)
 

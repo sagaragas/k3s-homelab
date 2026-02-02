@@ -14,15 +14,16 @@ Welcome to the comprehensive documentation for the Ragas Homelab Kubernetes clus
 
 ## Architecture Overview
 
-- **Platform**: Talos Linux v1.12.1
+- **Platform**: Talos Linux v1.12.2
 - **Kubernetes**: v1.34.2
-- **GitOps**: Flux v2
+- **GitOps**: Flux v2 (with Image Automation enabled)
 - **CNI**: Cilium (eBPF, DSR mode)
 - **Ingress**: Envoy Gateway (Gateway API)
 - **DNS**: bind9 + AdGuard (internal) + Cloudflare (public)
 - **Storage**: Ceph CSI (RBD + CephFS) + NFS (media/backups)
 - **Certificates**: cert-manager + Let's Encrypt
-- **CI/CD**: GitHub Actions + Droid AI automation
+- **CI/CD**: GitHub Actions + Renovate (auto-merge) + Droid AI
+- **Updates**: Renovate PRs + Flux Image Automation (auto-updates)
 
 ## Cluster Nodes
 
