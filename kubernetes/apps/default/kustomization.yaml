@@ -10,7 +10,7 @@ resources:
   - ./namespace.yaml
   - ./media-storage/ks.yaml
   - ./apprise/ks.yaml
-  - ./bazarr/ks.yaml
+
   - ./echo/ks.yaml
   - ./homepage/ks.yaml
   - ./huntarr/ks.yaml

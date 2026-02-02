@@ -70,18 +70,7 @@ spec:
   policy:
     semver:
       range: ">=1.0.0"
----
-# Bazarr - follow semver 1.x
-apiVersion: image.toolkit.fluxcd.io/v1
-kind: ImagePolicy
-metadata:
-  name: bazarr
-spec:
-  imageRepositoryRef:
-    name: bazarr
-  policy:
-    semver:
-      range: ">=1.0.0"
+
 ---
 # Overseerr - follow semver 1.x
 apiVersion: image.toolkit.fluxcd.io/v1

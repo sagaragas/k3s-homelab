@@ -65,18 +65,7 @@ spec:
   exclusionList:
     - "^develop.*$"
     - "^nightly.*$"
----
-# Bazarr
-apiVersion: image.toolkit.fluxcd.io/v1
-kind: ImageRepository
-metadata:
-  name: bazarr
-spec:
-  image: ghcr.io/linuxserver/bazarr
-  interval: 6h
-  exclusionList:
-    - "^develop.*$"
-    - "^nightly.*$"
+
 ---
 # Overseerr
 apiVersion: image.toolkit.fluxcd.io/v1
