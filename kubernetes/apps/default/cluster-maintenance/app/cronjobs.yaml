@@ -28,7 +28,7 @@ spec:
                   echo "Cleaning up completed pods..."
                   PODS_DELETED=$(kubectl delete pods --all-namespaces --field-selector=status.phase==Succeeded 2>&1 | grep -c "deleted" || echo "0")
                   FAILED_DELETED=$(kubectl delete pods --all-namespaces --field-selector=status.phase==Failed --ignore-not-found 2>&1 | grep -c "deleted" || echo "0")
-                  
+
                   echo "Cleaning up old replicasets..."
                   RS_DELETED=0
                   kubectl get rs --all-namespaces -o json | \
@@ -37,12 +37,12 @@ spec:
                       kubectl delete rs "$name" -n "$ns" --ignore-not-found
                       RS_DELETED=$((RS_DELETED+1))
                     done
-                  
+
                   # Send Discord notification
                   curl -s -H "Content-Type: application/json" \
                     -d "{\"embeds\":[{\"title\":\"🧹 Weekly Cleanup Complete\",\"color\":3066993,\"fields\":[{\"name\":\"Completed Pods\",\"value\":\"$PODS_DELETED deleted\",\"inline\":true},{\"name\":\"Failed Pods\",\"value\":\"$FAILED_DELETED deleted\",\"inline\":true},{\"name\":\"Stale ReplicaSets\",\"value\":\"Cleaned\",\"inline\":true}],\"timestamp\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}]}" \
                     "$DISCORD_WEBHOOK"
-                  
+
                   echo "Cleanup complete!"
 ---
 # Daily health check - restart unhealthy pods
@@ -73,7 +73,7 @@ spec:
                 - |
                   ISSUES_FOUND=0
                   ACTIONS=""
-                  
+
                   echo "Checking for CrashLoopBackOff pods..."
                   CRASH_PODS=$(kubectl get pods --all-namespaces | grep CrashLoopBackOff | awk '{print $1"/"$2}' || true)
                   if [ -n "$CRASH_PODS" ]; then
@@ -85,7 +85,7 @@ spec:
                     ISSUES_FOUND=$((ISSUES_FOUND + $(echo "$CRASH_PODS" | wc -l)))
                     ACTIONS="$ACTIONS\n- Restarted CrashLoopBackOff pods"
                   fi
-                  
+
                   echo "Checking for stuck ImagePullBackOff pods..."
                   PULL_PODS=$(kubectl get pods --all-namespaces | grep ImagePullBackOff | awk '{print $1"/"$2}' || true)
                   if [ -n "$PULL_PODS" ]; then
@@ -97,14 +97,14 @@ spec:
                     ISSUES_FOUND=$((ISSUES_FOUND + $(echo "$PULL_PODS" | wc -l)))
                     ACTIONS="$ACTIONS\n- Deleted ImagePullBackOff pods"
                   fi
-                  
+
                   # Only notify if issues were found
                   if [ $ISSUES_FOUND -gt 0 ]; then
                     curl -s -H "Content-Type: application/json" \
                       -d "{\"embeds\":[{\"title\":\"🔄 Health Check - Issues Fixed\",\"color\":16776960,\"description\":\"Found and fixed $ISSUES_FOUND unhealthy pods$ACTIONS\",\"timestamp\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}]}" \
                       "$DISCORD_WEBHOOK"
                   fi
-                  
+
                   echo "Health check complete! Issues found: $ISSUES_FOUND"
 ---
 # Weekly Flux garbage collection
@@ -141,10 +141,10 @@ spec:
                       xargs -r kubectl delete secret -n "$ns" --ignore-not-found 2>&1 | grep -c "deleted" || echo "0")
                     SECRETS_DELETED=$((SECRETS_DELETED + DELETED))
                   done
-                  
+
                   # Send Discord notification
                   curl -s -H "Content-Type: application/json" \
                     -d "{\"embeds\":[{\"title\":\"🗑️ Flux GC Complete\",\"color\":9807270,\"description\":\"Cleaned up $SECRETS_DELETED old Helm release secrets\",\"timestamp\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}]}" \
                     "$DISCORD_WEBHOOK"
-                  
+
                   echo "Flux GC complete! Deleted $SECRETS_DELETED secrets"
