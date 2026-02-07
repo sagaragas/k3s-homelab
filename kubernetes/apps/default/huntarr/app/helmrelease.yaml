@@ -21,7 +21,7 @@ spec:
           app:
             image:
               repository: docker.io/huntarr/huntarr
-              tag: 9.1.8 # {"$imagepolicy": "flux-system:huntarr:tag"}
+              tag: 9.2.3 # {"$imagepolicy": "flux-system:huntarr:tag"}
             env:
               TZ: America/Los_Angeles
             probes:
