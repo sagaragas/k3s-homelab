@@ -60,6 +60,11 @@ spec:
         subPath: custom.css
         readOnly: true
 
+    command:
+      - /bin/sh
+      - -c
+      - rm -f /app/.next/server/pages/en.html /app/.next/server/pages/en.json && node /app/server.js
+
     env:
       HOMEPAGE_ALLOWED_HOSTS: "home.ragas.cc,homepage.default.svc.cluster.local"
 
