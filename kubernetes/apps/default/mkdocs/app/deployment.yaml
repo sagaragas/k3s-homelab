@@ -36,7 +36,6 @@ spec:
               done
               cd /git/repo
               mkdocs serve --dev-addr=0.0.0.0:8000 --watch /git/root
-          workingDir: /git/repo
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false
