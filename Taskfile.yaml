@@ -48,3 +48,7 @@ tasks:
   test:flux:
     desc: Run Flux configuration validation
     cmd: ./tests/test_flux.sh
+
+  test:agents:
+    desc: Validate AGENTS.md service inventory
+    cmd: ./tests/test_agents.sh
