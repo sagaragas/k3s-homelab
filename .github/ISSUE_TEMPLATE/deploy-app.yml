@@ -1,0 +1,51 @@
+---
+name: Deploy New App
+description: Request deploying a new application to the cluster
+labels: [feature, area/apps]
+body:
+  - type: input
+    id: app-name
+    attributes:
+      label: Application Name
+      placeholder: e.g., lidarr
+    validations:
+      required: true
+  - type: input
+    id: image
+    attributes:
+      label: Container Image
+      placeholder: e.g., ghcr.io/linuxserver/lidarr:latest
+    validations:
+      required: true
+  - type: input
+    id: hostname
+    attributes:
+      label: Hostname
+      description: Internal (*.ragas.cc) or public (*.ragas.sh)
+      placeholder: e.g., lidarr.ragas.cc
+    validations:
+      required: true
+  - type: dropdown
+    id: storage
+    attributes:
+      label: Storage Needed
+      options:
+        - CephFS (app config)
+        - Ceph RBD (database)
+        - NFS media mount
+        - None
+    validations:
+      required: true
+  - type: dropdown
+    id: database
+    attributes:
+      label: Database
+      options:
+        - None
+        - Shared PostgreSQL
+        - SQLite (embedded)
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional Notes
+      description: Ports, env vars, dependencies, special requirements

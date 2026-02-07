@@ -1,0 +1,28 @@
+---
+name: Upgrade Request
+description: Request upgrading Talos, Kubernetes, or a cluster component
+labels: [enhancement]
+body:
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component to Upgrade
+      options:
+        - Talos Linux
+        - Kubernetes
+        - Cilium
+        - Flux
+        - Helm chart (specify below)
+        - Other (specify below)
+    validations:
+      required: true
+  - type: input
+    id: target-version
+    attributes:
+      label: Target Version
+      placeholder: e.g., v1.13.0
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Release notes link, breaking changes, motivation

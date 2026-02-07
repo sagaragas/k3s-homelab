@@ -72,7 +72,6 @@ All internal services use `*.ragas.cc` via bind9 DNS.
 | Service | URL | Status | Notes |
 |---------|-----|--------|-------|
 | Homepage | home.ragas.cc | ✅ Deployed | 2 replicas |
-| Bazarr | bazarr.ragas.cc | ✅ Deployed | |
 | Grafana | grafana.ragas.cc | ✅ Deployed | |
 | Prometheus | prometheus.ragas.cc | ✅ Deployed | |
 | MkDocs | docs.ragas.cc | ✅ Deployed | |
@@ -151,7 +150,6 @@ Synology NAS with NFS shares:
 | Radarr | ceph-filesystem | 10Gi |
 | Prowlarr | ceph-filesystem | 5Gi |
 | Seerr | ceph-filesystem | 5Gi |
-| Bazarr | ceph-filesystem | 5Gi |
 | Huntarr | ceph-filesystem | 2Gi |
 | Requestrr | ceph-filesystem | 1Gi |
 | Unpackerr | ceph-filesystem | 1Gi |

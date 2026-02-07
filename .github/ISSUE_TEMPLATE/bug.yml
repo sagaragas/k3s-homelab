@@ -1,0 +1,24 @@
+---
+name: Bug / Broken Service
+description: Report a service that is down or misbehaving
+labels: [bug]
+body:
+  - type: input
+    id: service
+    attributes:
+      label: Affected Service
+      placeholder: e.g., sonarr, prowlarr, homepage
+    validations:
+      required: true
+  - type: textarea
+    id: symptoms
+    attributes:
+      label: Symptoms
+      description: What is happening? (e.g., 502 error, CrashLoopBackOff, DNS not resolving)
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Relevant kubectl output, Flux status, or error messages

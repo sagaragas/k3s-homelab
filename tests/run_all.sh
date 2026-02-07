@@ -43,6 +43,16 @@ else
 fi
 echo ""
 
+# Run AGENTS.md validation tests
+echo ">>> Running AGENTS.md Validation Tests..."
+if "${SCRIPT_DIR}/test_agents.sh"; then
+    echo "✓ AGENTS.md Validation: PASSED"
+else
+    echo "✗ AGENTS.md Validation: FAILED"
+    FAILED=1
+fi
+echo ""
+
 echo "=========================================="
 if [ $FAILED -eq 0 ]; then
     echo "  ALL TESTS PASSED"
