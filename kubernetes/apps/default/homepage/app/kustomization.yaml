@@ -7,3 +7,4 @@ resources:
   - httproute.yaml
   - backendtrafficpolicy.yaml
   - secret.sops.yaml
+  - configmap-customcss.yaml
