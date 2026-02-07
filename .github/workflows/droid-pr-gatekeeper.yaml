@@ -198,7 +198,11 @@ jobs:
 
               elif [ "$IS_TRUSTED" = "true" ]; then
                 # Trusted bot + approved = auto-merge
-                gh pr review "$PR_NUMBER" --approve --body "Droid Gatekeeper: Reviewed and approved. Auto-merging."
+                # Note: skipping gh pr review --approve because GITHUB_TOKEN is not
+                # permitted to approve PRs by default. Merge directly instead.
+                gh pr comment "$PR_NUMBER" --body "## Droid Gatekeeper: Approved -- auto-merging
+
+          ${REVIEW_BODY}"
                 gh pr merge "$PR_NUMBER" --squash --auto --delete-branch || \
                   gh pr merge "$PR_NUMBER" --squash --delete-branch || \
                   echo "Merge failed -- may need manual intervention"
