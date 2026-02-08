@@ -24,3 +24,4 @@ resources:
   - ./speedtest-tracker/ks.yaml
   - ./unpackerr/ks.yaml
   - ./agregarr/ks.yaml
+  - ./optimus/ks.yaml
