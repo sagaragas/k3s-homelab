@@ -26,21 +26,22 @@ spec:
                 - -c
                 - |
                   echo "Cleaning up completed pods..."
-                  PODS_DELETED=$(kubectl delete pods --all-namespaces --field-selector=status.phase==Succeeded 2>&1 | grep -c "deleted" || echo "0")
-                  FAILED_DELETED=$(kubectl delete pods --all-namespaces --field-selector=status.phase==Failed --ignore-not-found 2>&1 | grep -c "deleted" || echo "0")
+                  PODS_DELETED=$(kubectl delete pods --all-namespaces --field-selector=status.phase==Succeeded 2>&1 | grep -c "deleted" || true)
+                  FAILED_DELETED=$(kubectl delete pods --all-namespaces --field-selector=status.phase==Failed --ignore-not-found 2>&1 | grep -c "deleted" || true)
 
                   echo "Cleaning up old replicasets..."
                   RS_DELETED=0
-                  kubectl get rs --all-namespaces -o json | \
-                    jq -r '.items[] | select(.spec.replicas==0) | "\(.metadata.namespace) \(.metadata.name)"' | \
-                    while read ns name; do
-                      kubectl delete rs "$name" -n "$ns" --ignore-not-found
+                  for rs_info in $(kubectl get rs --all-namespaces -o jsonpath='{range .items[?(@.spec.replicas==0)]}{.metadata.namespace}/{.metadata.name}{"\n"}{end}' 2>/dev/null); do
+                    ns=$(echo "$rs_info" | cut -d'/' -f1)
+                    name=$(echo "$rs_info" | cut -d'/' -f2)
+                    if kubectl delete rs "$name" -n "$ns" --ignore-not-found 2>/dev/null; then
                       RS_DELETED=$((RS_DELETED+1))
-                    done
+                    fi
+                  done
 
                   # Send Discord notification
                   curl -s -H "Content-Type: application/json" \
-                    -d "{\"embeds\":[{\"title\":\"🧹 Weekly Cleanup Complete\",\"color\":3066993,\"fields\":[{\"name\":\"Completed Pods\",\"value\":\"$PODS_DELETED deleted\",\"inline\":true},{\"name\":\"Failed Pods\",\"value\":\"$FAILED_DELETED deleted\",\"inline\":true},{\"name\":\"Stale ReplicaSets\",\"value\":\"Cleaned\",\"inline\":true}],\"timestamp\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}]}" \
+                    -d "{\"embeds\":[{\"title\":\"🧹 Weekly Cleanup Complete\",\"color\":3066993,\"fields\":[{\"name\":\"Completed Pods\",\"value\":\"$PODS_DELETED deleted\",\"inline\":true},{\"name\":\"Failed Pods\",\"value\":\"$FAILED_DELETED deleted\",\"inline\":true},{\"name\":\"Stale ReplicaSets\",\"value\":\"$RS_DELETED deleted\",\"inline\":true}],\"timestamp\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}]}" \
                     "$DISCORD_WEBHOOK"
 
                   echo "Cleanup complete!"
@@ -136,10 +137,12 @@ spec:
                   echo "Cleaning up old Helm secrets..."
                   SECRETS_DELETED=0
                   for ns in $(kubectl get ns -o jsonpath='{.items[*].metadata.name}'); do
-                    DELETED=$(kubectl get secrets -n "$ns" -l owner=helm --sort-by=.metadata.creationTimestamp 2>/dev/null | \
-                      grep "sh.helm.release" | head -n -3 | awk '{print $1}' | \
-                      xargs -r kubectl delete secret -n "$ns" --ignore-not-found 2>&1 | grep -c "deleted" || echo "0")
-                    SECRETS_DELETED=$((SECRETS_DELETED + DELETED))
+                    # List helm release secrets, keep only the 3 most recent per namespace, delete the rest
+                    SECRETS=$(kubectl get secrets -n "$ns" -l owner=helm --sort-by=.metadata.creationTimestamp -o name 2>/dev/null | grep "sh.helm.release" | head -n -3)
+                    if [ -n "$SECRETS" ]; then
+                      DELETED=$(echo "$SECRETS" | xargs kubectl delete -n "$ns" --ignore-not-found 2>&1 | grep -c "deleted" || true)
+                      SECRETS_DELETED=$((SECRETS_DELETED + DELETED))
+                    fi
                   done
 
                   # Send Discord notification
