@@ -1,0 +1,1377 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: portfolio-site
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>Sagar Ragas</title>
+      <meta name="description" content="Sagar Ragas — Software Engineer, Homelab Enthusiast, Infrastructure Architect." />
+      <meta name="keywords" content="Software Engineer, Homelab, Kubernetes, Infrastructure, DevOps, Self-Hosting" />
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+      <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+
+      <!-- Sidebar -->
+      <section id="sidebar">
+        <div class="inner">
+          <header>
+            <div class="avatar-placeholder">SR</div>
+            <h1>Sagar Ragas</h1>
+            <p class="tagline">Software Engineer &amp; Homelab Enthusiast</p>
+          </header>
+          <nav>
+            <ul>
+              <li><a href="#about" class="active"><i class="fa-solid fa-user"></i> About</a></li>
+              <li><a href="#whoami"><i class="fa-solid fa-terminal"></i> Who I Am</a></li>
+              <li><a href="#highlights"><i class="fa-solid fa-star"></i> Highlights</a></li>
+              <li><a href="#projects"><i class="fa-solid fa-diagram-project"></i> Projects</a></li>
+              <li><a href="#infrastructure"><i class="fa-solid fa-server"></i> Infrastructure</a></li>
+              <li><a href="#contact"><i class="fa-solid fa-paper-plane"></i> Contact</a></li>
+            </ul>
+          </nav>
+          <footer>
+            <ul class="icons">
+              <li><a href="https://github.com/sagaragas" aria-label="GitHub"><i class="fa-brands fa-github"></i></a></li>
+              <li><a href="mailto:sagar@ragas.cc" aria-label="Email"><i class="fa-solid fa-envelope"></i></a></li>
+            </ul>
+            <p class="sidebar-note">Hosted on Kubernetes &bull; GitOps deployed</p>
+          </footer>
+        </div>
+      </section>
+
+      <!-- Mobile Header -->
+      <div id="mobile-header">
+        <div class="mobile-header-inner">
+          <div class="avatar-placeholder small">SR</div>
+          <h1>Sagar Ragas</h1>
+          <button id="menu-toggle" aria-label="Toggle menu"><i class="fa-solid fa-bars"></i></button>
+        </div>
+        <nav id="mobile-nav" class="hidden">
+          <ul>
+            <li><a href="#about">About</a></li>
+            <li><a href="#whoami">Who I Am</a></li>
+            <li><a href="#highlights">Highlights</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#infrastructure">Infrastructure</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </nav>
+      </div>
+
+      <!-- Main -->
+      <div id="main">
+
+        <!-- Hero / About -->
+        <section id="about" class="hero-section">
+          <div class="container">
+            <div class="hero-content">
+              <p class="hero-greeting">Hi, I'm</p>
+              <h2 class="hero-name">Sagar Ragas</h2>
+              <p class="hero-subtitle">Software Engineer &amp; Infrastructure Architect</p>
+              <p class="hero-text">
+                I design, build, and operate a production-grade homelab that runs 24/7 — complete with
+                a 7-node Kubernetes cluster, distributed storage, automated monitoring, and an AI operations
+                agent that keeps everything healthy while I sleep.
+              </p>
+              <p class="hero-text">
+                My homelab isn't just a hobby — it's a fully autonomous platform where I experiment
+                with distributed systems, container orchestration, network engineering, and AI-driven
+                operations at a scale that mirrors real production environments.
+              </p>
+              <div class="hero-stats">
+                <div class="stat">
+                  <span class="stat-number">4</span>
+                  <span class="stat-label">Proxmox Hosts</span>
+                </div>
+                <div class="stat">
+                  <span class="stat-number">7</span>
+                  <span class="stat-label">K8s Nodes</span>
+                </div>
+                <div class="stat">
+                  <span class="stat-number">25+</span>
+                  <span class="stat-label">Monitoring Skills</span>
+                </div>
+                <div class="stat">
+                  <span class="stat-number">24/7</span>
+                  <span class="stat-label">Uptime</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Who I Am -->
+        <section id="whoami">
+          <div class="container">
+            <header>
+              <h2>Who I Am</h2>
+            </header>
+            <div class="roles-grid">
+              <div class="role-item">
+                <i class="fa-solid fa-code"></i>
+                <span>Software Engineer</span>
+              </div>
+              <div class="role-item">
+                <i class="fa-solid fa-server"></i>
+                <span>Infrastructure Architect</span>
+              </div>
+              <div class="role-item">
+                <i class="fa-solid fa-dharmachakra"></i>
+                <span>Kubernetes Engineer</span>
+              </div>
+              <div class="role-item">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Security Enthusiast</span>
+              </div>
+              <div class="role-item">
+                <i class="fa-solid fa-robot"></i>
+                <span>AI/Automation Builder</span>
+              </div>
+              <div class="role-item">
+                <i class="fa-solid fa-network-wired"></i>
+                <span>Network Engineer</span>
+              </div>
+              <div class="role-item">
+                <i class="fa-solid fa-house-signal"></i>
+                <span>Self-Hosting Advocate</span>
+              </div>
+              <div class="role-item">
+                <i class="fa-solid fa-database"></i>
+                <span>Storage Systems Operator</span>
+              </div>
+            </div>
+            <div class="skills-tags">
+              <h3>Technologies I Work With</h3>
+              <div class="tags">
+                <span>Python</span>
+                <span>TypeScript</span>
+                <span>React</span>
+                <span>FastAPI</span>
+                <span>Kubernetes</span>
+                <span>Talos Linux</span>
+                <span>Flux</span>
+                <span>Cilium</span>
+                <span>Helm</span>
+                <span>Proxmox</span>
+                <span>Ceph</span>
+                <span>ZFS</span>
+                <span>OPNsense</span>
+                <span>Suricata</span>
+                <span>Tailscale</span>
+                <span>WireGuard</span>
+                <span>bind9</span>
+                <span>AdGuard</span>
+                <span>Envoy</span>
+                <span>SOPS</span>
+                <span>Git</span>
+                <span>Docker</span>
+                <span>PostgreSQL</span>
+                <span>SQLite</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Highlights -->
+        <section id="highlights">
+          <div class="container">
+            <header>
+              <h2>A Few Highlights</h2>
+            </header>
+            <div class="highlights-grid">
+
+              <div class="highlight-card">
+                <div class="highlight-visual">
+                  <i class="fa-solid fa-robot"></i>
+                </div>
+                <div class="highlight-body">
+                  <h3>AI Operations</h3>
+                  <ol>
+                    <li>Built <strong>Optimus</strong>, an autonomous AI agent that monitors and self-heals the entire homelab 24/7</li>
+                    <li>25+ monitoring skills with auto-detection, incident resolution, and preventive maintenance</li>
+                    <li>Discord + Telegram integration for real-time alerts and conversational ops</li>
+                  </ol>
+                </div>
+              </div>
+
+              <div class="highlight-card">
+                <div class="highlight-visual">
+                  <i class="fa-solid fa-cubes"></i>
+                </div>
+                <div class="highlight-body">
+                  <h3>Infrastructure</h3>
+                  <ol>
+                    <li>4-node Proxmox cluster running 7-node Kubernetes (Talos Linux) with Cilium eBPF networking</li>
+                    <li>Ceph distributed storage (5 OSDs), Synology NAS, and Proxmox Backup Server</li>
+                    <li>Full GitOps with Flux v2, Renovate, and SOPS — everything is code</li>
+                  </ol>
+                </div>
+              </div>
+
+              <div class="highlight-card">
+                <div class="highlight-visual">
+                  <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div class="highlight-body">
+                  <h3>Security</h3>
+                  <ol>
+                    <li>OPNsense firewall with 10GbE SFP+ and Suricata IDS/IPS running 190k rules inline</li>
+                    <li>Dual-domain DNS architecture (AdGuard + bind9) with DoT to Cloudflare</li>
+                    <li>Tailscale mesh VPN, SOPS-encrypted secrets, automated TLS via cert-manager</li>
+                  </ol>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        <!-- Projects -->
+        <section id="projects">
+          <div class="container">
+            <header>
+              <h2>Projects</h2>
+            </header>
+
+            <div class="project-card">
+              <div class="project-header">
+                <div class="project-icon"><i class="fa-solid fa-robot"></i></div>
+                <div>
+                  <h3>Optimus — AI Operations Agent</h3>
+                  <span class="project-status"><i class="fa-solid fa-circle"></i> Running 24/7</span>
+                </div>
+              </div>
+              <p>
+                An autonomous AI agent that monitors and manages the entire homelab infrastructure.
+                Runs 25+ monitoring skills on configurable intervals, automatically detects and resolves
+                incidents, performs preventive maintenance (OSD memory management, pod restarts),
+                and communicates via Discord and Telegram. Features a React dashboard at
+                <a href="https://optimus.ragas.cc" class="inline-link">optimus.ragas.cc</a>.
+              </p>
+              <div class="tags">
+                <span>Python</span>
+                <span>FastAPI</span>
+                <span>React</span>
+                <span>SQLite</span>
+                <span>AI/LLM</span>
+                <span>WebSocket</span>
+              </div>
+            </div>
+
+            <div class="project-card">
+              <div class="project-header">
+                <div class="project-icon"><i class="fa-brands fa-github"></i></div>
+                <div>
+                  <h3>k3s-homelab — GitOps Infrastructure</h3>
+                  <span class="project-status"><i class="fa-solid fa-circle"></i> Flux Reconciled</span>
+                </div>
+              </div>
+              <p>
+                The complete infrastructure-as-code repository that defines the entire Kubernetes cluster.
+                Every application, network policy, secret, and configuration is declaratively managed
+                through Flux v2 GitOps. Includes automated image updates via Renovate, SOPS secret
+                management, and CI/CD validation.
+              </p>
+              <div class="tags">
+                <span>Kubernetes</span>
+                <span>Flux</span>
+                <span>Helm</span>
+                <span>Kustomize</span>
+                <span>SOPS</span>
+                <span>Renovate</span>
+              </div>
+            </div>
+
+            <div class="project-card">
+              <div class="project-header">
+                <div class="project-icon"><i class="fa-solid fa-film"></i></div>
+                <div>
+                  <h3>Media Automation Pipeline</h3>
+                  <span class="project-status"><i class="fa-solid fa-circle"></i> Streaming</span>
+                </div>
+              </div>
+              <p>
+                A fully automated media pipeline with Sonarr, Radarr, Prowlarr,
+                and Huntarr for acquisition, Jellyfin and Plex for streaming with GPU-accelerated
+                transcoding, and Overseerr for request management — all orchestrated through Kubernetes
+                with NFS-backed storage.
+              </p>
+              <div class="tags">
+                <span>Jellyfin</span>
+                <span>Plex</span>
+                <span>Sonarr</span>
+                <span>Radarr</span>
+                <span>GPU Transcoding</span>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Infrastructure -->
+        <section id="infrastructure">
+          <div class="container">
+            <header>
+              <h2>Homelab Infrastructure</h2>
+            </header>
+            <p class="section-intro">
+              A production-grade homelab running 24/7 with full GitOps automation, distributed storage,
+              and AI-driven operations. Everything is managed as code and self-healing.
+            </p>
+
+            <div class="infra-grid">
+              <div class="infra-card">
+                <div class="infra-icon"><i class="fa-solid fa-cubes"></i></div>
+                <h3>Compute</h3>
+                <ul>
+                  <li><strong>4x Proxmox hosts</strong> — Hypervisor cluster</li>
+                  <li><strong>7-node Kubernetes</strong> — Talos Linux (3 CP + 4 workers)</li>
+                  <li><strong>9 LXC containers</strong> — Dedicated service hosts</li>
+                  <li><strong>GPU passthrough</strong> — Media transcoding on pve4</li>
+                </ul>
+              </div>
+
+              <div class="infra-card">
+                <div class="infra-icon"><i class="fa-solid fa-hard-drive"></i></div>
+                <h3>Storage</h3>
+                <ul>
+                  <li><strong>Ceph cluster</strong> — 5 OSDs across 3 hosts (RBD + CephFS)</li>
+                  <li><strong>Synology NAS</strong> — NFS for media &amp; backups</li>
+                  <li><strong>PBS</strong> — Proxmox Backup Server for VM/CT backups</li>
+                  <li><strong>ZFS</strong> — On OPNsense with auto-snapshots</li>
+                </ul>
+              </div>
+
+              <div class="infra-card">
+                <div class="infra-icon"><i class="fa-solid fa-network-wired"></i></div>
+                <h3>Network</h3>
+                <ul>
+                  <li><strong>OPNsense</strong> — Firewall (2.5G WAN + 10G LAN SFP+)</li>
+                  <li><strong>Suricata IDS/IPS</strong> — 190k rules, inline netmap</li>
+                  <li><strong>DNS</strong> — AdGuard &rarr; bind9 &rarr; k8s-gateway</li>
+                  <li><strong>Tailscale</strong> — Mesh VPN + exit node</li>
+                </ul>
+              </div>
+
+              <div class="infra-card">
+                <div class="infra-icon"><i class="fa-solid fa-gears"></i></div>
+                <h3>GitOps &amp; Automation</h3>
+                <ul>
+                  <li><strong>Flux v2</strong> — Full GitOps pipeline</li>
+                  <li><strong>Renovate</strong> — Automated dependency updates</li>
+                  <li><strong>SOPS + age</strong> — Secret management</li>
+                  <li><strong>cert-manager</strong> — Automated TLS certificates</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Architecture Diagram -->
+            <div class="arch-diagram">
+              <h3>Architecture Overview</h3>
+              <pre class="diagram"><code>Internet
+  |
+  +-- Cloudflare (ragas.sh)
+  |     +-- Proxied to LXC services
+  |
+  +-- OPNsense Firewall (10GbE)
+        +-- Suricata IDS/IPS (190k rules)
+        +-- Tailscale VPN
+        |
+        +-- Proxmox Cluster (pve1-pve4)
+        |     +-- Talos K8s (7 nodes)
+        |     |     +-- Flux GitOps
+        |     |     +-- Cilium CNI
+        |     |     +-- Envoy Gateway
+        |     |     +-- Ceph Storage
+        |     |     +-- 20+ Apps
+        |     |
+        |     +-- LXC Containers
+        |           +-- DNS (bind9 + AdGuard)
+        |           +-- Media (Jellyfin, Plex)
+        |           +-- Optimus (AI Agent)
+        |           +-- Monitoring, Backups
+        |
+        +-- Synology NAS (NFS)</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- Contact -->
+        <section id="contact">
+          <div class="container">
+            <header>
+              <h2>Get In Touch</h2>
+            </header>
+            <p>
+              Interested in homelab setups, infrastructure automation, or just want to chat about
+              self-hosting? Feel free to reach out!
+            </p>
+            <ul class="contact-links">
+              <li>
+                <a href="https://github.com/sagaragas">
+                  <i class="fa-brands fa-github"></i>
+                  <span>github.com/sagaragas</span>
+                </a>
+              </li>
+              <li>
+                <a href="mailto:sagar@ragas.cc">
+                  <i class="fa-solid fa-envelope"></i>
+                  <span>sagar@ragas.cc</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- Footer -->
+        <footer id="footer">
+          <p>&copy; Sagar Ragas. Self-hosted on Kubernetes &bull; GitOps deployed via Flux</p>
+        </footer>
+
+      </div>
+
+      <script>
+        // Smooth scrolling for nav links
+        document.querySelectorAll('#sidebar nav a, #mobile-nav a').forEach(function(link) {
+          link.addEventListener('click', function(e) {
+            e.preventDefault();
+            var target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+              target.scrollIntoView({ behavior: 'smooth' });
+            }
+            // Update active state in sidebar
+            document.querySelectorAll('#sidebar nav a').forEach(function(a) { a.classList.remove('active'); });
+            var sidebarLink = document.querySelector('#sidebar nav a[href="' + this.getAttribute('href') + '"]');
+            if (sidebarLink) sidebarLink.classList.add('active');
+            // Close mobile nav
+            var mobileNav = document.getElementById('mobile-nav');
+            if (mobileNav) mobileNav.classList.add('hidden');
+          });
+        });
+
+        // Update active nav on scroll
+        window.addEventListener('scroll', function() {
+          var sections = document.querySelectorAll('#main > section');
+          var navLinks = document.querySelectorAll('#sidebar nav a');
+          var scrollPos = window.scrollY + 200;
+
+          sections.forEach(function(section) {
+            if (section.offsetTop <= scrollPos && (section.offsetTop + section.offsetHeight) > scrollPos) {
+              navLinks.forEach(function(link) {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + section.id) {
+                  link.classList.add('active');
+                }
+              });
+            }
+          });
+        });
+
+        // Mobile menu toggle
+        var toggle = document.getElementById('menu-toggle');
+        if (toggle) {
+          toggle.addEventListener('click', function() {
+            var nav = document.getElementById('mobile-nav');
+            nav.classList.toggle('hidden');
+          });
+        }
+      </script>
+
+    </body>
+    </html>
+  style.css: |
+    /* === Reset & Base === */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --accent: #4acaa8;
+      --accent-dark: #3ab494;
+      --accent-glow: rgba(74, 202, 168, 0.15);
+      --bg-sidebar: #1a1f2e;
+      --bg-main: #ffffff;
+      --bg-section-alt: #f8fafb;
+      --bg-hero: linear-gradient(135deg, #f8fafb 0%, #eef2f7 100%);
+      --text-primary: #1a1a2e;
+      --text-secondary: #555770;
+      --text-light: #8a8da0;
+      --text-sidebar: #c8ccd8;
+      --border: #e4e8ef;
+      --card-bg: #ffffff;
+      --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+      --card-shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.1);
+      --sidebar-width: 300px;
+      --radius: 14px;
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--text-primary);
+      background: var(--bg-main);
+    }
+
+    /* === Sidebar === */
+    #sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: var(--sidebar-width);
+      height: 100vh;
+      background: var(--bg-sidebar);
+      color: var(--text-sidebar);
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+      border-right: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    #sidebar .inner {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      padding: 2.5rem 1.5rem;
+    }
+
+    #sidebar header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .avatar-placeholder {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #38b2ac);
+      color: white;
+      font-size: 2rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      letter-spacing: 2px;
+      box-shadow: 0 4px 15px rgba(74, 202, 168, 0.3);
+    }
+
+    .avatar-placeholder.small {
+      width: 36px;
+      height: 36px;
+      font-size: 0.9rem;
+      margin: 0;
+    }
+
+    #sidebar h1 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.2rem;
+    }
+
+    .tagline {
+      font-size: 0.8rem;
+      color: var(--text-light);
+      font-weight: 300;
+    }
+
+    /* Nav */
+    #sidebar nav {
+      flex: 1;
+    }
+
+    #sidebar nav ul {
+      list-style: none;
+    }
+
+    #sidebar nav li {
+      margin-bottom: 0.15rem;
+    }
+
+    #sidebar nav a {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 0.55rem 0.9rem;
+      color: var(--text-light);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 400;
+      border-radius: 8px;
+      transition: var(--transition);
+    }
+
+    #sidebar nav a i {
+      font-size: 0.8rem;
+      width: 18px;
+      text-align: center;
+      opacity: 0.6;
+      transition: var(--transition);
+    }
+
+    #sidebar nav a:hover,
+    #sidebar nav a.active {
+      background: rgba(74, 202, 168, 0.1);
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    #sidebar nav a:hover i,
+    #sidebar nav a.active i {
+      opacity: 1;
+      color: var(--accent);
+    }
+
+    /* Sidebar footer */
+    #sidebar footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 1.2rem;
+    }
+
+    .icons {
+      list-style: none;
+      display: flex;
+      gap: 0.8rem;
+      justify-content: center;
+      margin-bottom: 0.8rem;
+    }
+
+    .icons a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-light);
+      font-size: 1rem;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .icons a:hover {
+      background: var(--accent);
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    .sidebar-note {
+      text-align: center;
+      font-size: 0.7rem;
+      color: rgba(255, 255, 255, 0.2);
+      font-weight: 300;
+    }
+
+    /* === Mobile Header === */
+    #mobile-header {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 200;
+      background: var(--bg-sidebar);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .mobile-header-inner {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.8rem 1.2rem;
+    }
+
+    #mobile-header h1 {
+      flex: 1;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    #menu-toggle {
+      background: none;
+      border: none;
+      color: var(--text-light);
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 0.3rem;
+    }
+
+    #mobile-nav {
+      padding: 0.5rem 1.2rem 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    #mobile-nav.hidden {
+      display: none;
+    }
+
+    #mobile-nav ul {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    #mobile-nav a {
+      display: block;
+      padding: 0.4rem 0.8rem;
+      color: var(--text-light);
+      text-decoration: none;
+      font-size: 0.85rem;
+      border-radius: 6px;
+      transition: var(--transition);
+    }
+
+    #mobile-nav a:hover {
+      background: rgba(74, 202, 168, 0.1);
+      color: var(--accent);
+    }
+
+    /* === Main Content === */
+    #main {
+      margin-left: var(--sidebar-width);
+      min-height: 100vh;
+    }
+
+    #main > section {
+      padding: 5rem 0;
+    }
+
+    #main > section:nth-child(even) {
+      background: var(--bg-section-alt);
+    }
+
+    .container {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 0 2.5rem;
+    }
+
+    /* Section headers */
+    .container > header {
+      margin-bottom: 2.5rem;
+    }
+
+    .container > header h2 {
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      position: relative;
+      padding-bottom: 0.8rem;
+    }
+
+    .container > header h2::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 45px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), #38b2ac);
+      border-radius: 2px;
+    }
+
+    .container > p {
+      color: var(--text-secondary);
+      font-size: 1.02rem;
+      margin-bottom: 1rem;
+    }
+
+    .section-intro {
+      margin-bottom: 2.5rem !important;
+    }
+
+    /* === Hero Section === */
+    .hero-section {
+      background: var(--bg-hero) !important;
+      padding: 6rem 0 !important;
+    }
+
+    .hero-greeting {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-name {
+      font-size: 2.8rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 0.3rem;
+      line-height: 1.2;
+    }
+
+    .hero-subtitle {
+      font-size: 1.2rem;
+      font-weight: 400;
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+    }
+
+    .hero-text {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+      max-width: 650px;
+      line-height: 1.8;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 2rem;
+      margin-top: 2.5rem;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      min-width: 100px;
+      transition: var(--transition);
+    }
+
+    .stat:hover {
+      border-color: var(--accent);
+      box-shadow: var(--card-shadow);
+    }
+
+    .stat-number {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 0.2rem;
+    }
+
+    /* === Roles Grid (Who I Am) === */
+    .roles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .role-item {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 1rem 1.2rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      transition: var(--transition);
+    }
+
+    .role-item:hover {
+      border-color: var(--accent);
+      box-shadow: var(--card-shadow);
+      transform: translateY(-1px);
+    }
+
+    .role-item i {
+      font-size: 1.1rem;
+      color: var(--accent);
+      width: 24px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .role-item span {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    /* Skills Tags */
+    .skills-tags h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .tags span {
+      display: inline-block;
+      padding: 0.3rem 0.85rem;
+      background: var(--accent-glow);
+      color: var(--accent-dark);
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .tags span:hover {
+      background: var(--accent);
+      color: white;
+    }
+
+    /* === Highlights Grid === */
+    .highlights-grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .highlight-card {
+      display: flex;
+      gap: 1.8rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      transition: var(--transition);
+    }
+
+    .highlight-card:hover {
+      box-shadow: var(--card-shadow-hover);
+      border-color: var(--accent);
+    }
+
+    .highlight-visual {
+      flex-shrink: 0;
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      background: var(--accent-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .highlight-visual i {
+      font-size: 1.5rem;
+      color: var(--accent);
+    }
+
+    .highlight-body h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 0.8rem;
+      color: var(--text-primary);
+    }
+
+    .highlight-body ol {
+      list-style: none;
+      counter-reset: hl;
+    }
+
+    .highlight-body li {
+      counter-increment: hl;
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+      padding: 0.35rem 0;
+      padding-left: 1.8rem;
+      position: relative;
+      line-height: 1.6;
+    }
+
+    .highlight-body li::before {
+      content: counter(hl);
+      position: absolute;
+      left: 0;
+      top: 0.35rem;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--accent-glow);
+      color: var(--accent);
+      font-size: 0.7rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .highlight-body li strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    /* === Project Cards === */
+    .project-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+      transition: var(--transition);
+    }
+
+    .project-card:hover {
+      box-shadow: var(--card-shadow-hover);
+      border-color: var(--accent);
+    }
+
+    .project-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .project-icon {
+      flex-shrink: 0;
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: var(--accent-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .project-icon i {
+      font-size: 1.2rem;
+      color: var(--accent);
+    }
+
+    .project-header h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.1rem;
+    }
+
+    .project-status {
+      font-size: 0.75rem;
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .project-status i {
+      font-size: 0.45rem;
+      vertical-align: middle;
+      margin-right: 0.3rem;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .project-card > p {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 1.2rem;
+    }
+
+    .inline-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+      border-bottom: 1px solid transparent;
+      transition: var(--transition);
+    }
+
+    .inline-link:hover {
+      border-bottom-color: var(--accent);
+    }
+
+    /* === Infrastructure Grid === */
+    .infra-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .infra-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.8rem;
+      transition: var(--transition);
+    }
+
+    .infra-card:hover {
+      box-shadow: var(--card-shadow-hover);
+      border-color: var(--accent);
+    }
+
+    .infra-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: var(--accent-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+
+    .infra-icon i {
+      font-size: 1.2rem;
+      color: var(--accent);
+    }
+
+    .infra-card h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 0.8rem;
+    }
+
+    .infra-card ul {
+      list-style: none;
+    }
+
+    .infra-card li {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      padding: 0.35rem 0;
+      border-bottom: 1px solid var(--border);
+      line-height: 1.5;
+    }
+
+    .infra-card li:last-child {
+      border-bottom: none;
+    }
+
+    .infra-card li strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    /* === Architecture Diagram === */
+    .arch-diagram {
+      background: var(--bg-sidebar);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-top: 1rem;
+    }
+
+    .arch-diagram h3 {
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 1.2rem;
+    }
+
+    .diagram {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      padding: 1.5rem;
+      overflow-x: auto;
+    }
+
+    .diagram code {
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 0.8rem;
+      line-height: 1.6;
+      color: var(--accent);
+      white-space: pre;
+    }
+
+    /* === Contact === */
+    .contact-links {
+      list-style: none;
+      margin-top: 1.5rem;
+    }
+
+    .contact-links li {
+      margin-bottom: 0.8rem;
+    }
+
+    .contact-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8rem;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      padding: 0.8rem 1.2rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      transition: var(--transition);
+    }
+
+    .contact-links a:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-glow);
+      transform: translateX(4px);
+    }
+
+    .contact-links i {
+      font-size: 1.1rem;
+      color: var(--accent);
+      width: 22px;
+      text-align: center;
+    }
+
+    /* === Footer === */
+    #footer {
+      padding: 2rem 0;
+      text-align: center;
+      border-top: 1px solid var(--border);
+      background: var(--bg-section-alt);
+    }
+
+    #footer p {
+      color: var(--text-light);
+      font-size: 0.82rem;
+    }
+
+    /* === Responsive === */
+    @media (max-width: 900px) {
+      #sidebar {
+        display: none;
+      }
+
+      #mobile-header {
+        display: block;
+      }
+
+      #main {
+        margin-left: 0;
+        padding-top: 60px;
+      }
+
+      #main > section {
+        padding: 3rem 0;
+      }
+
+      .hero-section {
+        padding: 3.5rem 0 !important;
+      }
+
+      .hero-name {
+        font-size: 2rem;
+      }
+
+      .hero-subtitle {
+        font-size: 1rem;
+      }
+
+      .hero-stats {
+        gap: 1rem;
+      }
+
+      .stat {
+        padding: 0.8rem 1rem;
+        min-width: 80px;
+      }
+
+      .stat-number {
+        font-size: 1.3rem;
+      }
+
+      .container {
+        padding: 0 1.5rem;
+      }
+
+      .container > header h2 {
+        font-size: 1.5rem;
+      }
+
+      .highlight-card {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .roles-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .infra-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .arch-diagram {
+        padding: 1.2rem;
+      }
+
+      .diagram {
+        padding: 1rem;
+      }
+
+      .diagram code {
+        font-size: 0.7rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  nginx.conf: |
+    server {
+        listen 80;
+        server_name _;
+        root /usr/share/nginx/html;
+        index index.html;
+
+        # Security headers
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+        add_header X-XSS-Protection "1; mode=block" always;
+
+        # Gzip
+        gzip on;
+        gzip_types text/css application/javascript text/html text/plain;
+        gzip_min_length 256;
+
+        # Cache static assets
+        location ~* \.(css|js|ico|png|jpg|jpeg|gif|svg|woff2?)$ {
+            expires 7d;
+            add_header Cache-Control "public, immutable";
+        }
+
+        location / {
+            try_files $uri $uri/ /index.html;
+        }
+
+        # Health check
+        location /healthz {
+            access_log off;
+            return 200 "ok";
+            add_header Content-Type text/plain;
+        }
+    }
