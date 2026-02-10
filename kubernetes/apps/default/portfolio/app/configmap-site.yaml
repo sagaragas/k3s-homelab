@@ -378,30 +378,30 @@ data:
             <!-- Architecture Diagram -->
             <div class="arch-diagram">
               <h3>Architecture Overview</h3>
-              <pre class="diagram"><code>Internet
-  |
-  +-- Cloudflare (ragas.sh)
-  |     +-- Proxied to LXC services
-  |
-  +-- OPNsense Firewall (10GbE)
-        +-- Suricata IDS/IPS (190k rules)
-        +-- Tailscale VPN
-        |
-        +-- Proxmox Cluster (pve1-pve4)
-        |     +-- Talos K8s (7 nodes)
-        |     |     +-- Flux GitOps
-        |     |     +-- Cilium CNI
-        |     |     +-- Envoy Gateway
-        |     |     +-- Ceph Storage
-        |     |     +-- 20+ Apps
-        |     |
-        |     +-- LXC Containers
-        |           +-- DNS (bind9 + AdGuard)
-        |           +-- Media (Jellyfin, Plex)
-        |           +-- Optimus (AI Agent)
-        |           +-- Monitoring, Backups
-        |
-        +-- Synology NAS (NFS)</code></pre>
+              <pre class="diagram"><code>    Internet
+      |
+      +-- Cloudflare (ragas.sh)
+      |     +-- Proxied to LXC services
+      |
+      +-- OPNsense Firewall (10GbE)
+            +-- Suricata IDS/IPS (190k rules)
+            +-- Tailscale VPN
+            |
+            +-- Proxmox Cluster (pve1-pve4)
+            |     +-- Talos K8s (7 nodes)
+            |     |     +-- Flux GitOps
+            |     |     +-- Cilium CNI
+            |     |     +-- Envoy Gateway
+            |     |     +-- Ceph Storage
+            |     |     +-- 20+ Apps
+            |     |
+            |     +-- LXC Containers
+            |           +-- DNS (bind9 + AdGuard)
+            |           +-- Media (Jellyfin, Plex)
+            |           +-- Optimus (AI Agent)
+            |           +-- Monitoring, Backups
+            |
+            +-- Synology NAS (NFS)</code></pre>
             </div>
           </div>
         </section>
