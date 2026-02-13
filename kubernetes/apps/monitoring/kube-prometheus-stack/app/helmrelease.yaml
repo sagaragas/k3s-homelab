@@ -19,109 +19,28 @@ spec:
       enabled: true
 
     alertmanager:
-      enabled: true
-      ingress:
-        enabled: false
-      alertmanagerSpec:
-        resources:
-          requests:
-            cpu: 10m
-            memory: 64Mi
-          limits:
-            memory: 256Mi
-        storage:
-          volumeClaimTemplate:
-            spec:
-              storageClassName: ceph-block
-              accessModes: ["ReadWriteOnce"]
-              resources:
-                requests:
-                  storage: 5Gi
+      enabled: false
 
     grafana:
-      enabled: true
-      defaultDashboardsEnabled: true
-      defaultDashboardsTimezone: America/Los_Angeles
-      resources:
-        requests:
-          cpu: 50m
-          memory: 256Mi
-        limits:
-          memory: 512Mi
-      deploymentStrategy:
-        type: Recreate
-      admin:
-        existingSecret: grafana-admin
-        userKey: admin-user
-        passwordKey: admin-password
-      ingress:
-        enabled: false  # Using Gateway API
-      persistence:
-        enabled: true
-        storageClassName: ceph-block
-        size: 10Gi
-      sidecar:
-        dashboards:
-          enabled: true
-          searchNamespace: ALL
-        datasources:
-          enabled: true
+      enabled: false
 
     prometheus:
-      enabled: true
-      ingress:
-        enabled: false
-      prometheusSpec:
-        resources:
-          requests:
-            cpu: 100m
-            memory: 512Mi
-          limits:
-            memory: 2Gi
-        retention: 7d
-        retentionSize: 45GB
-        storageSpec:
-          volumeClaimTemplate:
-            spec:
-              storageClassName: ceph-block
-              accessModes: ["ReadWriteOnce"]
-              resources:
-                requests:
-                  storage: 50Gi
-        serviceMonitorSelectorNilUsesHelmValues: false
-        podMonitorSelectorNilUsesHelmValues: false
-        ruleSelectorNilUsesHelmValues: false
+      enabled: false
 
     kubeApiServer:
-      enabled: true
+      enabled: false
 
     kubeControllerManager:
-      enabled: true
-      endpoints:
-        - 172.16.1.50
-        - 172.16.1.51
-        - 172.16.1.52
+      enabled: false
 
     kubeScheduler:
-      enabled: true
-      endpoints:
-        - 172.16.1.50
-        - 172.16.1.51
-        - 172.16.1.52
+      enabled: false
 
     kubeProxy:
-      enabled: false  # Cilium replaces kube-proxy
+      enabled: false
 
     kubeEtcd:
-      enabled: true
-      endpoints:
-        - 172.16.1.50
-        - 172.16.1.51
-        - 172.16.1.52
-      service:
-        enabled: true
-        port: 2381
-        targetPort: 2381
+      enabled: false
 
     nodeExporter:
       enabled: true
@@ -135,18 +54,7 @@ spec:
           memory: 128Mi
 
     kube-state-metrics:
-      resources:
-        requests:
-          cpu: 10m
-          memory: 64Mi
-        limits:
-          memory: 256Mi
+      enabled: false
 
     prometheusOperator:
-      enabled: true
-      resources:
-        requests:
-          cpu: 10m
-          memory: 64Mi
-        limits:
-          memory: 256Mi
+      enabled: false

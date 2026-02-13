@@ -23,18 +23,6 @@ spec:
     semver:
       range: "9.x"
 ---
-# Grafana - follow semver 11.x
-apiVersion: image.toolkit.fluxcd.io/v1
-kind: ImagePolicy
-metadata:
-  name: grafana
-spec:
-  imageRepositoryRef:
-    name: grafana
-  policy:
-    semver:
-      range: ">=11.0.0"
----
 # Sonarr - follow semver 4.x
 apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImagePolicy
