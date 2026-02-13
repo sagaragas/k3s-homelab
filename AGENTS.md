@@ -44,15 +44,16 @@ All internal services use `*.ragas.cc` via bind9 DNS.
 
 ### Talos K8s Nodes
 
-| Name | IP | Role | Host | VMID |
-|------|-----|------|------|------|
-| talos-cp-1 | 172.16.1.50 | controlplane | pve1 | 500 |
-| talos-cp-2 | 172.16.1.51 | controlplane | pve2 | 501 |
-| talos-cp-3 | 172.16.1.52 | controlplane | pve4 | 502 |
-| talos-worker-1 | 172.16.1.53 | worker | pve1 | 510 |
-| talos-worker-2 | 172.16.1.54 | worker | pve2 | 511 |
-| talos-worker-4 | 172.16.1.56 | worker | pve4 | 513 |
+| Name | IP | Role | Host | VMID | vCPU | RAM |
+|------|-----|------|------|------|------|-----|
+| talos-cp-1 | 172.16.1.50 | controlplane | pve1 | 500 | 4 | 6Gi |
+| talos-cp-2 | 172.16.1.51 | controlplane | pve2 | 501 | 4 | 6Gi |
+| talos-cp-3 | 172.16.1.52 | controlplane | pve4 | 502 | 4 | 8Gi |
+| talos-worker-1 | 172.16.1.53 | worker | pve1 | 510 | 8 | 16Gi |
+| talos-worker-2 | 172.16.1.54 | worker | pve2 | 511 | 8 | 14Gi |
+| talos-worker-4 | 172.16.1.56 | worker | pve4 | 513 | 6 | 16Gi |
 
+> **Cluster totals:** 34 vCPU, 66Gi RAM across 6 nodes.
 > **HA Distribution:** Each PVE host has max 1 control plane. Any single host failure maintains etcd quorum (2/3 CPs). No K8s VMs on pve3 (LXC-only host).
 
 ### K8s Network
@@ -85,6 +86,12 @@ All internal services use `*.ragas.cc` via bind9 DNS.
 | Agregarr | agg.ragas.cc | ✅ Deployed | Plex collections manager |
 | Unpackerr | (internal) | ✅ Deployed | Archive extraction |
 | PostgreSQL | postgres.database.svc | ✅ Deployed | Shared DB for arr apps |
+| Portfolio | portfolio.ragas.cc | ✅ Deployed | Personal website |
+| Apprise | (internal) | ✅ Deployed | Notification gateway |
+| Echo | (internal) | ✅ Deployed | HTTP echo test server |
+| Optimus | optimus.ragas.cc | ✅ Deployed | Monitoring skills |
+| Loki | (internal) | ✅ Deployed | Log aggregation |
+| Velero + MinIO | (internal) | ✅ Deployed | K8s backup/restore |
 
 ### On LXC: torrent (172.16.1.32) - Docker
 
@@ -114,7 +121,7 @@ All internal services use `*.ragas.cc` via bind9 DNS.
 Synology NAS with NFS shares:
 - `/volume2/media` - Media files (movies, TV, music)
 
-**NFS Access:** K8s workers (172.16.1.53-56) and LXC containers can mount NFS shares.
+**NFS Access:** K8s workers (172.16.1.53-54, 172.16.1.56) and LXC containers can mount NFS shares.
 
 ## Decision Rules: K8s vs LXC
 
