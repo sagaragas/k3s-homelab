@@ -51,10 +51,9 @@ All internal services use `*.ragas.cc` via bind9 DNS.
 | talos-cp-3 | 172.16.1.52 | controlplane | pve4 | 502 |
 | talos-worker-1 | 172.16.1.53 | worker | pve1 | 510 |
 | talos-worker-2 | 172.16.1.54 | worker | pve2 | 511 |
-| talos-worker-3 | 172.16.1.55 | worker | pve3 | 512 |
 | talos-worker-4 | 172.16.1.56 | worker | pve4 | 513 |
 
-> **HA Distribution:** Each PVE host has max 1 control plane. Any single host failure maintains etcd quorum (2/3 CPs).
+> **HA Distribution:** Each PVE host has max 1 control plane. Any single host failure maintains etcd quorum (2/3 CPs). No K8s VMs on pve3 (LXC-only host).
 
 ### K8s Network
 
