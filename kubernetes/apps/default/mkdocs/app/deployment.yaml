@@ -68,7 +68,7 @@ spec:
               cpu: 200m
               memory: 256Mi
         - name: git-sync
-          image: registry.k8s.io/git-sync/git-sync:v4.5.1
+          image: registry.k8s.io/git-sync/git-sync:v4.6.0
           args:
             - --repo=https://github.com/sagaragas/k3s-homelab.git
             - --ref=main
