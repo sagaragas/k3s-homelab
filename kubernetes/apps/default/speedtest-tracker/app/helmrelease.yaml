@@ -20,7 +20,7 @@ spec:
           app:
             image:
               repository: ghcr.io/linuxserver/speedtest-tracker
-              tag: 1.13.9 # {"$imagepolicy": "flux-system:speedtest-tracker:tag"}
+              tag: 1.13.10 # {"$imagepolicy": "flux-system:speedtest-tracker:tag"}
             env:
               TZ: America/Los_Angeles
               APP_TIMEZONE: America/Los_Angeles
