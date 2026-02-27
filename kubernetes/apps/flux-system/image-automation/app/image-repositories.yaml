@@ -96,15 +96,6 @@ spec:
   image: ghcr.io/linuxserver/apprise-api
   interval: 6h
 ---
-# Huntarr
-apiVersion: image.toolkit.fluxcd.io/v1
-kind: ImageRepository
-metadata:
-  name: huntarr
-spec:
-  image: docker.io/huntarr/huntarr
-  interval: 6h
----
 # Agregarr
 apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImageRepository
