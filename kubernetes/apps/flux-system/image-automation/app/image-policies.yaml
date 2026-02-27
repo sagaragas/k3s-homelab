@@ -114,18 +114,6 @@ spec:
     semver:
       range: ">=0.1.0"
 ---
-# Huntarr - follow semver
-apiVersion: image.toolkit.fluxcd.io/v1
-kind: ImagePolicy
-metadata:
-  name: huntarr
-spec:
-  imageRepositoryRef:
-    name: huntarr
-  policy:
-    semver:
-      range: ">=0.1.0"
----
 # Agregarr - follow semver
 apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImagePolicy
