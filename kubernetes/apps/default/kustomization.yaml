@@ -26,4 +26,3 @@ resources:
   - ./agregarr/ks.yaml
   - ./optimus/ks.yaml
   - ./portfolio/ks.yaml
-  - ./personal-site/ks.yaml
